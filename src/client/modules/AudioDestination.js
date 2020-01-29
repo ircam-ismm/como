@@ -47,7 +47,7 @@ class AudioDestination extends AudioModule {
 
   _updateVolume(value) {
     const gain = helpers.math.decibelToLinear(value);
-    const now = this.audioContext.currentTime;
+    // const now = this.audioContext.currentTime;
 
     // @todo - this is NOT clean...
     // this.volume.gain.cancelScheduledValues(now);

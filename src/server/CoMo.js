@@ -60,6 +60,7 @@ class CoMo {
 
     this.server.registerService('scripts-audio', serviceScriptingFactory, {
       directory: scriptsAudioDir,
+      defaultScriptValue: fs.readFileSync(path.join(scriptsAudioDir, 'default.js')).toString(),
     });
 
     this.server.registerService('sync', serviceSyncFactory);

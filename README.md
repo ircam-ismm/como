@@ -9,7 +9,7 @@ This library is under heavy developmment
 ## Linked libraries
 
 ```
-npm link @soundworks/service-audio-buffer-loader @soundworks/service-checkin @soundworks/service-file-system @soundworks/service-platform @soundworks/service-sync @soundworks/service-scripting
+npm link @soundworks/service-sync @soundworks/service-scripting
 ```
 
 
