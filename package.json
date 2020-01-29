@@ -30,6 +30,9 @@
     "url": "https://github.com/collective-soundworks/soundworks-services"
   },
   "dependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "@ircam/devicemotion": "^1.2.0",
     "@ircam/ticker": "^1.0.6",
     "@sindresorhus/slugify": "^0.9.1",
