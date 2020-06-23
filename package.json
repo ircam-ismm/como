@@ -41,7 +41,7 @@
     "@soundworks/service-file-system": "0.0.1-alpha.2",
     "@soundworks/service-logger": "0.0.1-alpha.0",
     "@soundworks/service-platform": "0.0.1-alpha.3",
-    "@soundworks/service-scripting": "0.0.1-alpha.1",
+    "@soundworks/service-scripting": "0.0.1-alpha.2",
     "@soundworks/service-sync": "0.0.1-alpha.4",
     "fs-extra": "^8.1.0",
     "lodash.clonedeep": "^4.5.0",

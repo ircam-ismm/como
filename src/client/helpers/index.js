@@ -9,9 +9,6 @@ import linearToDecibel from './math/linearToDecibel.js';
 import powerToDecibel from './math/powerToDecibel.js';
 import scale from './math/scale.js';
 
-// fx
-
-
 // synths
 import BufferPlayer from './synth/BufferPlayer.js';
 
