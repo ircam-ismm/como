@@ -3,7 +3,7 @@ import path from 'path';
 import { promisify } from 'util';
 import JSON5 from 'json5';
 import rimraf from 'rimraf';
-import fse from 'fs-extra';
+import mkdirp from 'mkdirp';
 
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
@@ -46,7 +46,7 @@ const db = {
         }
 
         // create directory if not exists
-        await fse.ensureDir(path.dirname(fullpath));
+        await mkdirp(path.dirname(fullpath));
         // write the file
         const json = JSON5.stringify(data, null, 2);
         await writeFile(fullpath, json, 'utf8');

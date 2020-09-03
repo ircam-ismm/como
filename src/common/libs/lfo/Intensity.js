@@ -1,7 +1,5 @@
-import * as lfo from 'waves-lfo/common';
-
-const BaseLfo = lfo.core.BaseLfo;
-const Delta = lfo.operator.Delta;
+import BaseLfo from './BaseLfo.js';
+import Delta from './Delta.js';
 
 const definitions = {
   feedback: {

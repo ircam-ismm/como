@@ -1,4 +1,4 @@
-import BaseSource from './BaseSource';
+import BaseSource from '../../common/sources/BaseSource';
 
 // @todo - create a SineSource (probably more usefull for testing)
 class RandomValues extends BaseSource {
@@ -38,7 +38,7 @@ class RandomValues extends BaseSource {
   process() {
     // @note - using audio time as a synced clock source is not very accurate
     // on Android phones
-    const syncTime = this.como.experience.services['sync'].getSyncTime();
+    const syncTime = this.como.experience.plugins['sync'].getSyncTime();
     // metas
     this.data.metas[0] = this.streamId;
     this.data.metas[1] = syncTime;

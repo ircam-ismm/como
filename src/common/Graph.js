@@ -1,5 +1,4 @@
 import diffArrays from '../common/diffArrays';
-import moduleList from './modules/module-list';
 
 class Graph {
   /**
@@ -31,7 +30,7 @@ class Graph {
     // register default modules
     // @fixme - this is not usable in real life because of the `Project.createGraph`
     // factory method, this should be fixed
-    moduleList.forEach(ctor => {
+    this.como.modules.forEach(ctor => {
       this.registerModule(ctor);
     });
   }

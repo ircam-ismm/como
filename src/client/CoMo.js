@@ -1,32 +1,27 @@
 // import path from 'path';
-import serviceFileSystemFactory from '@soundworks/service-file-system/client';
-import servicePlatformFactory from '@soundworks/service-platform/client';
-import serviceCheckinFactory from '@soundworks/service-checkin/client';
-import serviceAudioBufferLoaderFactory from '@soundworks/service-audio-buffer-loader/client';
-import serviceSyncFactory from '@soundworks/service-sync/client';
-import serviceScriptingFactory from '@soundworks/service-scripting/client';
-import serviceLoggerFactory from '@soundworks/service-logger/client';
+import pluginFileSystemFactory from '@soundworks/plugin-filesystem/client';
+import pluginPlatformFactory from '@soundworks/plugin-platform/client';
+import pluginCheckinFactory from '@soundworks/plugin-checkin/client';
+import pluginAudioBufferLoaderFactory from '@soundworks/plugin-audio-buffer-loader/client';
+import pluginSyncFactory from '@soundworks/plugin-sync/client';
+import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
+import pluginLoggerFactory from '@soundworks/plugin-logger/client';
 
 import devicemotion from '@ircam/devicemotion';
-// sources
-import DeviceMotion from './sources/DeviceMotion';
-import RandomValues from './sources/RandomValues';
-// import Network from './sources/Network';
-// import Record from './sources/Record';
 
-// import moduleList from './modules/module-list';
-import sourceList from './sources/source-list';
+import modules from './modules/index.js';
+import sources from './sources/index.js';
 
-import Project from './Project';
+import Project from './Project.js';
 
 class CoMo {
   constructor(soundworksClient, audioContext = null) {
     // expose constructors of available sources and nodes
-    this.sources = sourceList;
-    // this.modules = moduleList; // @note - do not expose for now
+    this.sources = sources;
+    this.modules = modules;
 
     // register device motion feature
-    servicePlatformFactory.addFeatureDefinition({
+    pluginPlatformFactory.addFeatureDefinition({
       id: 'devicemotion',
       initialize: async () => {
         const result = await devicemotion.requestPermission();
@@ -40,7 +35,7 @@ class CoMo {
 
     this.client = soundworksClient;
 
-    this.client.registerService('platform', servicePlatformFactory, {
+    this.client.pluginManager.register('platform', pluginPlatformFactory, {
       features: [
         // @note - this syntax is ugly
         ['web-audio', audioContext],
@@ -48,25 +43,25 @@ class CoMo {
       ],
     });
 
-    this.client.registerService('checkin', serviceCheckinFactory);
-    this.client.registerService('file-watcher', serviceFileSystemFactory);
+    this.client.pluginManager.register('checkin', pluginCheckinFactory);
+    this.client.pluginManager.register('file-watcher', pluginFileSystemFactory);
 
 
-    this.client.registerService('scripts-data', serviceScriptingFactory);
-    this.client.registerService('scripts-audio', serviceScriptingFactory);
+    this.client.pluginManager.register('scripts-data', pluginScriptingFactory);
+    this.client.pluginManager.register('scripts-audio', pluginScriptingFactory);
 
-    // maybe have 2 sync services : 1 for audio, 1 for high precision
+    // maybe have 2 sync plugins : 1 for audio, 1 for high precision
     // on androids devices, the resolution of the movement time stamp
     // can be really poor (~80ms on samsung A3)
     //
-    this.client.registerService('sync', serviceSyncFactory, {
+    this.client.pluginManager.register('sync', pluginSyncFactory, {
       getTimeFunction: () => audioContext.currentTime,
     }, ['platform']);
 
-    this.client.registerService('logger', serviceLoggerFactory);
+    this.client.pluginManager.register('logger', pluginLoggerFactory);
 
     // we don't want to block for whatever reason on first screen
-    this.client.registerService('audio-buffer-loader', serviceAudioBufferLoaderFactory, {}, ['platform']);
+    this.client.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {}, ['platform']);
 
     this.audioContext = audioContext;
 
@@ -88,9 +83,9 @@ class CoMo {
 
   configureExperience(experience, enableServices = {}) {
     this.experience = experience;
-    this.experience.services = {};
+    this.experience.plugins = {};
 
-    const services = [
+    const plugins = [
       // 'file-watcher', // we don't need that client-side
       'sync',
       'platform',
@@ -101,22 +96,22 @@ class CoMo {
       'logger',
     ];
 
-    const servicesRequiringAudioContext = [
+    const pluginsRequiringAudioContext = [
       'platform',
       'sync',
     ]
 
-    services.forEach(serviceName => {
-      if (!(serviceName in enableServices) || enableServices[serviceName] === true) {
-        // check service that requires the audioContext
+    plugins.forEach(pluginName => {
+      if (!(pluginName in enableServices) || enableServices[pluginName] === true) {
+        // check plugin that requires the audioContext
         if (
-          servicesRequiringAudioContext.indexOf(serviceName) !== -1
+          pluginsRequiringAudioContext.indexOf(pluginName) !== -1
           && this.audioContext === null
         ) {
-          throw new Error(`service ${serviceName} requires a valid audioContext`);
+          throw new Error(`plugin ${pluginName} requires a valid audioContext`);
         }
 
-        this.experience.services[serviceName] = this.experience.require(serviceName);
+        this.experience.plugins[pluginName] = this.experience.require(pluginName);
       }
     });
   }

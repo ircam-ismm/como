@@ -2,13 +2,13 @@ import path from 'path';
 import { uuid as uuidv4 } from 'uuidv4';
 
 import xmm from 'xmm-node';
-import XmmProcessor from '../client/libs/mano/XmmProcessor';
+import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
 import rapidMixAdapters from 'rapid-mix-adapters';
 
 import db from './utils/db';
-import diffArrays from '../common/diffArrays';
-import Graph from '../client/Graph';
-import BaseSource from '../client/sources/BaseSource';
+import diffArrays from '../common/utils/diffArrays.js';
+import Graph from '../common/Graph.js';
+import BaseSource from '../common/sources/BaseSource.js';
 
 // hardcoded subgraph for pre-processing
 const processingModules = [

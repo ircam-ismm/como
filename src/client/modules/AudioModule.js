@@ -1,4 +1,4 @@
-import BaseModule from './BaseModule.js';
+import BaseModule from '../../common/modules/BaseModule.js';
 
 class AudioModule extends BaseModule {
   constructor(graph, type, id, options) {

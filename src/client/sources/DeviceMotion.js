@@ -1,5 +1,5 @@
 import devicemotion from '@ircam/devicemotion';
-import BaseSource from './BaseSource';
+import BaseSource from '../../common/sources/BaseSource';
 
 class DeviceMotion extends BaseSource {
   constructor(como, streamId = null) {
@@ -42,7 +42,7 @@ class DeviceMotion extends BaseSource {
   }
 
   process(e) {
-    const syncTime = this.como.experience.services['sync'].getSyncTime();
+    const syncTime = this.como.experience.plugins['sync'].getSyncTime();
 
     // metas
     this.data.metas[0] = this.streamId;

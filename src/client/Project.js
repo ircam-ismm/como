@@ -1,6 +1,6 @@
 import Sessions from './Sessions';
 import Players from './Players';
-import Graph from './Graph';
+import Graph from '../common/Graph';
 
 class Project {
   constructor(como) {

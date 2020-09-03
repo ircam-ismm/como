@@ -1,4 +1,4 @@
-import BaseSource from './BaseSource';
+import BaseSource from '../../common/sources/BaseSource';
 
 class Network extends BaseSource {
   constructor(como, streamId) {

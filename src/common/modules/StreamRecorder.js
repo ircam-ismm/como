@@ -16,7 +16,7 @@ class StreamRecorder extends BaseModule {
       if ('streamRecord' in updates) {
         if (updates['streamRecord'] === true) {
           const recordingName = this.options.name;
-          const logger = graph.como.experience.services['logger'];
+          const logger = graph.como.experience.plugins['logger'];
 
           this.writer = await logger.create(recordingName, {
             bufferSize: this.options.bufferSize,

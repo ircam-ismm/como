@@ -8,7 +8,7 @@ class ScriptAudio extends AudioModule {
     options = Object.assign({ scriptName: 'default' }, options);
     super(graph, type, id, options);
 
-    this.scriptService = this.graph.como.experience.services['scripts-audio'];
+    this.scriptService = this.graph.como.experience.plugins['scripts-audio'];
 
     this.script = null;
     this.executeFunction = null;
@@ -32,7 +32,7 @@ class ScriptAudio extends AudioModule {
   updateOptions(options) {
     super.updateOptions(options);
 
-    if (!this.script || (this.options.scriptName !== this.script.name)) {
+    if (!this.script || (this.options.scriptName !== this.script.name)) {
       this.setScript(this.options.scriptName);
     }
   }
@@ -69,7 +69,7 @@ class ScriptAudio extends AudioModule {
         this.outputFrame
       );
 
-      if (!('process' in audioScript) || !('destroy' in audioScript)) {
+      if (!('process' in audioScript) || !('destroy' in audioScript)) {
         throw new Error(`Invalid audioScript "${scriptName}", should implement a \
 "process" method and a "destroy" method`);
       }

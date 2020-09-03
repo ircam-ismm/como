@@ -7,7 +7,7 @@ class ScriptData extends BaseModule {
     options = Object.assign({ scriptName: 'default' }, options);
     super(graph, type, id, options);
 
-    this.scriptService = this.graph.como.experience.services['scripts-data'];
+    this.scriptService = this.graph.como.experience.plugins['scripts-data'];
 
     this.script = null;
     this.executeFunction = null;
@@ -29,7 +29,7 @@ class ScriptData extends BaseModule {
   updateOptions(options) {
     super.updateOptions(options);
 
-    if (!this.script || (this.options.scriptName !== this.script.name)) {
+    if (!this.script || (this.options.scriptName !== this.script.name)) {
       this.setScript(this.options.scriptName);
     }
   }

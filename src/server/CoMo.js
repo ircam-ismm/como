@@ -1,15 +1,17 @@
 import path from 'path';
 import fs from 'fs';
 import serveStatic from 'serve-static';
-import serviceFileSystemFactory from '@soundworks/service-file-system/server';
-import servicePlatformFactory from '@soundworks/service-platform/server';
-import serviceCheckinFactory from '@soundworks/service-checkin/server';
-import serviceAudioBufferLoaderFactory from '@soundworks/service-audio-buffer-loader/server';
-import serviceSyncFactory from '@soundworks/service-sync/server';
-import serviceScriptingFactory from '@soundworks/service-scripting/server';
-import serviceLoggerFactory from '@soundworks/service-logger/server';
+import pluginFileSystemFactory from '@soundworks/plugin-filesystem/server';
+import pluginPlatformFactory from '@soundworks/plugin-platform/server';
+import pluginCheckinFactory from '@soundworks/plugin-checkin/server';
+import pluginAudioBufferLoaderFactory from '@soundworks/plugin-audio-buffer-loader/server';
+import pluginSyncFactory from '@soundworks/plugin-sync/server';
+import pluginScriptingFactory from '@soundworks/plugin-scripting/server';
+import pluginLoggerFactory from '@soundworks/plugin-logger/server';
 
-import Project from './Project';
+import modules from '../common/modules/index.js';
+
+import Project from './Project.js';
 
 
 class CoMo {
@@ -19,54 +21,52 @@ class CoMo {
     this.projectName = projectName;
     this.projectDirectory = path.join(projectsDirectory, projectName);
     this.project = null;
+    this.modules = modules;
 
     this.idClientMap = new Map();
 
-    // register services needed for
-    this.server.registerService('file-watcher', serviceFileSystemFactory, {
+    // register plugins needed for
+    this.server.pluginManager.register('file-watcher', pluginFileSystemFactory, {
       directories: [
         {
           name: 'audio',
           path: path.join(this.projectDirectory, 'audio'),
-          publicDirectory: path.join(this.projectDirectory),
-          watch: true,
+          publicDirectory: 'audio',
         },
         {
           name: 'sessions',
           path: path.join(this.projectDirectory, 'sessions'),
-          publicDirectory: path.join(this.projectDirectory),
-          watch: true,
+          publicDirectory: 'sessions',
         },
         { // for now, we can't create presets dynamically
           name: 'presets',
           path: path.join(this.projectDirectory, 'presets'),
-          publicDirectory: path.join(this.projectDirectory),
-          watch: false,
+          publicDirectory: 'presets',
         }
       ],
     });
 
-    this.server.registerService('logger', serviceLoggerFactory, {
+    this.server.pluginManager.register('logger', pluginLoggerFactory, {
       directory: path.join(this.projectDirectory, 'recordings'),
     });
 
     const scriptsDataDir = path.join(this.projectDirectory, 'scripts/data');
     const scriptsAudioDir = path.join(this.projectDirectory, 'scripts/audio');
 
-    this.server.registerService('scripts-data', serviceScriptingFactory, {
+    this.server.pluginManager.register('scripts-data', pluginScriptingFactory, {
       directory: scriptsDataDir,
       defaultScriptValue: fs.readFileSync(path.join(scriptsDataDir, 'default.js')).toString(),
     });
 
-    this.server.registerService('scripts-audio', serviceScriptingFactory, {
+    this.server.pluginManager.register('scripts-audio', pluginScriptingFactory, {
       directory: scriptsAudioDir,
       defaultScriptValue: fs.readFileSync(path.join(scriptsAudioDir, 'default.js')).toString(),
     });
 
-    this.server.registerService('sync', serviceSyncFactory);
-    this.server.registerService('platform', servicePlatformFactory);
-    this.server.registerService('checkin', serviceCheckinFactory);
-    this.server.registerService('audio-buffer-loader', serviceAudioBufferLoaderFactory);
+    this.server.pluginManager.register('sync', pluginSyncFactory);
+    this.server.pluginManager.register('platform', pluginPlatformFactory);
+    this.server.pluginManager.register('checkin', pluginCheckinFactory);
+    this.server.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory);
   }
 
   get clientTypes() {
@@ -78,13 +78,13 @@ class CoMo {
     // open public route for audio files
     this.server.router.use('audio', serveStatic(path.join(this.projectDirectory, 'audio')));
     // projects needs the file watcher
-    this.fileWatcher = this.server.serviceManager.get('file-watcher');
+    this.fileWatcher = this.server.pluginManager.get('file-watcher');
 
     return Promise.resolve(true);
   }
 
   async start() {
-    // server is started and all services are ready
+    // server is started and all plugins are ready
     this.project = new Project(this);
     await this.project.init();
 
@@ -93,9 +93,9 @@ class CoMo {
 
   configureExperience(experience) {
     this.experience = experience;
-    this.experience.services = {};
+    this.experience.plugins = {};
 
-    const services = [
+    const plugins = [
       'file-watcher',
       'sync',
       'platform',
@@ -106,8 +106,8 @@ class CoMo {
       'logger',
     ];
 
-    services.forEach(serviceName => {
-      this.experience.services[serviceName] = this.experience.require(serviceName);
+    plugins.forEach(pluginName => {
+      this.experience.plugins[pluginName] = this.experience.require(pluginName);
     });
   }
 

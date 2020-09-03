@@ -1,55 +1,49 @@
 {
   "name": "como",
-  "version": "0.0.1",
-  "description": "high-level framework based on soundworks dedicated at creating CoMo applications",
+  "version": "0.1.0",
+  "description": "high-level JS framework based on soundworks dedicated at creating movement based applications",
   "authors": [
     "Benjamin Matuszewski"
   ],
-  "private": true,
   "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -Rf client && rm -Rf server",
-    "deploy": "np --yolo",
-    "doc": "jsdoc -c jsdoc.json",
-    "version": "npm run clean && npm run transpile && npm run doc && git add docs",
-    "transpile:client": "babel src/client --out-dir client",
-    "transpile:server": "babel src/server --out-dir server",
-    "transpile:common": "babel src/common --out-dir common",
-    "transpile": "npm run transpile:server && npm run transpile:client && npm run transpile:common",
-    "watch:client": "chokidar src/client/ -c \"npm run transpile:client\"",
-    "watch:server": "chokidar src/server/ -c \"npm run transpile:server\"",
-    "watch:common": "chokidar src/common/ -c \"npm run transpile:common\"",
-    "watch": "npm run clean && npm run transpile && concurrently \"npm run watch:client\" \"npm run watch:server\" \"npm run watch:common\"",
-    "postinstall": "npm run transpile"
+    "version": "npm run clean && npm run build && npm run doc && git add docs",
+    "build:client": "babel src/client --out-dir client",
+    "build:server": "babel src/server --out-dir server",
+    "build:common": "babel src/common --out-dir common",
+    "build": "npm run build:server && npm run build:client && npm run build:common",
+    "dev:client": "chokidar src/client/ -c \"npm run build:client\"",
+    "dev:server": "chokidar src/server/ -c \"npm run build:server\"",
+    "dev:common": "chokidar src/common/ -c \"npm run build:common\"",
+    "dev": "npm run clean && npm run build &&  (npm run dev:client & npm run dev:server & npm run dev:common)",
+    "postinstall": "npm run build"
   },
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/collective-soundworks/soundworks-services"
+    "url": "https://github.com/ircam-ismm/como"
   },
   "dependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "@ircam/devicemotion": "^1.2.0",
+    "@ircam/parameters": "^1.2.2",
     "@ircam/ticker": "^1.0.6",
-    "@sindresorhus/slugify": "^0.9.1",
-    "@soundworks/service-audio-buffer-loader": "0.0.1-alpha.3",
-    "@soundworks/service-checkin": "0.0.1-alpha.2",
-    "@soundworks/service-file-system": "0.0.1-alpha.2",
-    "@soundworks/service-logger": "0.0.1-alpha.0",
-    "@soundworks/service-platform": "0.0.1-alpha.3",
-    "@soundworks/service-scripting": "0.0.1-alpha.3",
-    "@soundworks/service-sync": "0.0.1-alpha.4",
-    "fs-extra": "^8.1.0",
+    "@sindresorhus/slugify": "^1.1.0",
+    "@soundworks/plugin-audio-buffer-loader": "^1.0.0",
+    "@soundworks/plugin-checkin": "^1.0.1",
+    "@soundworks/plugin-filesystem": "^1.0.0",
+    "@soundworks/plugin-logger": "^1.0.0",
+    "@soundworks/plugin-platform": "^1.0.0",
+    "@soundworks/plugin-scripting": "^1.0.0",
+    "@soundworks/plugin-sync": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
+    "mkdirp": "^1.0.4",
     "rapid-mix-adapters": "github:ircam-rnd/rapid-mix-adapters#v1.2.2",
     "rimraf": "^3.0.0",
     "serve-static": "^1.14.1",
     "uuidv4": "^6.0.0",
-    "waves-lfo": "^1.1.6",
     "xmm-node": "github:ircam-rnd/xmm-node#napi"
   },
   "devDependencies": {
@@ -57,7 +51,6 @@
     "@babel/core": "^7.6.4",
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "chokidar": "^3.2.2",
-    "chokidar-cli": "^2.0.0",
-    "concurrently": "^5.0.0"
+    "chokidar-cli": "^2.0.0"
   }
 }

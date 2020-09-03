@@ -1,4 +1,4 @@
-import { BaseLfo } from 'waves-lfo/core';
+import BaseLfo from './BaseLfo.js';
 
 // port of orientation.cpp Max object
 const abs = Math.abs;

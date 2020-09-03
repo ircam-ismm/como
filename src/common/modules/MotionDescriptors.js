@@ -1,9 +1,17 @@
 import BaseModule from './BaseModule.js';
-import * as lfo from 'waves-lfo/common';
 
-// @note - should be removed at some point
+// @note - should be replaced at some point
 import Intensity from '../libs/lfo/Intensity';
 import Orientation from '../libs/lfo/Orientation';
+import Select from '../libs/lfo/Select';
+import EventIn from '../libs/lfo/EventIn';
+import Clip from '../libs/lfo/Clip';
+import Power from '../libs/lfo/Power';
+import Scale from '../libs/lfo/Scale';
+import Multiplier from '../libs/lfo/Multiplier';
+import Biquad from '../libs/lfo/Biquad';
+import Merger from '../libs/lfo/Merger';
+import Bridge from '../libs/lfo/Bridge';
 
 
 /**
@@ -29,15 +37,15 @@ class MotionDescriptors extends BaseModule {
 
     this.propagate = this.propagate.bind(this);
 
-    this.eventIn = new lfo.source.EventIn({
+    this.eventIn = new EventIn({
       frameType: 'vector',
       frameSize: 9,
       frameRate: 1, // dummy value updated on first received frame
     });
 
-    this.accGyroSelect = new lfo.operator.Select({ indexes: [0, 1, 2, 3, 4, 5] });
-    this.accSelect = new lfo.operator.Select({ indexes: [0, 1, 2] });
-    this.gyroSelect = new lfo.operator.Select({ indexes: [3, 4, 5] });
+    this.accGyroSelect = new Select({ indexes: [0, 1, 2, 3, 4, 5] });
+    this.accSelect = new Select({ indexes: [0, 1, 2] });
+    this.gyroSelect = new Select({ indexes: [3, 4, 5] });
 
     // intensity
     this.intensity = new Intensity({
@@ -45,13 +53,13 @@ class MotionDescriptors extends BaseModule {
       gain: 0.07,
     });
 
-    this.intensityNormSelect = new lfo.operator.Select({ index: 0 });
+    this.intensityNormSelect = new Select({ index: 0 });
 
     // boost
-    this.intensityClip = new lfo.operator.Clip({ min: 0, max: 1 });
-    this.intensityPower = new lfo.operator.Power({ exponent: 0.25 });
-    this.powerClip = new lfo.operator.Clip({ min: 0.15, max: 1 });
-    this.powerScale = new lfo.operator.Scale({
+    this.intensityClip = new Clip({ min: 0, max: 1 });
+    this.intensityPower = new Power({ exponent: 0.25 });
+    this.powerClip = new Clip({ min: 0.15, max: 1 });
+    this.powerScale = new Scale({
       inputMin: 0.15,
       inputMax: 1,
       outputMin: 0,
@@ -59,29 +67,29 @@ class MotionDescriptors extends BaseModule {
     });
 
     // bandpass
-    this.normalizeAcc = new lfo.operator.Multiplier({ factor: 1 / 9.81 });
-    this.bandpass = new lfo.operator.Biquad({
+    this.normalizeAcc = new Multiplier({ factor: 1 / 9.81 });
+    this.bandpass = new Biquad({
       type: 'bandpass',
       q: 1,
       f0: 5,
     });
 
-    this.bandpassGain = new lfo.operator.Multiplier({ factor: 1 });
+    this.bandpassGain = new Multiplier({ factor: 1 });
 
     // orientation filter
     this.orientation = new Orientation();
 
     // gyroscopes scaling
-    this.gyroScale = new lfo.operator.Multiplier({
+    this.gyroScale = new Multiplier({
       factor: [1/1000, 1/1000, 1/1000],
     });
 
     // merge and output
-    this.merger = new lfo.operator.Merger({
+    this.merger = new Merger({
       frameSizes: [1, 1, 3, 3, 3],
     });
 
-    this.bridge = new lfo.sink.Bridge({
+    this.bridge = new Bridge({
       processFrame: this.propagate,
       finalizeStream: this.propagate,
     });
