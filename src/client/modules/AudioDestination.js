@@ -4,6 +4,7 @@ import helpers from '../helpers';
 class AudioDestination extends AudioModule {
   constructor(graph, type, id, options) {
     options = Object.assign({ volume: 0, mute: false, pan: 0 }, options);
+
     super(graph, type, id, options);
 
     const now = this.audioContext.currentTime;
@@ -23,9 +24,8 @@ class AudioDestination extends AudioModule {
 
     this.audioInNode.connect(this.mute);
 
-    // @todo - implement panning
+    // @todo - panning
     // need to do something clean with splitter and merger because of Safari
-    // or assume we use a modern API (so we use a polyfill...)
   }
 
   destroy() {
@@ -41,26 +41,20 @@ class AudioDestination extends AudioModule {
   updateOptions(options) {
     super.updateOptions(options);
 
+    // console.log(this.options);
     this._updateVolume(this.options.volume);
     this._updateMute(this.options.mute);
   }
 
   _updateVolume(value) {
     const gain = helpers.math.decibelToLinear(value);
-    // const now = this.audioContext.currentTime;
+    const now = this.audioContext.currentTime;
 
-    // @todo - this is NOT clean...
-    // this.volume.gain.cancelScheduledValues(now);
-    // this.volume.gain.setValueAtTime(this.currentVolume, now);
-    // this.volume.gain.linearRampToValueAtTime(gain, now + 0.005);
-
-    // @note - // this is NOT clean neither... this is f****** insane...
-    // this.volume.gain.cancelAndHoldAtTime(now);
-    // this.volume.gain.linearRampToValueAtTime(gain, now + 0.01);
-    // this.currentVolume = gain;
-
-    // ok... this is the most clean at least on Android (to be tested on iOS)
-    this.volume.gain.value = gain;
+    // compared to linearRampToValueAtTime and cancelAndHoldValue
+    // this is the most clean (at least on Android, to be tested on iOS)
+    // @todo - test on every platform
+    this.volume.gain.cancelScheduledValues(now);
+    this.volume.gain.setTargetAtTime(gain, now, 0.001);
   }
 
   _updateMute(value) {
@@ -69,8 +63,9 @@ class AudioDestination extends AudioModule {
 
     // this is clean
     this.mute.gain.cancelScheduledValues(now);
-    this.mute.gain.setValueAtTime(1 - gain, now);
-    this.mute.gain.linearRampToValueAtTime(gain, now + 0.005);
+    this.volume.gain.setTargetAtTime(gain, now, 0.005);
+    // this.mute.gain.setValueAtTime(1 - gain, now);
+    // this.mute.gain.linearRampToValueAtTime(gain, now + 0.005);
   }
 
 }

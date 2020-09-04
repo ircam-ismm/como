@@ -1,6 +1,6 @@
 import diffArrays from '../common/diffArrays.js';
 
-// we should maybe ahve a parent StateDecorator class
+// we should maybe have a parent StateDecorator class
 class Session {
   constructor(como, sessionState) {
     this.como = como;

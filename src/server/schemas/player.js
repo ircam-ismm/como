@@ -32,7 +32,7 @@ export default {
     default: false,
   },
 
-  // @todo - this has to be rethinked and refactored
+  // @todo - this has to be rethinked and refactored (ok but why ?)
   recordingState: {
     type: 'enum',
     list: ['idle', 'armed', 'recording', 'pending', 'confirm', 'cancel'],
@@ -62,7 +62,10 @@ export default {
     default: false,
   },
 
-  //
+  // @note - this works (quite simply) as an event but it's not clean,
+  // we need a real state to ensure views are kept synchronized
+  // we should be close from 'graph' format to simplify overrides in one way
+  // or the other
   graphOptionsOverrides: {
     type: 'any',
     event: true,

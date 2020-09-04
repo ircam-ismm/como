@@ -17,10 +17,6 @@ const processingModules = [
     type: 'Input',
   },
   {
-    id: 'example-recorder',
-    type: 'ExampleRecorder',
-  },
-  {
     id: 'motion-descriptors',
     type: 'MotionDescriptors',
     options: {
@@ -32,7 +28,7 @@ const processingModules = [
     type: 'Merge',
   },
   {
-    id: 'script-descriptors',
+    id: 'script-select-descriptors',
     type: 'ScriptData',
     options: {
       scriptName: 'default-ml-descriptors',
@@ -44,7 +40,7 @@ const processingConnections = [
   [ 'input', 'merge-descriptors' ],
   [ 'input', 'motion-descriptors' ],
   [ 'motion-descriptors', 'merge-descriptors' ],
-  [ 'merge-descriptors', 'script-descriptors' ],
+  [ 'merge-descriptors', 'script-select-descriptors' ],
 ];
 
 // this will be usefull client-side to plot recorded examples
@@ -274,7 +270,7 @@ class Session {
       const bufferDest = new DestBuffer();
 
       this.graph.setSource(offlineSource);
-      this.graph.modules['script-descriptors'].connect(bufferDest);
+      this.graph.modules['script-select-descriptors'].connect(bufferDest);
 
       offlineSource.run(); // @important - everything must be synchronous here...
 
@@ -291,7 +287,7 @@ class Session {
       // add to processed examples
       processedExamples.payload.data.push(processedExample);
 
-      this.graph.modules['script-descriptors'].disconnect();
+      this.graph.modules['script-select-descriptors'].disconnect();
       this.graph.removeSource(offlineSource);
     }
 

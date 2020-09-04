@@ -20,12 +20,21 @@ class Graph {
       for (let name in updates) {
         switch (name) {
           case 'graph': {
-            this.updateGraphOptions();
+            this._updateGraphOptions(updates);
             break;
           }
         }
       }
     });
+
+    if (this.player) {
+      this.player.subscribe(updates => {
+        if ('graphOptionsOverrides' in updates) {
+          const overrides = updates.graphOptionsOverrides;
+          this._overrideGraphOptions(overrides);
+        }
+      });
+    }
 
     // register default modules
     // @fixme - this is not usable in real life because of the `Project.createGraph`
@@ -121,11 +130,7 @@ class Graph {
     this.sources.delete(source);
   }
 
-  /**
-   * @note - For now, we only allow to change the options of existing nodes
-   * but we can't change the topology of the graph.
-   */
-  updateGraphOptions() {
+  _updateGraphOptions() {
     const { modules } = this.session.get('graph');
 
     modules.forEach(description => {
@@ -135,8 +140,14 @@ class Graph {
     });
   }
 
-  // fadeOut(duration = 3, callback) {}
-  // fadeIn(duration = 3) {}
+  // use `player.graphOptionsOverrides` to override graph options at player level
+  _overrideGraphOptions(overrides) {
+    for (let id in overrides) {
+      const options = overrides[id];
+      const module = this.modules[id];
+      module.updateOptions(options);
+    }
+  }
 }
 
 export default Graph;
