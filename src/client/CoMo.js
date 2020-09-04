@@ -61,7 +61,9 @@ class CoMo {
     this.client.pluginManager.register('logger', pluginLoggerFactory);
 
     // we don't want to block for whatever reason on first screen
-    this.client.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {}, ['platform']);
+    this.client.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {
+      assetsDomain: this.client.config.env.assetsDomain,
+    }, ['platform']);
 
     this.audioContext = audioContext;
 
