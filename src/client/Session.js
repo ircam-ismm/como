@@ -1,4 +1,4 @@
-import diffArrays from '../common/diffArrays.js';
+import diffArrays from '../common/utils/diffArrays.js';
 
 // we should maybe have a parent StateDecorator class
 class Session {

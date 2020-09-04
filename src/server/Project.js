@@ -6,7 +6,7 @@ import slugify from '@sindresorhus/slugify';
 
 import Session from './Session';
 import db from './utils/db';
-import diffArrays from '../common/diffArrays';
+import diffArrays from '../common/utils/diffArrays';
 
 import projectSchema from './schemas/project.js';
 import sessionSchema from './schemas/session.js';

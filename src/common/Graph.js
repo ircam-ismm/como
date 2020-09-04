@@ -1,4 +1,4 @@
-import diffArrays from '../common/diffArrays';
+import diffArrays from '../common/utils/diffArrays';
 
 class Graph {
   /**

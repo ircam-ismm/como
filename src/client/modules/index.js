@@ -1,4 +1,4 @@
-import modules from '../../common/modules/module-list.js';
+import modules from '../../common/modules/index.js';
 
 import AudioDestination from './AudioDestination.js';
 import ScriptAudio from './ScriptAudio.js';
