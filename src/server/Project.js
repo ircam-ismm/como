@@ -83,6 +83,12 @@ class Project {
 
               if (sessionId !== null) {
                 const session = this.sessions.get(sessionId);
+
+                if (!session) {
+                  console.warn(`[como] required session "${sessionId}" does not exists`);
+                  playerState.set({ sessionId: null });
+                  return;
+                }
                 // pick a default label for the new player
                 // @todo - this should be updated on any `audioFiles.label` update
                 const defaultLabel = session.state.get('audioFiles')
