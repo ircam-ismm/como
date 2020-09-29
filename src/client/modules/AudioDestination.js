@@ -61,11 +61,8 @@ class AudioDestination extends AudioModule {
     const gain = value ? 0 : 1;
     const now = this.audioContext.currentTime;
 
-    // this is clean
     this.mute.gain.cancelScheduledValues(now);
-    this.volume.gain.setTargetAtTime(gain, now, 0.005);
-    // this.mute.gain.setValueAtTime(1 - gain, now);
-    // this.mute.gain.linearRampToValueAtTime(gain, now + 0.005);
+    this.mute.gain.setTargetAtTime(gain, now, 0.005);
   }
 
 }
