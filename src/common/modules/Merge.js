@@ -63,23 +63,27 @@ class Merge extends BaseModule {
         const inputData = this.stack[i].data;
 
         for (let name in inputData) {
-          const isArray = Array.isArray(inputData[name]);
-          // inititialize `outputData[name]`  entry if not exists
-          // @note - differenciate arrays and objects may be overkill,
-          // but could be interesting later for mapping scripts -> TBC
-          if (!(name in outputData)) {
-            outputData[name] = isArray ? [] : {};
-          }
+          // handle arrays
+          if (Array.isArray(inputData[name])) {
+            if (!outputData[name]) {
+              outputData[name] = [];
+            }
 
-          // copy values from `inputData[name]` into `outputData[name]`
-          if (isArray) {
             for (let i = 0; i < inputData[name].length; i++) {
               outputData[name][i] = inputData[name][i];
             }
-          } else {
+          // handle objects
+          } else if (Object.prototype.toString.call(inputData[name]) === '[object Object]') {
+            if (!outputData[name]) {
+              outputData[name] = {};
+            }
+
             for (let key in inputData[name]) {
               outputData[name][key] = inputData[name][key];
             }
+          // consider everything else as a scalar
+          } else {
+            outputData[name] = inputData[name];
           }
         }
       }
