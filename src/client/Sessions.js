@@ -42,8 +42,13 @@ class Sessions {
    */
   getStateId(sessionId) {
     const sessionsOverview = this.como.project.get('sessionsOverview');
-    const stateId = sessionsOverview.find(s => s.id === sessionId).stateId;
-    return stateId;
+    const overview = sessionsOverview.find(s => s.id === sessionId);
+
+    if (overview) {
+      return overview.stateId;
+    } else {
+      return null;
+    }
   }
 }
 

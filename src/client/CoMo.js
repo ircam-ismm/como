@@ -55,7 +55,8 @@ class CoMo {
     // can be really poor (~80ms on samsung A3)
     //
     this.client.pluginManager.register('sync', pluginSyncFactory, {
-      getTimeFunction: () => audioContext.currentTime,
+      // getTimeFunction: () => audioContext.currentTime,
+      getTimeFunction: () => Date.now() / 1000,
     }, ['platform']);
 
     this.client.pluginManager.register('logger', pluginLoggerFactory);

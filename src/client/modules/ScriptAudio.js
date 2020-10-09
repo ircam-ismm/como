@@ -64,8 +64,8 @@ class ScriptAudio extends AudioModule {
       const audioScript = this.script.execute(
         this.graph,
         helpers,
-        this.audioInNode,
-        this.audioOutNode,
+        this.passThroughInNode,
+        this.passThroughOutNode,
         this.outputFrame
       );
 
