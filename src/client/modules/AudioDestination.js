@@ -7,25 +7,19 @@ class AudioDestination extends AudioModule {
 
     super(graph, type, id, options);
 
-    const now = this.audioContext.currentTime;
-    const volumeGain = helpers.math.decibelToLinear(options.volume);
-    const muteGain = options.mute ? 0 : 1;
+    // const now = this.audioContext.currentTime;
+    // const volumeGain = helpers.math.decibelToLinear(options.volume);
+    // const muteGain = options.mute ? 0 : 1;
 
-    this.volume = this.audioContext.createGain();
-    this.volume.connect(this.graph.como.audioMaster);
-    this.volume.gain.value = volumeGain;
-    // this.volume.gain.setValueAtTime(volumeGain, now);
-    // this.currentVolume = volumeGain;
-
-    this.mute = this.audioContext.createGain();
+    this.audioOutNode.connect(this.graph.como.audioMaster);
+    // recycle existing passThroughIn and passThroughOut nodes
+    // @todo - panning, use splitter and merger for Safari
+    this.mute = this.passThroughInNode;
+    this.volume = this.passThroughOutNode;
     this.mute.connect(this.volume);
-    this.mute.gain.value = muteGain;
-    this.mute.gain.setValueAtTime(muteGain, now);
 
-    this.audioInNode.connect(this.mute);
-
-    // @todo - panning
-    // need to do something clean with splitter and merger because of Safari
+    this._updateVolume(this.options.volume);
+    this._updateMute(this.options.mute);
   }
 
   destroy() {
@@ -39,9 +33,9 @@ class AudioDestination extends AudioModule {
   }
 
   updateOptions(options) {
-    super.updateOptions(options);
+    // do not call super to prevent default `AudioModule` bypass behavior
+    this.options = Object.assign(this.options, options);
 
-    // console.log(this.options);
     this._updateVolume(this.options.volume);
     this._updateMute(this.options.mute);
   }
@@ -50,9 +44,6 @@ class AudioDestination extends AudioModule {
     const gain = helpers.math.decibelToLinear(value);
     const now = this.audioContext.currentTime;
 
-    // compared to linearRampToValueAtTime and cancelAndHoldValue
-    // this is the most clean (at least on Android, to be tested on iOS)
-    // @todo - test on every platform
     this.volume.gain.cancelScheduledValues(now);
     this.volume.gain.setTargetAtTime(gain, now, 0.001);
   }
