@@ -1,5 +1,4 @@
 import BaseModule from './BaseModule';
-import cloneDeep from 'lodash.clonedeep';
 
 class Logger extends BaseModule {
   execute(inputFrame) {

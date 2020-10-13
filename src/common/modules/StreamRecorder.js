@@ -38,7 +38,7 @@ class StreamRecorder extends BaseModule {
 
   // @note - deadend
   process(inputFrame) {
-    if (this.writer) {
+    if (this.writer !== null) {
       const clone = clonedeep(inputFrame.data);
       this.writer.write(clone);
     }

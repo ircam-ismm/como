@@ -2,6 +2,7 @@ import Input from './Input.js';
 import InputResampler from './InputResampler.js';
 
 import ExampleRecorder from './ExampleRecorder.js';
+import Bridge from './Bridge.js';
 import Logger from './Logger.js';
 import Merge from './Merge.js';
 import MLDecoder from './MLDecoder.js';
@@ -15,6 +16,7 @@ export default [
   InputResampler,
 
   ExampleRecorder,
+  Bridge,
   Logger,
   Merge,
   MLDecoder,

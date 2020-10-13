@@ -56,7 +56,7 @@ class CoMo {
     //
     this.client.pluginManager.register('sync', pluginSyncFactory, {
       // getTimeFunction: () => audioContext.currentTime,
-      getTimeFunction: () => Date.now() / 1000,
+      getTimeFunction: () => performance.now() / 1000,
     }, ['platform']);
 
     this.client.pluginManager.register('logger', pluginLoggerFactory);

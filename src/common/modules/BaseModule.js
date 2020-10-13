@@ -59,8 +59,6 @@ class BaseModule {
    */
   execute(inputFrame) {}
 
-  // @note - probably a problem with the resampler as its async
-  // or we can consider the resampler is itself a source
   process(inputFrame) {
     this.outputFrame = this.execute(inputFrame);
     this.propagate(this.outputFrame);

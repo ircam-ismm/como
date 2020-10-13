@@ -42,30 +42,24 @@ class ScriptData extends BaseModule {
 
     this.script = await this.scriptService.attach(scriptName);
 
-    this.script.subscribe(() => {
-      try {
+    this.script.subscribe((updates) => {
+      if (!updates.error) {
         this.executeFunction = this.script.execute(this.graph, helpers, this.outputFrame);
-      } catch(err) {
-        console.log(err);
       }
     });
 
     this.script.onDetach(() => this.executeFunction = null);
 
-    // init script
-    try {
-      this.executeFunction = this.script.execute(this.graph, helpers, this.outputFrame);
-    } catch(err) {
-      console.log(err);
-    }
+    this.executeFunction = this.script.execute(this.graph, helpers, this.outputFrame);
   }
 
   // @todo - define what should happen when the script is deleted
   execute(inputFrame) {
     if (this.executeFunction) {
       this.outputFrame = this.executeFunction(inputFrame, this.outputFrame);
-      return this.outputFrame;
     }
+
+    return this.outputFrame;
   }
 }
 

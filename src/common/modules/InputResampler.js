@@ -28,7 +28,9 @@ class InputResampler extends BaseModule {
   }
 
   destroy() {
-    this.ticker.stop();
+    if (this.ticker !== null) {
+      this.ticker.stop();
+    }
   }
 
   process(inputFrame) {

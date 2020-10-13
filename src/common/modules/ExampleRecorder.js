@@ -88,6 +88,7 @@ class ExampleRecorder extends BaseModule {
       for (let name in inputData) {
         copy[name] = [];
 
+        // @todo - handle objects, arrays, scalar
         for (let i = 0; i < inputData[name].length; i++) {
           copy[name][i] = inputData[name][i];
         }

@@ -3,9 +3,10 @@ class MovingMedian {
   constructor(order = 5, initValue = 0) {
     this.order = order;
     this.stack = [];
+    this.orderedStack = [];
     this.index = 0;
 
-    // fill stack with zeros
+    // fill stack with initValue
     for (let i = 0; i < this.order; i++) {
       this.stack[i] = initValue;
     }
@@ -15,25 +16,26 @@ class MovingMedian {
     this.stack[this.index] = value;
     this.index = (this.index + 1) % this.order;
 
-    const orderedStack = this.stack.sort(function(a, b){return a - b}); 
-	  const median = 0;
-	
-	  if (order > 1) {
-		  if (order % 2) {
-    		median = orderedStack[(order - 1) / 2];  //odd order
+    for (let i = 0; i < this.order; i++) {
+      this.orderedStack[i] = this.stack[i];
+    }
 
-		  } else {
-			median = (orderedStack[(order / 2) - 1] + orderedStack[order  / 2]) / 2;  //even order
-  		}
-		
-	  } else {
-		median = value;
-	}
+    this.orderedStack.sort((a, b) => a - b);
 
-	return median;
+    let median = 0;
+
+    if (this.order > 1) {
+      if (this.order % 2 === 1) { // odd order
+        median = this.orderedStack[(this.order - 1) / 2];
+      } else { // even order
+        median = (this.orderedStack[(this.order / 2) - 1] + this.orderedStack[this.order  / 2]) / 2;
+      }
+    } else {
+      median = value;
+    }
+
+    return median;
   }
 }
 
 export default MovingMedian;
-
-
