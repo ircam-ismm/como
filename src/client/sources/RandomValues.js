@@ -11,9 +11,9 @@ class RandomValues extends BaseSource {
 
     this.buffer = new Float32Array(9);
     this.data = {
-      metas: [],
-      accelerationIncludingGravity: [],
-      rotationRate: [],
+      metas: {},
+      accelerationIncludingGravity: {},
+      rotationRate: {},
     };
 
     this.intervalId = null;
@@ -40,17 +40,17 @@ class RandomValues extends BaseSource {
     // on Android phones
     const syncTime = this.como.experience.plugins['sync'].getSyncTime();
     // metas
-    this.data.metas[0] = this.streamId;
-    this.data.metas[1] = syncTime;
-    this.data.metas[2] = this.period;
+    this.data.metas.id = this.streamId;
+    this.data.metas.time = syncTime;
+    this.data.metas.period = this.period;
     // acceleration
-    this.data.accelerationIncludingGravity[0] = Math.random();
-    this.data.accelerationIncludingGravity[1] = Math.random();
-    this.data.accelerationIncludingGravity[2] = Math.random();
+    this.data.accelerationIncludingGravity.x = Math.random();
+    this.data.accelerationIncludingGravity.y = Math.random();
+    this.data.accelerationIncludingGravity.z = Math.random();
     // rotation
-    this.data.rotationRate[0] = Math.random();
-    this.data.rotationRate[1] = Math.random();
-    this.data.rotationRate[2] = Math.random();
+    this.data.rotationRate.alpha = Math.random();
+    this.data.rotationRate.beta = Math.random();
+    this.data.rotationRate.gamma = Math.random();
 
     this.emit(this.data);
   }

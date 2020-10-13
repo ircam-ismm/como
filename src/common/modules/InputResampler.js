@@ -36,17 +36,47 @@ class InputResampler extends BaseModule {
   process(inputFrame) {
     // copy inputFrame.data as the source may reuse the same instance
     const frameData = {};
+    const inputData = inputFrame.data;
 
-    for (let name in inputFrame.data) {
-      frameData[name] = [];
+    for (let name in inputData) {
+      // ---------------------------------------
+      // handle arrays
+      if (Array.isArray(inputData[name])) {
+        frameData[name] = [];
 
-      for (let i = 0; i < inputFrame.data[name].length; i++) {
-        frameData[name][i] = inputFrame.data[name][i];
-      }
+        for (let i = 0; i < inputData[name].length; i++) {
+          frameData[name][i] = inputData[name][i];
+        }
 
-      // create `outputFrame.data[name]` array instance with proper length
-      if (!(name in this.outputFrame.data)) {
-        this.outputFrame.data[name] = new Array(inputFrame.data[name].length);
+        // create `outputFrame.data[name]` array instance with proper length
+        if (!(name in this.outputFrame.data)) {
+          this.outputFrame.data[name] = new Array(inputData[name].length);
+        }
+      // ---------------------------------------
+      // handle objects
+      } else if (Object.prototype.toString.call(inputData[name]) === '[object Object]') {
+        frameData[name] = {};
+
+        for (let key in inputData[name]) {
+          frameData[name][key] = inputData[name][key];
+        }
+
+        // create `outputFrame.data[name]` array instance with proper length
+        if (!(name in this.outputFrame.data)) {
+          this.outputFrame.data[name] = {};
+
+          for (let key in inputData[name]) {
+            this.outputFrame.data[name][key] = 0; // do we assume a source can only produce numbers ?
+          }
+        }
+      // ---------------------------------------
+      // handle scalar
+      } else {
+        frameData[name] = inputData[name];
+
+        if (!(name in this.outputFrame.data)) {
+          this.outputFrame.data[name] = 0;
+        }
       }
     }
 
@@ -70,29 +100,63 @@ class InputResampler extends BaseModule {
       const outputData = this.outputFrame.data;
 
       for (let name in outputData) {
-        const entryLength = outputData[name].length;
-        // reset
-        for (let i = 0; i < entryLength; i++) {
-          outputData[name][i] = 0;
-        }
-
-        // sums
-        for (let i = 0; i < this.bufferedFrameIndex; i++) {
-          // console.log(this.stack[i][name]);
-          for (let j = 0; j < entryLength; j++) {
-            outputData[name][j] += this.stack[i][name][j];
+        if (Array.isArray(outputData[name])) {
+          const entryLength = outputData[name].length;
+          // reset
+          for (let i = 0; i < entryLength; i++) {
+            outputData[name][i] = 0;
           }
-        }
 
-        // mean
-        for (let i = 0; i < entryLength; i++) {
-          outputData[name][i] /= this.bufferedFrameIndex;
+          // sums
+          for (let i = 0; i < this.bufferedFrameIndex; i++) {
+            // console.log(this.stack[i][name]);
+            for (let j = 0; j < entryLength; j++) {
+              outputData[name][j] += this.stack[i][name][j];
+            }
+          }
+
+          // mean
+          for (let i = 0; i < entryLength; i++) {
+            outputData[name][i] /= this.bufferedFrameIndex;
+          }
+        } else if (Object.prototype.toString.call(outputData[name]) === '[object Object]') {
+          // reset
+          for (let key in outputData[name]) {
+            outputData[name][key] = 0;
+          }
+
+          // sum
+          for (let i = 0; i < this.bufferedFrameIndex; i++) {
+            // console.log(this.stack[i][name]);
+            for (let key in outputData[name]) {
+              outputData[name][key] += this.stack[i][name][key];
+            }
+          }
+
+          // mean
+          for (let key in outputData[name]) {
+            outputData[name][key] /= this.bufferedFrameIndex;
+          }
+        } else {
+          // reset
+          outputData[name] = 0;
+
+          // sum
+          for (let i = 0; i < this.bufferedFrameIndex; i++) {
+            outputData[name] += this.stack[i][name];
+          }
+          // mean
+          outputData[name] /= this.bufferedFrameIndex;
         }
       }
 
-      // override sourceId and period
-      outputData.metas[0] = this.stack[0].metas[0];
-      outputData.metas[2] = this.options.resamplingPeriod;
+      // override metas
+      // @note - confirm we really want to override the time
+      if (this.stack[0].metas) { // mainly for testing purposes...
+        outputData.metas.id = this.stack[0].metas.id;
+        outputData.metas.time = this.graph.como.experience.plugins['sync'].getSyncTime();
+        outputData.metas.period = this.options.resamplingPeriod;
+      }
 
       this.bufferedFrameIndex = 0;
 

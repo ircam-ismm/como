@@ -8,16 +8,10 @@ class Bridge extends BaseModule {
     this._listeners = new Set();
   }
 
-  addListener(callback) {
+  subscribe(callback) {
     this._listeners.add(callback);
-  }
 
-  removeListener(callback = null) {
-    if (callback === null) {
-      this._listeners.clear();
-    } else {
-      this._listeners.delete(callback);
-    }
+    return () => this._listeners.delete(callback);
   }
 
   execute(inputFrame) {

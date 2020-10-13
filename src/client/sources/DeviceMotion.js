@@ -17,9 +17,9 @@ class DeviceMotion extends BaseSource {
     this.streamId = streamId;
 
     this.data = {
-      metas: [],
-      accelerationIncludingGravity: [],
-      rotationRate: [],
+      metas: {},
+      accelerationIncludingGravity: {},
+      rotationRate: {},
     };
 
     this.process = this.process.bind(this);
@@ -45,17 +45,17 @@ class DeviceMotion extends BaseSource {
     const syncTime = this.como.experience.plugins['sync'].getSyncTime();
 
     // metas
-    this.data.metas[0] = this.streamId;
-    this.data.metas[1] = syncTime;
-    this.data.metas[2] = e.interval / 1000;
+    this.data.metas.clientId = this.streamId;
+    this.data.metas.time = syncTime;
+    this.data.metas.period = e.interval / 1000;
     // acceleration
-    this.data.accelerationIncludingGravity[0] = e.accelerationIncludingGravity.x;
-    this.data.accelerationIncludingGravity[1] = e.accelerationIncludingGravity.y;
-    this.data.accelerationIncludingGravity[2] = e.accelerationIncludingGravity.z;
+    this.data.accelerationIncludingGravity.x = e.accelerationIncludingGravity.x;
+    this.data.accelerationIncludingGravity.y = e.accelerationIncludingGravity.y;
+    this.data.accelerationIncludingGravity.z = e.accelerationIncludingGravity.z;
     // rotation
-    this.data.rotationRate[0] = e.rotationRate.alpha;
-    this.data.rotationRate[1] = e.rotationRate.beta;
-    this.data.rotationRate[2] = e.rotationRate.gamma;
+    this.data.rotationRate.alpha = e.rotationRate.alpha;
+    this.data.rotationRate.beta = e.rotationRate.beta;
+    this.data.rotationRate.gamma = e.rotationRate.gamma;
 
     this.emit(this.data);
   }

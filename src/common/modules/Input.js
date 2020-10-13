@@ -8,14 +8,30 @@ class Input extends BaseModule {
   }
 
   // format raw data to `frame` format to propagate into graph.
-  execute(data) {
-    for (let name in data) {
-      if (!(name in this.outputFrame.data)) {
-        this.outputFrame.data[name] = [];
-      }
+  execute(inputData) {
+    const outputData = this.outputFrame.data;
 
-      for (let i = 0; i < data[name].length; i++) {
-        this.outputFrame.data[name][i] = data[name][i];
+    for (let name in inputData) {
+      if (Array.isArray(inputData[name])) {
+        if (!outputData[name]) {
+          outputData[name] = [];
+        }
+
+        for (let i = 0; i < inputData[name].length; i++) {
+          outputData[name][i] = inputData[name][i];
+        }
+      // handle objects
+      } else if (Object.prototype.toString.call(inputData[name]) === '[object Object]') {
+        if (!outputData[name]) {
+          outputData[name] = {};
+        }
+
+        for (let key in inputData[name]) {
+          outputData[name][key] = inputData[name][key];
+        }
+      // consider everything else as a scalar
+      } else {
+        outputData[name] = inputData[name];
       }
     }
 

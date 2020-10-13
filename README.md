@@ -23,3 +23,9 @@ __This library is under heavy developmment__
 - review script nodes to allow generation of controls GUIs
 - add preset format check
 
+Frames structure
+
+frame[module.id] = [...],
+frame[module.id] = { ... },
+frame[module.id] = Number|String,
+
