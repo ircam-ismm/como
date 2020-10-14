@@ -1,5 +1,5 @@
-import BaseModule from './BaseModule';
-
+import BaseModule from './BaseModule.js';
+import { copyFrameData } from './helpers.js';
 /**
  * Merge two stream without making assumptions on how to merge them
  * outputs only when all stream have been received at least once, if a stream
@@ -62,30 +62,7 @@ class Merge extends BaseModule {
       for (let i = 0; i < this.inputIds.length; i++) {
         const inputData = this.stack[i].data;
 
-        for (let name in inputData) {
-          // handle arrays
-          if (Array.isArray(inputData[name])) {
-            if (!outputData[name]) {
-              outputData[name] = [];
-            }
-
-            for (let i = 0; i < inputData[name].length; i++) {
-              outputData[name][i] = inputData[name][i];
-            }
-          // handle objects
-          } else if (Object.prototype.toString.call(inputData[name]) === '[object Object]') {
-            if (!outputData[name]) {
-              outputData[name] = {};
-            }
-
-            for (let key in inputData[name]) {
-              outputData[name][key] = inputData[name][key];
-            }
-          // consider everything else as a scalar
-          } else {
-            outputData[name] = inputData[name];
-          }
-        }
+        copyFrameData(inputData, outputData);
       }
 
       super.propagate(this.outputFrame);

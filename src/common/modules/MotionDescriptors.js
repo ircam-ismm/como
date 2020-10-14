@@ -30,10 +30,11 @@ class MotionDescriptors extends BaseModule {
 
     super(graph, type, id, options);
 
-    this.outputFrame.data.intensity = [];
-    this.outputFrame.data.accelerationBandpass5hz = [];
-    this.outputFrame.data.orientation = [];
-    this.outputFrame.data.rotationRateMs = [];
+    // @todo - review intensity naming
+    this.outputFrame.data.intensity = { high: 0, low: 0 };
+    this.outputFrame.data.accelerationBandpass5hz = { x: 0, y: 0, z: 0 };
+    this.outputFrame.data.orientation = { x: 0, y: 0, z: 0 };
+    this.outputFrame.data.rotationRateMs = { alpha: 0, beta: 0, gamma: 0 };
 
     this.propagate = this.propagate.bind(this);
 
@@ -137,13 +138,12 @@ class MotionDescriptors extends BaseModule {
       data: [],
     };
 
-    for (let i = 0; i < inputFrame.data['accelerationIncludingGravity'].length; i++) {
-      lfoFrame.data[i] = inputFrame.data['accelerationIncludingGravity'][i];
-    }
-
-    for (let i = 0; i < inputFrame.data['rotationRate'].length; i++) {
-      lfoFrame.data[i + 3] = inputFrame.data['rotationRate'][i];
-    }
+    lfoFrame.data[0] = inputFrame.data.accelerationIncludingGravity.x;
+    lfoFrame.data[1] = inputFrame.data.accelerationIncludingGravity.y;
+    lfoFrame.data[2] = inputFrame.data.accelerationIncludingGravity.z;
+    lfoFrame.data[3] = inputFrame.data.rotationRate.alpha;
+    lfoFrame.data[4] = inputFrame.data.rotationRate.beta;
+    lfoFrame.data[5] = inputFrame.data.rotationRate.gamma;
 
     this.outputFrame.data.metas = inputFrame.data.metas;
     // pipe to lfo graph
@@ -151,20 +151,20 @@ class MotionDescriptors extends BaseModule {
   }
 
   propagate(lfoFrame) {
-    this.outputFrame.data.intensity[0] = lfoFrame.data[0];
-    this.outputFrame.data.intensity[1] = lfoFrame.data[1];
+    this.outputFrame.data.intensity.high = lfoFrame.data[0];
+    this.outputFrame.data.intensity.low = lfoFrame.data[1];
 
-    this.outputFrame.data.accelerationBandpass5hz[0] = lfoFrame.data[2];
-    this.outputFrame.data.accelerationBandpass5hz[1] = lfoFrame.data[3];
-    this.outputFrame.data.accelerationBandpass5hz[2] = lfoFrame.data[4];
+    this.outputFrame.data.accelerationBandpass5hz.x = lfoFrame.data[2];
+    this.outputFrame.data.accelerationBandpass5hz.y = lfoFrame.data[3];
+    this.outputFrame.data.accelerationBandpass5hz.z = lfoFrame.data[4];
 
-    this.outputFrame.data.orientation[0] = lfoFrame.data[5];
-    this.outputFrame.data.orientation[1] = lfoFrame.data[6];
-    this.outputFrame.data.orientation[2] = lfoFrame.data[7];
+    this.outputFrame.data.orientation.x = lfoFrame.data[5];
+    this.outputFrame.data.orientation.y = lfoFrame.data[6];
+    this.outputFrame.data.orientation.z = lfoFrame.data[7];
 
-    this.outputFrame.data.rotationRateMs[0] = lfoFrame.data[8];
-    this.outputFrame.data.rotationRateMs[1] = lfoFrame.data[9];
-    this.outputFrame.data.rotationRateMs[2] = lfoFrame.data[10];
+    this.outputFrame.data.rotationRateMs.alpha = lfoFrame.data[8];
+    this.outputFrame.data.rotationRateMs.beta = lfoFrame.data[9];
+    this.outputFrame.data.rotationRateMs.gamma = lfoFrame.data[10];
 
     super.propagate(this.outputFrame);
   }

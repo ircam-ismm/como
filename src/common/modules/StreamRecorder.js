@@ -1,5 +1,5 @@
 import BaseModule from './BaseModule';
-import clonedeep from 'lodash.clonedeep';
+import { copyFrameData } from './helpers';
 
 class StreamRecorder extends BaseModule {
   constructor(graph, type, id, options) {
@@ -39,8 +39,9 @@ class StreamRecorder extends BaseModule {
   // @note - deadend
   process(inputFrame) {
     if (this.writer !== null) {
-      const clone = clonedeep(inputFrame.data);
-      this.writer.write(clone);
+      const copy = {}
+      copyFrameData(inputFrame.data, copy);
+      this.writer.write(copy);
     }
   }
 }

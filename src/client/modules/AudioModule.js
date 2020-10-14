@@ -7,7 +7,7 @@ class AudioModule extends BaseModule {
     super(graph, type, id, options);
 
     this.audioContext = graph.como.audioContext;
- 
+
     //                            (0|1)
     //               /----------o bypass ----------- \
     //              /                                 \
@@ -42,7 +42,7 @@ class AudioModule extends BaseModule {
     if (!(dest instanceof AudioModule)) {
       throw new Error(`can't connect "${this.id}" to "${dest.id}, destination is not of type AudioModule`);
     }
-      
+
     this.audioOutNode.connect(dest.audioInNode);
   }
 
@@ -68,7 +68,7 @@ class AudioModule extends BaseModule {
   }
 
   _updateAudioRouting() {
-    const timeConstant = 0.005; // @note - this could be user defined
+    const timeConstant = 0.005;
     const now = this.graph.como.audioContext.currentTime;
     const passThroughGain = this._bypass ? 0 : 1;
     const bypassGain = this._bypass ? 1 : 0;

@@ -45,7 +45,7 @@ class DeviceMotion extends BaseSource {
     const syncTime = this.como.experience.plugins['sync'].getSyncTime();
 
     // metas
-    this.data.metas.clientId = this.streamId;
+    this.data.metas.id = this.streamId;
     this.data.metas.time = syncTime;
     this.data.metas.period = e.interval / 1000;
     // acceleration

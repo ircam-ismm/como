@@ -2,7 +2,7 @@ import BaseSource from '../../common/sources/BaseSource';
 
 // @todo - create a SineSource (probably more usefull for testing)
 class RandomValues extends BaseSource {
-  constructor(como, streamId = 0, period = 0.05) {
+  constructor(como, streamId = 0, { period = 0.05 } = {}) {
     super();
 
     this.como = como;

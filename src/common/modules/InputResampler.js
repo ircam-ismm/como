@@ -1,5 +1,6 @@
 import BaseModule from './BaseModule.js';
 import Ticker from '@ircam/ticker';
+import { copyFrameData } from './helpers';
 
 /**
  * There is a problem w/ this node,
@@ -34,34 +35,18 @@ class InputResampler extends BaseModule {
   }
 
   process(inputFrame) {
-    // copy inputFrame.data as the source may reuse the same instance
-    const frameData = {};
+    const copy = {};
     const inputData = inputFrame.data;
+    // copy inputFrame.data into new object as the source reuses the same instance
+    copyFrameData(inputData, copy);
 
+    // papre `outputFrame.data` structure to simplify logic in `proapgate`
     for (let name in inputData) {
-      // ---------------------------------------
-      // handle arrays
       if (Array.isArray(inputData[name])) {
-        frameData[name] = [];
-
-        for (let i = 0; i < inputData[name].length; i++) {
-          frameData[name][i] = inputData[name][i];
-        }
-
-        // create `outputFrame.data[name]` array instance with proper length
         if (!(name in this.outputFrame.data)) {
           this.outputFrame.data[name] = new Array(inputData[name].length);
         }
-      // ---------------------------------------
-      // handle objects
       } else if (Object.prototype.toString.call(inputData[name]) === '[object Object]') {
-        frameData[name] = {};
-
-        for (let key in inputData[name]) {
-          frameData[name][key] = inputData[name][key];
-        }
-
-        // create `outputFrame.data[name]` array instance with proper length
         if (!(name in this.outputFrame.data)) {
           this.outputFrame.data[name] = {};
 
@@ -69,20 +54,14 @@ class InputResampler extends BaseModule {
             this.outputFrame.data[name][key] = 0; // do we assume a source can only produce numbers ?
           }
         }
-      // ---------------------------------------
-      // handle scalar
       } else {
-        frameData[name] = inputData[name];
-
         if (!(name in this.outputFrame.data)) {
           this.outputFrame.data[name] = 0;
         }
       }
     }
 
-    // we keep a separate index pointer to reuse the stack and not allocate
-    // a new Array on each `propagate` call
-    this.stack[this.bufferedFrameIndex] = frameData;
+    this.stack[this.bufferedFrameIndex] = copy;
     this.bufferedFrameIndex += 1;
 
     if (this.ticker === null) {
@@ -94,7 +73,9 @@ class InputResampler extends BaseModule {
 
   propagate() {
     if (this.bufferedFrameIndex === 0) {
-      // output last frame
+      // update timetag and output last frame
+      this.outputFrame.data.metas.time = this.graph.como.experience.plugins['sync'].getSyncTime();
+
       super.propagate(this.outputFrame);
     } else {
       const outputData = this.outputFrame.data;
@@ -151,11 +132,10 @@ class InputResampler extends BaseModule {
       }
 
       // override metas
-      // @note - confirm we really want to override the time
-      if (this.stack[0].metas) { // mainly for testing purposes...
-        outputData.metas.id = this.stack[0].metas.id;
-        outputData.metas.time = this.graph.como.experience.plugins['sync'].getSyncTime();
-        outputData.metas.period = this.options.resamplingPeriod;
+      if (this.stack[0].metas) { // this condition is for testing purposes
+        this.outputFrame.data.metas.id = this.stack[0].metas.id;
+        this.outputFrame.data.metas.time = this.graph.como.experience.plugins['sync'].getSyncTime();
+        this.outputFrame.data.metas.period = this.options.resamplingPeriod;
       }
 
       this.bufferedFrameIndex = 0;

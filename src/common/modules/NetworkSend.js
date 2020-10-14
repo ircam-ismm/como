@@ -22,17 +22,18 @@ class NetworkSend extends BaseModule {
   // this is a deadend
   process(frame) {
     if (this.streamSource) {
-      this.data[0] = frame.data.metas[0];
-      this.data[1] = frame.data.metas[1];
-      this.data[2] = frame.data.metas[2];
+      // how to generalize that (automatic binary codec) ?
+      this.data[0] = frame.data.metas.id;
+      this.data[1] = frame.data.metas.time;
+      this.data[2] = frame.data.metas.period;
 
-      this.data[3] = frame.data.accelerationIncludingGravity[0];
-      this.data[4] = frame.data.accelerationIncludingGravity[1];
-      this.data[5] = frame.data.accelerationIncludingGravity[2];
+      this.data[3] = frame.data.accelerationIncludingGravity.x;
+      this.data[4] = frame.data.accelerationIncludingGravity.y;
+      this.data[5] = frame.data.accelerationIncludingGravity.z;
 
-      this.data[6] = frame.data.rotationRate[0];
-      this.data[7] = frame.data.rotationRate[1];
-      this.data[8] = frame.data.rotationRate[2];
+      this.data[6] = frame.data.rotationRate.alpha;
+      this.data[7] = frame.data.rotationRate.beta;
+      this.data[8] = frame.data.rotationRate.gamma;
 
       this.graph.como.client.socket.sendBinary('stream', this.data);
     }

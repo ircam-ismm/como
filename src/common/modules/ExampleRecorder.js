@@ -1,4 +1,5 @@
 import BaseModule from './BaseModule';
+import { copyFrameData } from './helpers';
 
 // states: idle, armed, recording, pending, confirm, cancel
 
@@ -85,14 +86,7 @@ class ExampleRecorder extends BaseModule {
       const inputData = inputFrame.data;
       const copy = {};
 
-      for (let name in inputData) {
-        copy[name] = [];
-
-        // @todo - handle objects, arrays, scalar
-        for (let i = 0; i < inputData[name].length; i++) {
-          copy[name][i] = inputData[name][i];
-        }
-      }
+      copyFrameData(inputData, copy);
 
       this.example.input.push(copy);
     }
