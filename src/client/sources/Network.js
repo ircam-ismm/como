@@ -8,9 +8,9 @@ class Network extends BaseSource {
     this.streamId = streamId;
 
     this.data = {
-      metas: [],
-      accelerationIncludingGravity: [],
-      rotationRate: [],
+      metas: {},
+      accelerationIncludingGravity: {},
+      rotationRate: {},
     };
 
     this.process = this.process.bind(this);

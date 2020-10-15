@@ -50,14 +50,14 @@ class Graph {
   }
 
   async init() {
-    const graph = this.session.get('graph');
+    const description = this.session.get('graph');
 
-    for (let i = 0; i < graph.modules.length; i++) {
-      const { type, id, options } = graph.modules[i];
+    for (let i = 0; i < description.modules.length; i++) {
+      const { type, id, options } = description.modules[i];
       await this.createNode(type, id, options);
     }
 
-    graph.connections.forEach(conn => {
+    description.connections.forEach(conn => {
       const sourceId = conn[0];
       const destId = conn[1];
       this.createConnection(sourceId, destId);
@@ -131,10 +131,10 @@ class Graph {
   }
 
   _updateGraphOptions() {
-    const { modules } = this.session.get('graph');
+    const description = this.session.get('graph');
 
-    modules.forEach(description => {
-      const { id, options } = description;
+    description.modules.forEach(desc => {
+      const { id, options } = desc;
       const module = this.modules[id];
       module.updateOptions(options);
     });

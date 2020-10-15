@@ -134,7 +134,7 @@ class MotionDescriptors extends BaseModule {
   process(inputFrame) {
     // create a valid lfo frame
     const lfoFrame = {
-      time: inputFrame[1],
+      time: inputFrame.data.metas.time,
       data: [],
     };
 
@@ -144,8 +144,6 @@ class MotionDescriptors extends BaseModule {
     lfoFrame.data[3] = inputFrame.data.rotationRate.alpha;
     lfoFrame.data[4] = inputFrame.data.rotationRate.beta;
     lfoFrame.data[5] = inputFrame.data.rotationRate.gamma;
-
-    this.outputFrame.data.metas = inputFrame.data.metas;
     // pipe to lfo graph
     this.eventIn.processFrame(lfoFrame);
   }
