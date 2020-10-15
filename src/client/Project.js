@@ -1,6 +1,6 @@
-import Sessions from './Sessions';
-import Players from './Players';
-import Graph from '../common/Graph';
+import Sessions from './Sessions.js';
+import Players from './Players.js';
+import Graph from '../common/Graph.js';
 
 class Project {
   constructor(como) {
@@ -117,19 +117,13 @@ class Project {
    *  (e.g. soudnworks.client.id) will be a good choice.
    */
   async createPlayer(playerId = null) {
-    if (playerId === null) {
-      throw new Error(`project.createPlayer(playerId) - "id" is mandatory and should be unique`);
-    }
-
-    const player = await this.como.client.stateManager.create('player', { id: playerId });
-    await player.set({ stateId: player.id, nodeId: this.como.client.id });
-
-    return player;
+    return this.players.create(playerId);
   }
 
 
   async createGraph(session, player) {
-    const graph = new Graph(this.como, session, player);
+    const graphDescription = session.get('graph');
+    const graph = new Graph(this.como, graphDescription, session, player);
     await graph.init();
 
     return graph;

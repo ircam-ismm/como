@@ -1,8 +1,9 @@
+import Player from './Player.js';
 
 class Players {
   constructor(como) {
     this.como = como;
-    this._list = new Map();
+    // this._list = new Map();
   }
 
   observe(callback) {
@@ -13,19 +14,29 @@ class Players {
     });
   }
 
-  async attach(stateId) {
-    const player = await this.como.client.stateManager.attach('player', stateId);
-    const playerId = player.get('id');
+  async create(playerId) {
+    if (playerId === null) {
+      throw new Error(`project.createPlayer(playerId) - "id" is mandatory and should be unique`);
+    }
 
-    player.onDetach(() => this._list.delete(playerId));
-    this._list.set(playerId, player);
+    const playerState = await this.como.client.stateManager.create('player', { id: playerId });
+    await playerState.set({ stateId: playerState.id, nodeId: this.como.client.id });
+
+    const player = new Player(playerState);
 
     return player;
   }
 
-  // get(playerId) {
-  //   return this._list.get(playerId);
-  // }
+  async attach(stateId) {
+    const playerState = await this.como.client.stateManager.attach('player', stateId);
+    const playerId = playerState.get('id');
+
+    // playerState.onDetach(() => this._list.delete(playerId));
+    // this._list.set(playerId, player);
+    const player = new Player(playerState);
+
+    return player;
+  }
 }
 
 export default Players;

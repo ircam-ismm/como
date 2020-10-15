@@ -90,7 +90,6 @@ class InputResampler extends BaseModule {
 
           // sums
           for (let i = 0; i < this.bufferedFrameIndex; i++) {
-            // console.log(this.stack[i][name]);
             for (let j = 0; j < entryLength; j++) {
               outputData[name][j] += this.stack[i][name][j];
             }
@@ -107,8 +106,7 @@ class InputResampler extends BaseModule {
           }
 
           // sum
-          for (let i = 0; i < this.bufferedFrameIndex; i++) {
-            // console.log(this.stack[i][name]);
+          for (let i = 0; i < this.bufferedFrameIndex; i++) {;
             for (let key in outputData[name]) {
               outputData[name][key] += this.stack[i][name][key];
             }

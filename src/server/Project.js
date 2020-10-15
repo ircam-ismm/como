@@ -76,50 +76,57 @@ class Project {
 
         // maybe move this in Session, would be more logical...
         playerState.subscribe(updates => {
-          for (let name in updates) {
-            // reset player state when it change session
-            // @note - this could be a kind of reducer provided by
-            // the stateManager itself
-            if (name === 'sessionId') {
-              const sessionId = updates[name];
+          for (let [name, values] of Object.entries(updates)) {
+            switch (name) {
+              // reset player state when it change session
+              // @note - this could be a kind of reducer provided by
+              // the stateManager itself
+              case 'sessionId': {
+                const sessionId = values;
 
-              if (sessionId !== null) {
-                const session = this.sessions.get(sessionId);
+                if (sessionId !== null) {
+                  const session = this.sessions.get(sessionId);
 
-                if (!session) {
-                  console.warn(`[como] required session "${sessionId}" does not exists`);
-                  playerState.set({ sessionId: null });
-                  return;
+                  if (!session) {
+                    console.warn(`[como] required session "${sessionId}" does not exists`);
+                    playerState.set({ sessionId: null });
+                    return;
+                  }
+                  // pick a default label for the new player
+                  // @todo - this should be updated on any `audioFiles.label` update
+                  const defaultLabel = session.state.get('audioFiles')
+                    .map(file => file.label)
+                    .filter((label, index, arr) => arr.indexOf(label) === index)
+                    .sort()[0];
+
+                  const graphOptions = session.state.get('graphOptions');
+
+                  playerState.set({
+                    label: defaultLabel,
+                    recordingState: 'idle',
+                    graphOptions,
+                  });
+                } else {
+                  playerState.set({
+                    label: '',
+                    recordingState: 'idle',
+                    graphOptions: null,
+                  });
                 }
-                // pick a default label for the new player
-                // @todo - this should be updated on any `audioFiles.label` update
-                const defaultLabel = session.state.get('audioFiles')
-                  .map(file => file.label)
-                  .filter((label, index, arr) => arr.indexOf(label) === index)
-                  .sort()[0];
-
-                const graphOptions = session.state.get('graphOptions');
-                console.log(graphOptions);
-
-                playerState.set({
-                  label: defaultLabel,
-                  recordingState: 'idle',
-                  graphOptions,
-                });
-              } else {
-                playerState.set({
-                  label: '',
-                  recordingState: 'idle',
-                  graphOptions: null,
-                });
+                break;
               }
-            } else if (name === 'graphOptionsEvent') {
-              const optionsUpdates = updates[name];
-              const graphOptions = playerState.get('graphOptions');
-              for (let moduleId in optionsUpdates) {
-                Object.assign(graphOptions[moduleId], optionsUpdates[moduleId]);
+
+              case 'graphOptionsEvent': {
+                const optionsUpdates = values;
+                const graphOptions = playerState.get('graphOptions');
+
+                for (let moduleId in optionsUpdates) {
+                  Object.assign(graphOptions[moduleId], optionsUpdates[moduleId]);
+                }
+
+                playerState.set({ graphOptions });
+                break;
               }
-              playerState.set({ graphOptions });
             }
           }
         });

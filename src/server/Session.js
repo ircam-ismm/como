@@ -11,6 +11,7 @@ import Graph from '../common/Graph.js';
 import BaseSource from '../common/sources/BaseSource.js';
 
 // hardcoded subgraph for pre-processing
+// that's bad update when graph is plitted config wise
 const processingModules = [
   {
     id: 'input',
@@ -121,14 +122,7 @@ class Session {
   }
 
   get(name) {
-    if (name === 'graph') {
-      return {
-        modules: processingModules,
-        connections: processingConnections,
-      };
-    } else {
-      return this.state.get(name);
-    }
+    return this.state.get(name);
   }
 
   subscribe(func) {
@@ -186,9 +180,10 @@ class Session {
 
             const players = Array.from(this.como.project.players.values())
               .filter(player => player.get('sessionId') === this.id)
-              .forEach(player => player.set({ graphOptionsEvent: updates }));
+              .forEach(player => player.set({ graphOptionsEvent: values }));
 
             // find player attached to the session and forward event
+            break;
           }
         }
       }
@@ -200,17 +195,15 @@ class Session {
 
     // ----- start dirty
     // @todo - review this part...
-    // for now we have no way to dyamically modify the graph,
-    // then this is ok (for now...)
-    const graph = this.state.get('graph');
-
-    this.graph = new Graph(
-      this.como,
-      this,
-    );
-
-    await this.graph.init();
+    // review once config and, audio and data graphs are splitted
+    const graphDescription = {
+      modules: processingModules,
+      connections: processingConnections,
+    };
     // ----- end dirty
+
+    this.graph = new Graph(this.como, graphDescription, this);
+    await this.graph.init();
 
 
 

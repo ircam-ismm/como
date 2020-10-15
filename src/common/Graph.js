@@ -6,10 +6,10 @@ class Graph {
    * not related to a particular player (e.g. duplicate audio), each node
    * should be responsible to do the proper checks if it needs a player
    * (e.g. ExampleRecorder)
+   *
+   * Warning: we need to keep "session" and "player" because modules may use them
    */
-
-  // move to (como, graphDescription, optionsSource <Session|Player>)
-  constructor(como, session, player = null) {
+  constructor(como, graphDescription, session, player = null) {
     this.como = como;
     this.session = session;
     this.player = player;
@@ -18,11 +18,13 @@ class Graph {
     this.modules = {}; // <id, module>
     this.sources = new Set();
 
-    this.description = this.session.get('graph');
-    this.options = this.player ?
-      this.player.get('graphOptions') : this.session.get('graphOptions');
+    this.description = graphDescription;
 
-    this.unsubscribeSession = this.session.subscribe(updates => {
+    const optionsSource = this.player ? this.player : this.session;
+    this.options = optionsSource.get('graphOptions');
+
+    // @todo - replace w/ optionsSource
+    this.unsubscribeOptions = optionsSource.subscribe(updates => {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
           case 'graphOptionsEvent': {
@@ -35,37 +37,11 @@ class Graph {
         }
       }
     });
-
-    this.unsubscribePlayer = this.player.subscribe(updates => {
-      for (let [name, values] of Object.entries(updates)) {
-        switch (name) {
-          case 'graphOptionsEvent': {
-            console.log()
-            for (let moduleId in values) {
-              Object.assign(this.options[moduleId], values[moduleId]);
-              this._updateModuleOptions(moduleId, values[moduleId]);
-            }
-            break;
-          }
-        }
-      }
-    });
-
-    // if (this.player) {
-    //   this.player.subscribe(updates => {
-    //     if ('graphOptionsOverrides' in updates) {
-    //       const overrides = updates.graphOptionsOverrides;
-    //       this._overrideGraphOptions(overrides);
-    //     }
-    //   });
-    // }
 
     // register default modules
     // @note - this is not usable in real life because of the `Project.createGraph`
     // factory method, this should be fixed at some point
-    this.como.modules.forEach(ctor => {
-      this.registerModule(ctor);
-    });
+    this.como.modules.forEach(ctor => this.registerModule(ctor));
   }
 
   registerModule(ctor) {
@@ -77,7 +53,6 @@ class Graph {
     for (let i = 0; i < this.description.modules.length; i++) {
       const { type, id } = this.description.modules[i];
       const options = this.options[id];
-      console.log(type, id, options);
       await this.createNode(type, id, options);
     }
 
@@ -89,7 +64,7 @@ class Graph {
   }
 
   async delete() {
-    this.unsubscribeSession();
+    this.unsubscribeOptions();
 
     this.sources.forEach(source => source.removeAllListeners());
     this.sources.clear();
@@ -142,9 +117,7 @@ class Graph {
   setSource(source, inputId = 'input') {
     const input = this.modules[inputId];
     // input.inputs.size = 1;
-    source.addListener(rawData => {
-      input.process(rawData);
-    });
+    source.addListener(rawData => input.process(rawData));
 
     this.sources.add(source);
   }
