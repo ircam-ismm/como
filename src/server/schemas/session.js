@@ -16,6 +16,17 @@ export default {
     default: {},
   },
 
+  // these two are not persisted, they are mixed in "graph"
+  graphOptions: {
+    type: 'any',
+    default: {},
+  },
+  graphOptionsEvent: {
+    type: 'any',
+    default: {},
+    event: true,
+  },
+
   // this should belong to the "encoder / decoder"
   model: {
     type: 'any',

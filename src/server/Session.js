@@ -103,6 +103,38 @@ class Session {
     this.configFullPath = path.join(this.directory, `config.json`);
   }
 
+  serialize() {
+    // reapply graphOptions in graph definition and clean
+    const values = this.state.getValues();
+    const { graph, graphOptions } = values;
+
+    graph.modules.forEach(desc => {
+      if (Object.keys(graphOptions[desc.id]).length) {
+        desc.options = graphOptions[desc.id];
+      }
+    });
+
+    delete values.graphOptions;
+    delete values.graphOptionsEvent;
+
+    return values;
+  }
+
+  get(name) {
+    if (name === 'graph') {
+      return {
+        modules: processingModules,
+        connections: processingConnections,
+      };
+    } else {
+      return this.state.get(name);
+    }
+  }
+
+  subscribe(func) {
+    return this.state.subscribe(func);
+  }
+
   async delete() {
     await this.state.detach();
   }
@@ -112,34 +144,56 @@ class Session {
    * problem here that should be solved at some point...
    */
   async init(initValues) {
+    // extract graph options from graph definition
+    initValues.graphOptions = initValues.graph.modules.reduce((acc, desc) => {
+      acc[desc.id] = desc.options || {};
+      return acc;
+    }, {});
+
     this.state = await this.como.server.stateManager.create(`session`, initValues);
 
     this.state.subscribe(async updates => {
-      await db.write(this.configFullPath, this.serialize());
-
       // if updates['audioFiles'] => handle labels (old / new) and retrain model if needed
       // @todo - we should also take into account the `active` label
       // @note - this should probably be cleaned up when updated from file system too, TBC
-      if (updates['audioFiles']) {
-        const examples = this.state.get('examples');
-        const labels = updates['audioFiles'].map(file => file.label);
-        let dirty = false;
-        // delete examples with a label that does not exists anymore
-        for (let uuid in examples) {
-          const exampleLabel = examples[uuid].label;
+      for (let [name, values] of Object.entries(updates)) {
+        switch (name) {
+          case 'audioFiles': {
+            const examples = this.state.get('examples');
+            const labels = values.map(file => file.label);
+            let dirty = false;
+            // delete examples with a label that does not exists anymore
+            for (let uuid in examples) {
+              const exampleLabel = examples[uuid].label;
 
-          if (labels.indexOf(exampleLabel) === -1) {
-            delete examples[uuid];
-            dirty = true;
+              if (labels.indexOf(exampleLabel) === -1) {
+                delete examples[uuid];
+                dirty = true;
+              }
+            }
+
+            if (dirty) {
+              this.trainModel(examples);
+            }
+            break;
           }
-        }
+          case 'graphOptionsEvent': {
+            const graphOptions = this.state.get('graphOptions');
 
-        if (dirty) {
-          this.trainModel(examples);
+            for (let moduleId in values) {
+              Object.assign(graphOptions[moduleId], values[moduleId]);
+            }
+
+            const players = Array.from(this.como.project.players.values())
+              .filter(player => player.get('sessionId') === this.id)
+              .forEach(player => player.set({ graphOptionsEvent: updates }));
+
+            // find player attached to the session and forward event
+          }
         }
       }
 
-      // retrain on graph update, for now is only usefull on scripts updates
+      await db.write(this.configFullPath, this.serialize());
     });
 
     // @todo - check that the graph topology is valid
@@ -152,17 +206,7 @@ class Session {
 
     this.graph = new Graph(
       this.como,
-      // @warning / @todo - this is a ugly hack, this should be cleaned up
-      {
-        get: () => {
-          return {
-            modules: processingModules,
-            connections: processingConnections,
-          }
-        },
-        // it's getting worse...
-        subscribe: (func) => this.state.subscribe(func),
-      }
+      this,
     );
 
     await this.graph.init();
@@ -352,10 +396,6 @@ finished (${new Date().getTime() - startTime}ms)`);
         resolve();
       });
     });
-  }
-
-  serialize() {
-    return this.state.getValues();
   }
 }
 

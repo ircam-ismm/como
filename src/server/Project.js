@@ -68,11 +68,13 @@ class Project {
       if (schemaName === 'player') {
         const playerState = await this.como.server.stateManager.attach(schemaName, stateId);
         const playerId = playerState.get('id');
+
         playerState.onDetach(() => {
           this.clearStreamRouting(playerId);
           this.players.delete(playerId)
         });
 
+        // maybe move this in Session, would be more logical...
         playerState.subscribe(updates => {
           for (let name in updates) {
             // reset player state when it change session
@@ -96,16 +98,28 @@ class Project {
                   .filter((label, index, arr) => arr.indexOf(label) === index)
                   .sort()[0];
 
+                const graphOptions = session.state.get('graphOptions');
+                console.log(graphOptions);
+
                 playerState.set({
                   label: defaultLabel,
                   recordingState: 'idle',
+                  graphOptions,
                 });
               } else {
                 playerState.set({
                   label: '',
                   recordingState: 'idle',
+                  graphOptions: null,
                 });
               }
+            } else if (name === 'graphOptionsEvent') {
+              const optionsUpdates = updates[name];
+              const graphOptions = playerState.get('graphOptions');
+              for (let moduleId in optionsUpdates) {
+                Object.assign(graphOptions[moduleId], optionsUpdates[moduleId]);
+              }
+              playerState.set({ graphOptions });
             }
           }
         });

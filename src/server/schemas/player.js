@@ -62,17 +62,16 @@ export default {
     default: false,
   },
 
-  // @note - this works (quite simply) as an event but it's not clean,
-  // we need a real state to ensure views are kept synchronized
-  // we should be close from 'graph' format to simplify overrides in one way
-  // or the other
-  graphOptionsOverrides: {
+  // override graph option on the player only
+  graphOptions: {
     type: 'any',
+    default: {},
+  },
+  graphOptionsEvent: {
+    type: 'any',
+    default: {},
     event: true,
-    nullable: true,
-    default: null,
-  }
-  // ...
+  },
 };
 
 

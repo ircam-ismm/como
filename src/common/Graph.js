@@ -7,6 +7,8 @@ class Graph {
    * should be responsible to do the proper checks if it needs a player
    * (e.g. ExampleRecorder)
    */
+
+  // move to (como, graphDescription, optionsSource <Session|Player>)
   constructor(como, session, player = null) {
     this.como = como;
     this.session = session;
@@ -16,29 +18,51 @@ class Graph {
     this.modules = {}; // <id, module>
     this.sources = new Set();
 
+    this.description = this.session.get('graph');
+    this.options = this.player ?
+      this.player.get('graphOptions') : this.session.get('graphOptions');
+
     this.unsubscribeSession = this.session.subscribe(updates => {
-      for (let name in updates) {
+      for (let [name, values] of Object.entries(updates)) {
         switch (name) {
-          case 'graph': {
-            this._updateGraphOptions(updates);
+          case 'graphOptionsEvent': {
+            for (let moduleId in values) {
+              Object.assign(this.options[moduleId], values[moduleId]);
+              this._updateModuleOptions(moduleId, values[moduleId]);
+            }
             break;
           }
         }
       }
     });
 
-    if (this.player) {
-      this.player.subscribe(updates => {
-        if ('graphOptionsOverrides' in updates) {
-          const overrides = updates.graphOptionsOverrides;
-          this._overrideGraphOptions(overrides);
+    this.unsubscribePlayer = this.player.subscribe(updates => {
+      for (let [name, values] of Object.entries(updates)) {
+        switch (name) {
+          case 'graphOptionsEvent': {
+            console.log()
+            for (let moduleId in values) {
+              Object.assign(this.options[moduleId], values[moduleId]);
+              this._updateModuleOptions(moduleId, values[moduleId]);
+            }
+            break;
+          }
         }
-      });
-    }
+      }
+    });
+
+    // if (this.player) {
+    //   this.player.subscribe(updates => {
+    //     if ('graphOptionsOverrides' in updates) {
+    //       const overrides = updates.graphOptionsOverrides;
+    //       this._overrideGraphOptions(overrides);
+    //     }
+    //   });
+    // }
 
     // register default modules
-    // @fixme - this is not usable in real life because of the `Project.createGraph`
-    // factory method, this should be fixed
+    // @note - this is not usable in real life because of the `Project.createGraph`
+    // factory method, this should be fixed at some point
     this.como.modules.forEach(ctor => {
       this.registerModule(ctor);
     });
@@ -50,14 +74,14 @@ class Graph {
   }
 
   async init() {
-    const description = this.session.get('graph');
-
-    for (let i = 0; i < description.modules.length; i++) {
-      const { type, id, options } = description.modules[i];
+    for (let i = 0; i < this.description.modules.length; i++) {
+      const { type, id } = this.description.modules[i];
+      const options = this.options[id];
+      console.log(type, id, options);
       await this.createNode(type, id, options);
     }
 
-    description.connections.forEach(conn => {
+    this.description.connections.forEach(conn => {
       const sourceId = conn[0];
       const destId = conn[1];
       this.createConnection(sourceId, destId);
@@ -130,21 +154,12 @@ class Graph {
     this.sources.delete(source);
   }
 
-  _updateGraphOptions() {
-    const description = this.session.get('graph');
-
-    description.modules.forEach(desc => {
-      const { id, options } = desc;
-      const module = this.modules[id];
-      module.updateOptions(options);
-    });
-  }
-
-  // use `player.graphOptionsOverrides` to override graph options at player level
-  _overrideGraphOptions(overrides) {
-    for (let id in overrides) {
-      const options = overrides[id];
-      const module = this.modules[id];
+  _updateModuleOptions(moduleId, options) {
+    const module = this.modules[moduleId];
+    // @note - we need this check because server-side graph may not have all
+    // the modules instanciated (i.e. AudioModules). This should be removed
+    // when the two graphs are seprated
+    if (module) {
       module.updateOptions(options);
     }
   }

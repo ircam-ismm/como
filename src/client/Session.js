@@ -30,9 +30,10 @@ class Session {
   onDetach(func) {
     // @note - just a decorator for log
     const callback = () => {
-      console.log('@todo - clean session buffer cache');
+      console.log('@todo - clean session audio buffers');
       func();
     }
+
     this.state.onDetach(callback);
   }
 
@@ -58,6 +59,15 @@ class Session {
   clearLabel(label) {
     const sessionId = this.state.get('id');
     this.como.client.socket.send(`como:session:clearLabel`, sessionId, label);
+  }
+
+  setGraphOptions(moduleId, updates) {
+    this.state.set({ graphOptionsEvent: { [moduleId]: updates }});
+  }
+
+  getGraphOptions(moduleId) {
+    graphOptions = this.state.get('graphOptions');
+    return graphOptions[moduleId];
   }
 
   async updateAudioFiles() {
