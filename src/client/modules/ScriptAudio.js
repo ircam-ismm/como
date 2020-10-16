@@ -1,5 +1,6 @@
 import AudioModule from './AudioModule.js';
 import helpers from '../helpers/index.js';
+import JSON5 from 'json5';
 
 // extend AudioModule
 class ScriptAudio extends AudioModule {
@@ -29,11 +30,24 @@ class ScriptAudio extends AudioModule {
     }
   }
 
-  updateOptions(options) {
+  async updateOptions(options) {
     super.updateOptions(options);
 
     if (!this.script || (this.options.scriptName !== this.script.name)) {
-      this.setScript(this.options.scriptName);
+      await this.setScript(this.options.scriptName);
+    }
+
+    if (this.audioScriptModule && this.options.scriptParams) {
+      if (typeof this.options.scriptParams === 'string') {
+        try {
+          this.options.scriptParams = JSON5.parse(this.options.scriptParams);
+        } catch (err) {
+          console.error(`Invalid script param, please provide a proper javascript object`);
+          console.error(err);
+        }
+      }
+
+      this.audioScriptModule.updateParams(this.options.scriptParams);
     }
   }
 
@@ -48,20 +62,20 @@ class ScriptAudio extends AudioModule {
     this.script.subscribe(() => this.initScript());
 
     this.script.onDetach(() => {
-      this.audioScript.destroy();
-      this.audioScript = null;
+      this.audioScriptModule.destroy();
+      this.audioScriptModule = null;
     });
 
     this.initScript();
   }
 
   initScript() {
-    if (this.audioScript) {
-      this.audioScript.destroy();
+    if (this.audioScriptModule) {
+      this.audioScriptModule.destroy();
     }
 
     try {
-      const audioScript = this.script.execute(
+      const audioScriptModule = this.script.execute(
         this.graph,
         helpers,
         this.passThroughInNode,
@@ -69,20 +83,20 @@ class ScriptAudio extends AudioModule {
         this.outputFrame
       );
 
-      if (!('process' in audioScript) || !('destroy' in audioScript)) {
-        throw new Error(`Invalid audioScript "${scriptName}", should implement a \
+      if (!('process' in audioScriptModule) || !('destroy' in audioScriptModule)) {
+        throw new Error(`Invalid audioScriptModule "${scriptName}", should implement a \
 "process" method and a "destroy" method`);
       }
 
-      this.audioScript = audioScript;
+      this.audioScriptModule = audioScriptModule;
     } catch(err) {
       console.log(err);
     }
   }
 
   execute(inputFrame) {
-    if (this.audioScript) {
-      this.outputFrame = this.audioScript.process(inputFrame, this.outputFrame);
+    if (this.audioScriptModule) {
+      this.outputFrame = this.audioScriptModule.process(inputFrame, this.outputFrame);
     }
 
     return this.outputFrame;
