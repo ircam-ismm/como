@@ -31,7 +31,7 @@ class MotionDescriptors extends BaseModule {
     super(graph, type, id, options);
 
     // @todo - review intensity naming
-    this.outputFrame.data.intensity = { high: 0, low: 0 };
+    this.outputFrame.data.intensity = { linear: 0, compressed: 0 };
     this.outputFrame.data.accelerationBandpass5hz = { x: 0, y: 0, z: 0 };
     this.outputFrame.data.orientation = { x: 0, y: 0, z: 0 };
     this.outputFrame.data.rotationRateMs = { alpha: 0, beta: 0, gamma: 0 };
@@ -149,8 +149,8 @@ class MotionDescriptors extends BaseModule {
   }
 
   propagate(lfoFrame) {
-    this.outputFrame.data.intensity.high = lfoFrame.data[0];
-    this.outputFrame.data.intensity.low = lfoFrame.data[1];
+    this.outputFrame.data.intensity.linear = lfoFrame.data[0];
+    this.outputFrame.data.intensity.compressed = lfoFrame.data[1];
 
     this.outputFrame.data.accelerationBandpass5hz.x = lfoFrame.data[2];
     this.outputFrame.data.accelerationBandpass5hz.y = lfoFrame.data[3];
