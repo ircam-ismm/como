@@ -1,5 +1,6 @@
 import BaseModule from './BaseModule.js';
 import helpers from '../helpers/index.js';
+import JSON5 from 'json5';
 
 class ScriptData extends BaseModule {
   constructor(graph, type, id, options) {
@@ -10,7 +11,6 @@ class ScriptData extends BaseModule {
     this.scriptService = this.graph.como.experience.plugins['scripts-data'];
 
     this.script = null;
-    this.executeFunction = null;
   }
 
   async init() {
@@ -18,19 +18,34 @@ class ScriptData extends BaseModule {
   }
 
   async destroy() {
+    super.destroy();
+
     if (this.script !== null) {
       const script = this.script;
       this.script = null;
-
+      // this will call the onDetach callback and thus destroy the script
       await script.detach();
     }
   }
 
-  updateOptions(options) {
+  async updateOptions(options) {
     super.updateOptions(options);
 
     if (!this.script || (this.options.scriptName !== this.script.name)) {
-      this.setScript(this.options.scriptName);
+      await this.setScript(this.options.scriptName);
+    }
+
+    if (this.scriptModule && this.options.scriptParams) {
+      if (typeof this.options.scriptParams === 'string') {
+        try {
+          this.options.scriptParams = JSON5.parse(this.options.scriptParams);
+        } catch (err) {
+          console.error(`Invalid script param, please provide a proper javascript object`);
+          console.error(err);
+        }
+      }
+
+      this.scriptModule.updateParams(this.options.scriptParams);
     }
   }
 
@@ -42,21 +57,48 @@ class ScriptData extends BaseModule {
 
     this.script = await this.scriptService.attach(scriptName);
 
-    this.script.subscribe((updates) => {
+    this.script.subscribe(updates => {
       if (!updates.error) {
-        this.executeFunction = this.script.execute(this.graph, helpers, this.outputFrame);
+        this.initScript();
       }
     });
 
-    this.script.onDetach(() => this.executeFunction = null);
+    this.script.onDetach(() => {
+      this.scriptModule.destroy();
+      this.scriptModule = null;
+    });
 
-    this.executeFunction = this.script.execute(this.graph, helpers, this.outputFrame);
+    this.initScript();
   }
 
-  // @todo - define what should happen when the script is deleted
+  initScript() {
+    if (this.scriptModule) {
+      this.scriptModule.destroy();
+    }
+
+    try {
+      const scriptModule = this.script.execute(
+        this.graph,
+        helpers,
+        this.outputFrame
+      );
+
+      if (!('process' in scriptModule) ||
+          !('destroy' in scriptModule) ||
+          !('updateParams' in scriptModule)
+      ) {
+        throw new Error(`Invalid scriptModule "${scriptName}", the script should return an object { updateParams, process, destroy }`);
+      }
+
+      this.scriptModule = scriptModule;
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
   execute(inputFrame) {
-    if (this.executeFunction) {
-      this.outputFrame = this.executeFunction(inputFrame, this.outputFrame);
+    if (this.scriptModule) {
+      this.outputFrame = this.scriptModule.process(inputFrame, this.outputFrame);
     }
 
     return this.outputFrame;

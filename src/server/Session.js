@@ -175,14 +175,20 @@ class Session {
             const graphOptions = this.state.get('graphOptions');
 
             for (let moduleId in values) {
+              // delete scriptParams on scriptName change
+              if ('scriptName' in values[moduleId]) {
+                delete graphOptions[moduleId].scriptParams;
+              }
+
               Object.assign(graphOptions[moduleId], values[moduleId]);
             }
 
+            this.state.set({ graphOptions });
+            // forward event to players attached to the session
             const players = Array.from(this.como.project.players.values())
               .filter(player => player.get('sessionId') === this.id)
               .forEach(player => player.set({ graphOptionsEvent: values }));
 
-            // find player attached to the session and forward event
             break;
           }
         }

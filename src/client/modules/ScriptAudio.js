@@ -2,7 +2,9 @@ import AudioModule from './AudioModule.js';
 import helpers from '../helpers/index.js';
 import JSON5 from 'json5';
 
-// extend AudioModule
+// extend AudioModule to have the bypass node
+// @note - the implmentation is mostly the same as ScriptData, but we can't
+// derive 2 parents... maybe mixin would help
 class ScriptAudio extends AudioModule {
   constructor(graph, type, id, options) {
     // @note - these defaults are weak, we must reinforce this
@@ -12,7 +14,6 @@ class ScriptAudio extends AudioModule {
     this.scriptService = this.graph.como.experience.plugins['scripts-audio'];
 
     this.script = null;
-    this.executeFunction = null;
   }
 
   async init() {
@@ -37,7 +38,7 @@ class ScriptAudio extends AudioModule {
       await this.setScript(this.options.scriptName);
     }
 
-    if (this.audioScriptModule && this.options.scriptParams) {
+    if (this.scriptModule && this.options.scriptParams) {
       if (typeof this.options.scriptParams === 'string') {
         try {
           this.options.scriptParams = JSON5.parse(this.options.scriptParams);
@@ -47,7 +48,7 @@ class ScriptAudio extends AudioModule {
         }
       }
 
-      this.audioScriptModule.updateParams(this.options.scriptParams);
+      this.scriptModule.updateParams(this.options.scriptParams);
     }
   }
 
@@ -59,23 +60,27 @@ class ScriptAudio extends AudioModule {
 
     this.script = await this.scriptService.attach(scriptName);
 
-    this.script.subscribe(() => this.initScript());
+    this.script.subscribe(updates => {
+      if (!updates.error) {
+        this.initScript();
+      }
+    });
 
     this.script.onDetach(() => {
-      this.audioScriptModule.destroy();
-      this.audioScriptModule = null;
+      this.scriptModule.destroy();
+      this.scriptModule = null;
     });
 
     this.initScript();
   }
 
   initScript() {
-    if (this.audioScriptModule) {
-      this.audioScriptModule.destroy();
+    if (this.scriptModule) {
+      this.scriptModule.destroy();
     }
 
     try {
-      const audioScriptModule = this.script.execute(
+      const scriptModule = this.script.execute(
         this.graph,
         helpers,
         this.passThroughInNode,
@@ -83,20 +88,22 @@ class ScriptAudio extends AudioModule {
         this.outputFrame
       );
 
-      if (!('process' in audioScriptModule) || !('destroy' in audioScriptModule)) {
-        throw new Error(`Invalid audioScriptModule "${scriptName}", should implement a \
-"process" method and a "destroy" method`);
+      if (!('process' in scriptModule) ||
+          !('destroy' in scriptModule) ||
+          !('updateParams' in scriptModule)
+      ) {
+        throw new Error(`Invalid scriptModule "${this.script.name}", the script should return an object { updateParams, process, destroy }`);
       }
 
-      this.audioScriptModule = audioScriptModule;
+      this.scriptModule = scriptModule;
     } catch(err) {
       console.log(err);
     }
   }
 
   execute(inputFrame) {
-    if (this.audioScriptModule) {
-      this.outputFrame = this.audioScriptModule.process(inputFrame, this.outputFrame);
+    if (this.scriptModule) {
+      this.outputFrame = this.scriptModule.process(inputFrame, this.outputFrame);
     }
 
     return this.outputFrame;
