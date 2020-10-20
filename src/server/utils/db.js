@@ -26,7 +26,7 @@ const db = {
   },
 
   // @todo - we need to queue write calls because it can lead to file corruption
-  async write(fullpath, data) {
+  async write(fullpath, data, format = true) {
     try {
       if (locks[fullpath] === true) {
         if (VERBOSE) {
@@ -48,7 +48,8 @@ const db = {
         // create directory if not exists
         await mkdirp(path.dirname(fullpath));
         // write the file
-        const json = JSON5.stringify(data, null, 2);
+        const json = format ? JSON5.stringify(data, null, 2) : JSON5.stringify(data);
+
         await writeFile(fullpath, json, 'utf8');
 
         locks[fullpath] = false;

@@ -18,26 +18,6 @@ class Project {
   constructor(como) {
     this.como = como;
 
-    // define existing presets
-    this.presets = new Map();
-    const fileTree = this.como.fileWatcher.state.get('presets');
-
-    fileTree.children.forEach(leaf => {
-      if (leaf.type === 'file') {
-        const str = fs.readFileSync(leaf.path).toString();
-        const preset = JSON5.parse(str);
-        const basename = path.basename(leaf.name, '.json');
-        this.presets.set(basename, preset);
-      }
-    });
-
-    const presetNames = Array.from(this.presets.keys());
-    projectSchema.presetNames.default = presetNames;
-
-    this.como.server.stateManager.registerSchema('project', projectSchema);
-    this.como.server.stateManager.registerSchema(`session`, sessionSchema);
-    this.como.server.stateManager.registerSchema('player', playerSchema);
-
     this.state = null;
     this.players = new Map();
     this.sessions = new Map();
@@ -61,6 +41,28 @@ class Project {
   }
 
   async init() {
+    // parse existing presets
+    this.presets = new Map();
+    const fileTree = this.como.fileWatcher.state.get('presets');
+
+    for (let i = 0; i < fileTree.children.length; i++) {
+      const leaf = fileTree.children[i];
+
+      if (leaf.type === 'directory') {
+        const presetName = leaf.name;
+        const dataGraph = await db.read(path.join(leaf.path, 'graph-data.json'));
+        const audioGraph = await db.read(path.join(leaf.path, 'graph-audio.json'));
+        const preset = { data: dataGraph, audio: audioGraph };
+        this.presets.set(presetName, preset);
+      }
+    }
+
+    projectSchema.presetNames.default = Array.from(this.presets.keys());
+
+    this.como.server.stateManager.registerSchema('project', projectSchema);
+    this.como.server.stateManager.registerSchema(`session`, sessionSchema);
+    this.como.server.stateManager.registerSchema('player', playerSchema);
+
     this.state = await this.como.server.stateManager.create('project');
 
     this.como.server.stateManager.observe(async (schemaName, stateId, nodeId) => {
@@ -215,7 +217,7 @@ class Project {
       .map(dir => {
         return {
           id: dir.name,
-          configPath: path.join(dir.path, 'config.json'),
+          configPath: dir.path,
         };
       });
 
@@ -230,9 +232,8 @@ class Project {
       const sessionOverview = created[i];
 
       try {
-        const json = await db.read(sessionOverview.configPath);
         const audioFiles = this.get('audioFiles');
-        const session = await Session.fromData(this.como, json, audioFiles);
+        const session = await Session.fromFileSystem(this.como, sessionOverview.configPath, audioFiles);
 
         this.sessions.set(sessionOverview.id, session);
       } catch(err) {

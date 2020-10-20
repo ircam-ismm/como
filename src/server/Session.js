@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import { uuid as uuidv4 } from 'uuidv4';
 
 import xmm from 'xmm-node';
@@ -15,30 +16,62 @@ class Session {
 
   /** factory methods */
   static async create(como, id, name, graph, audioFiles) {
-    const session = new Session(como, id, name);
-    await session.init({ id, name, graph });
+    const session = new Session(como, id);
+    await session.init({ name, graph });
     await session.updateAudioFilesFromFileSystem(audioFiles);
 
-    await db.write(session.configFullPath, session.serialize());
+    await session.persist();
+    return session;
+  }
+
+  static async fromFileSystem(como, dirname, audioFiles) {
+    let configFileExists;
+    let id;
+    let config;
+
+    // facilitate moving from old config format to new one
+    if (fs.existsSync(path.join(dirname, 'config.json'))) {
+      const json = await db.read(path.join(dirname, 'config.json'));
+      id = json.id;
+      config = json;
+      configFileExists = true;
+    } else {
+      // version 0.0.0
+      const metas = await db.read(path.join(dirname, 'metas.json'));
+      const dataGraph = await db.read(path.join(dirname, `graph-data.json`));
+      const audioGraph = await db.read(path.join(dirname, `graph-audio.json`));
+      const learningConfig = await db.read(path.join(dirname, 'ml-config.json'));
+      const examples = await db.read(path.join(dirname, '.ml-examples.json'));
+      const model = await db.read(path.join(dirname, '.ml-model.json'));
+
+      id = metas.id;
+      config = {
+        name: metas.name,
+        graph: { data: dataGraph, audio: audioGraph },
+        learningConfig,
+        examples,
+        model,
+      };
+      configFileExists = false;
+    }
+
+    const session = new Session(como, id);
+    await session.init(config);
+    await session.updateAudioFilesFromFileSystem(audioFiles);
+
+    // delete old config file
+    if (configFileExists) {
+      await db.delete(path.join(dirname, 'config.json'));
+    }
 
     return session;
   }
 
-  static async fromData(como, json, audioFiles) {
-    const { name, id } = json;
-    const session = new Session(como, id, name);
-    await session.init(json);
-    await session.updateAudioFilesFromFileSystem(audioFiles);
-
-    return session;
-  }
-
-  constructor(como, id, name) {
+  constructor(como, id) {
     this.como = como;
     this.id = id;
 
     this.directory = path.join(this.como.projectDirectory, 'sessions', id);
-    this.configFullPath = path.join(this.directory, `config.json`);
 
     this.xmmInstances = {
       'gmm': new xmm('gmm'),
@@ -49,27 +82,53 @@ class Session {
     this.processor = new XmmProcessor();
   }
 
-  serialize() {
-    // reapply graphOptions in graph definition and clean
+  async persist(key = null) {
     const values = this.state.getValues();
-    const { graph, graphOptions } = values;
 
-    graph.data.modules.forEach(desc => {
-      if (Object.keys(graphOptions[desc.id]).length) {
-        desc.options = graphOptions[desc.id];
+    if (key === null || key === 'name') {
+      const { id, name } = values;
+      await db.write(path.join(this.directory, 'metas.json'), { id, name, version: '0.0.0' });
+    }
+
+    if (key === null || key === 'graph' || key === 'graphOptions') {
+      // reapply current graph options into graph definitions
+      const { graph, graphOptions } = values;
+      const types = ['data', 'audio'];
+
+      for (let i = 0; i < types.length; i++) {
+        const type = types[i];
+        const subGraph = graph[type];
+
+        subGraph.modules.forEach(desc => {
+          if (Object.keys(graphOptions[desc.id]).length) {
+            desc.options = graphOptions[desc.id];
+          }
+        });
+
+        await db.write(path.join(this.directory, `graph-${type}.json`), subGraph);
       }
-    });
+    }
 
-    graph.audio.modules.forEach(desc => {
-      if (Object.keys(graphOptions[desc.id]).length) {
-        desc.options = graphOptions[desc.id];
-      }
-    });
+    if (key === null || key === 'learningConfig') {
+      const { learningConfig } = values;
+      await db.write(path.join(this.directory, 'ml-config.json'), learningConfig);
+    }
 
-    delete values.graphOptions;
-    delete values.graphOptionsEvent;
+    // generated files, keep them hidden
+    if (key === null || key === 'examples') {
+      const { examples } = values;
+      await db.write(path.join(this.directory, '.ml-examples.json'), examples, false);
+    }
 
-    return values;
+    if (key === null || key === 'model') {
+      const { model } = values;
+      await db.write(path.join(this.directory, '.ml-model.json'), model, false);
+    }
+
+    if (key === null || key === 'audioFiles') {
+      const { audioFiles } = values;
+      await db.write(path.join(this.directory, '.audio-files.json'), audioFiles, false);
+    }
   }
 
   get(name) {
@@ -85,12 +144,20 @@ class Session {
   }
 
   /**
-   * All this subgraph stuff is really dirty... there is an architectural
-   * problem here that should be solved at some point...
+   * @param {Object} initValues
+   * @param {Object} initValues.id
+   * @param {Object} initValues.name
+   * @param {Object} initValues.graph
+   * @param {Object} [initValues.model]
+   * @param {Object} [initValues.examples]
+   * @param {Object} [initValues.learningConfig]
+   * @param {Object} [initValues.audioFiles]
    */
   async init(initValues) {
+    initValues.id = this.id;
     // extract graph options from graph definition
     const modules = [...initValues.graph.data.modules, ...initValues.graph.audio.modules];
+
     initValues.graphOptions = modules.reduce((acc, desc) => {
       acc[desc.id] = desc.options || {};
       return acc;
@@ -148,9 +215,9 @@ class Session {
             break;
           }
         }
-      }
 
-      await db.write(this.configFullPath, this.serialize());
+        await this.persist(name);
+      }
     });
 
     // init model
@@ -319,7 +386,6 @@ class Session {
 
     xmm.setConfig(xmmConfig);
     xmm.setTrainingSet(xmmTrainingSet);
-
 
 
     return new Promise((resolve, reject) => {

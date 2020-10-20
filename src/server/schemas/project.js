@@ -5,7 +5,7 @@ export default {
   },
   presetNames: {
     type: 'any',
-    default: [], // popoulated in `Projet.constructor
+    default: [], // populated in `Projet.constructor
   },
   metas: {
     type: 'any',
