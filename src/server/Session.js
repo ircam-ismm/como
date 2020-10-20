@@ -8,71 +8,8 @@ import rapidMixAdapters from 'rapid-mix-adapters';
 import db from './utils/db';
 import diffArrays from '../common/utils/diffArrays.js';
 import Graph from '../common/Graph.js';
-import BaseSource from '../common/sources/BaseSource.js';
-
-// hardcoded subgraph for pre-processing
-// that's bad update when graph is plitted config wise
-const processingModules = [
-  {
-    id: 'input',
-    type: 'Input',
-  },
-  {
-    id: 'motion-descriptors',
-    type: 'MotionDescriptors',
-    options: {
-      resamplingPeriod: 0.02,
-    },
-  },
-  {
-    id: 'merge-descriptors',
-    type: 'Merge',
-  },
-  {
-    id: 'script-select-descriptors',
-    type: 'ScriptData',
-    options: {
-      scriptName: 'default-ml-descriptors',
-    },
-  },
-];
-
-const processingConnections = [
-  [ 'input', 'merge-descriptors' ],
-  [ 'input', 'motion-descriptors' ],
-  [ 'motion-descriptors', 'merge-descriptors' ],
-  [ 'merge-descriptors', 'script-select-descriptors' ],
-];
-
-// this will be usefull client-side to plot recorded examples
-class OfflineSource extends BaseSource {
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-
-  run() {
-    this.data.forEach(frame => this.emit(frame));
-  }
-}
-
-class DestBuffer {
-  constructor() {
-    this.inputs = new Set();
-    this.output = new Set();
-    this.data = [];
-  }
-
-  process(inputFrame) {
-    const frame = [];
-
-    for (let i = 0; i < inputFrame.data.length; i++) {
-      frame[i] = inputFrame.data[i];
-    }
-
-    this.data.push(frame);
-  }
-}
+import OfflineSource from '../common/sources/OfflineSource.js';
+import clonedeep from 'lodash.clonedeep';
 
 class Session {
 
@@ -102,6 +39,14 @@ class Session {
 
     this.directory = path.join(this.como.projectDirectory, 'sessions', id);
     this.configFullPath = path.join(this.directory, `config.json`);
+
+    this.xmmInstances = {
+      'gmm': new xmm('gmm'),
+      'hhmm': new xmm('hhmm'),
+    };
+    // @note - only used for config formatting, this should be simplified
+    // the translation between xmm / mano / rapidmix config styles is messy
+    this.processor = new XmmProcessor();
   }
 
   serialize() {
@@ -109,7 +54,13 @@ class Session {
     const values = this.state.getValues();
     const { graph, graphOptions } = values;
 
-    graph.modules.forEach(desc => {
+    graph.data.modules.forEach(desc => {
+      if (Object.keys(graphOptions[desc.id]).length) {
+        desc.options = graphOptions[desc.id];
+      }
+    });
+
+    graph.audio.modules.forEach(desc => {
       if (Object.keys(graphOptions[desc.id]).length) {
         desc.options = graphOptions[desc.id];
       }
@@ -139,7 +90,8 @@ class Session {
    */
   async init(initValues) {
     // extract graph options from graph definition
-    initValues.graphOptions = initValues.graph.modules.reduce((acc, desc) => {
+    const modules = [...initValues.graph.data.modules, ...initValues.graph.audio.modules];
+    initValues.graphOptions = modules.reduce((acc, desc) => {
       acc[desc.id] = desc.options || {};
       return acc;
     }, {});
@@ -147,11 +99,11 @@ class Session {
     this.state = await this.como.server.stateManager.create(`session`, initValues);
 
     this.state.subscribe(async updates => {
-      // if updates['audioFiles'] => handle labels (old / new) and retrain model if needed
-      // @todo - we should also take into account the `active` label
-      // @note - this should probably be cleaned up when updated from file system too, TBC
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
+          // if updates['audioFiles'] => handle labels (old / new) and retrain model if needed
+          // @todo - we should also take into account the `active` label
+          // @note - this should probably be cleaned up when updated from file system too, TBC
           case 'audioFiles': {
             const examples = this.state.get('examples');
             const labels = values.map(file => file.label);
@@ -167,10 +119,11 @@ class Session {
             }
 
             if (dirty) {
-              this.trainModel(examples);
+              this._updateModel(examples);
             }
             break;
           }
+
           case 'graphOptionsEvent': {
             const graphOptions = this.state.get('graphOptions');
 
@@ -178,14 +131,17 @@ class Session {
               // delete scriptParams on scriptName change
               if ('scriptName' in values[moduleId]) {
                 delete graphOptions[moduleId].scriptParams;
+                // @todo - update the model when a dataScript is upated...
+                // this._updateModel(this.state.get('examples'));
               }
 
               Object.assign(graphOptions[moduleId], values[moduleId]);
             }
 
             this.state.set({ graphOptions });
+
             // forward event to players attached to the session
-            const players = Array.from(this.como.project.players.values())
+            Array.from(this.como.project.players.values())
               .filter(player => player.get('sessionId') === this.id)
               .forEach(player => player.set({ graphOptionsEvent: values }));
 
@@ -197,31 +153,9 @@ class Session {
       await db.write(this.configFullPath, this.serialize());
     });
 
-    // @todo - check that the graph topology is valid
-
-    // ----- start dirty
-    // @todo - review this part...
-    // review once config and, audio and data graphs are splitted
-    const graphDescription = {
-      modules: processingModules,
-      connections: processingConnections,
-    };
-    // ----- end dirty
-
-    this.graph = new Graph(this.como, graphDescription, this);
-    await this.graph.init();
-
-
-
-    this.xmmInstances = {
-      'gmm': new xmm('gmm'),
-      'hhmm': new xmm('hhmm'),
-    };
-    // used for config formatting
-    this.processor = new XmmProcessor();
-    // retrain model on instanciation
+    // init model
     const examples = this.state.get('examples');
-    await this.trainModel(examples);
+    await this._updateModel(examples);
   }
 
   async updateAudioFilesFromFileSystem(audioFileTree) {
@@ -250,7 +184,7 @@ class Session {
     const examples = this.state.get('examples');
     examples[uuid] = example;
 
-    this.trainModel(examples);
+    this._updateModel(examples);
   }
 
   deleteExample(uuid) {
@@ -258,13 +192,13 @@ class Session {
 
     if (uuid in examples) {
       delete examples[uuid];
-      this.trainModel(examples);
+      this._updateModel(examples);
     }
   }
 
   clearExamples() {
     const examples = {};
-    this.trainModel(examples);
+    this._updateModel(examples);
   }
 
   clearLabel(label) {
@@ -278,17 +212,50 @@ class Session {
       }
     }
 
-    this.trainModel(examples);
+    this._updateModel(examples);
   }
 
-  async trainModel(examples) {
-    const VERBOSE = true;
+  async _updateModel(examples) {
+    // ---------------------------------------
+    const logPrefix = `[session "${this.state.get('id')}"]`;
+    // ---------------------------------------
+    const labels = Object.values(examples).map(d => d.label).filter((d, i, arr) => arr.indexOf(d) === i);
+    console.log(`\n${logPrefix} > UPDATE MODEL - labels:`, labels);
+    // ---------------------------------------
+    const processingStartTime = new Date().getTime();
+    console.log(`${logPrefix} processing start\t(# examples: ${Object.keys(examples).length})`);
+    // ---------------------------------------
 
-    if (VERBOSE) {
-      console.log(`\n[session "${this.state.get('id')}"] > TRAIN MODEL \
-(# examples: ${Object.keys(examples).length})`);
+    const graphDescription = this.state.get('graph');
+    const graphData = clonedeep(graphDescription.data);
+
+    // replace MLDecoder w/ DestBuffer in graph for recording transformed stream
+    // @note - we concentrate on case w/ 1 or 0 decoder,
+    //         we will handle cases w/ 2 or more decoders later.
+    let hasDecoder = false;
+    let bufferId = null;
+
+    graphData.modules.forEach(module => {
+      if (module.type === 'MLDecoder') {
+        module.type = 'Buffer';
+
+        hasDecoder = true;
+        bufferId = module.id;
+      }
+    });
+
+    if (!hasDecoder) {
+      console.log(`\n${logPrefix} > graph does not contain any MLDecoder, abort traning...`);
+      return Promise.resolve();
     }
-    // process each example into subgraph
+
+    const graph = new Graph(this.como, { data: graphData }, this, null, true);
+    await graph.init();
+
+    const buffer = graph.getModule(bufferId);
+    let offlineSource;
+
+    // @note - mimic rapid-mix API, remove / update later
     const processedExamples = {
       docType: 'rapid-mix:ml-training-set',
       docVersion: '1.0.0',
@@ -299,98 +266,75 @@ class Session {
       }
     }
 
-    if (VERBOSE) {
-      console.log(`[session "${this.state.get('id')}"] processing examples start`);
-    }
-
-    const startTime = new Date().getTime();
-
     // process examples raw data in pre-processing graph
     for (let uuid in examples) {
       const example = examples[uuid];
 
-      const offlineSource = new OfflineSource(example.input);
-      const bufferDest = new DestBuffer();
+      offlineSource = new OfflineSource(example.input);
+      graph.setSource(offlineSource);
 
-      this.graph.setSource(offlineSource);
-      this.graph.modules['script-select-descriptors'].connect(bufferDest);
+      // run the graph offline, this MUST be synchronous
+      offlineSource.run();
+      const transformedStream = buffer.getData();
 
-      offlineSource.run(); // @important - everything must be synchronous here...
-
-      const processedExample = {
-        label: example.label,
-        output: example.output,
-        input: bufferDest.data
-      };
-
-      if (example.input.length !== processedExample.input.length) {
-        throw new Error(`Session:trainModel - incoherent example processing for ${uuid}`);
+      if (example.input.length !== transformedStream.length) {
+        throw new Error(`${logPrefix} Error: incoherent example processing for example ${uuid}`);
       }
 
+      graph.removeSource(offlineSource);
+      buffer.reset();
+
       // add to processed examples
-      processedExamples.payload.data.push(processedExample);
-
-      this.graph.modules['script-select-descriptors'].disconnect();
-      this.graph.removeSource(offlineSource);
+      processedExamples.payload.data.push({
+        label: example.label,
+        output: example.output,
+        input: transformedStream,
+      });
     }
-
-    if (VERBOSE) {
-      console.log(`[session "${this.state.get('id')}"] processing examples \
-finished (${new Date().getTime() - startTime}ms)`);
-    }
-
-    console.log(`[session "${this.state.get('id')}"] training labels:`,
-      [...new Set(processedExamples.payload.data.map(d => d.label))]);
-
-    // -----------------------------------------------------------
-    // this Mano / RapidMix / Xmm stuff is a f****** mess too...
-    // -----------------------------------------------------------
-
-    const model = {};
-
-    // @note - these 2 guys are not really different...,
-    // removing `this.processor` should not be a impossible problem
-    const learningConfig = this.state.get('learningConfig');
-    this.processor.setConfig(learningConfig);
-    const rapidMixConfig = this.processor.getConfig();
-    // console.log(learningConfig);
-    // console.log(rapidMixConfig);
 
     if (processedExamples.payload.data[0]) {
       processedExamples.payload.inputDimension = processedExamples.payload.data[0].input[0].length;
-    } else {
-      processedExamples.payload.inputDimension = 0;
     }
 
-    const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(processedExamples);
-    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(rapidMixConfig);
+    // ---------------------------------------
+    const processingTime = new Date().getTime() - processingStartTime;
+    console.log(`${logPrefix} processing end\t\t(${processingTime}ms)`);
+    // ---------------------------------------
+    const trainingStartTime = new Date().getTime();
+    const numInputDimensions = processedExamples.payload.inputDimension;
+    console.log(`${logPrefix} training start\t\t(# input dimensions: ${numInputDimensions})`);
+    // ---------------------------------------
 
-    const target = learningConfig.payload.modelType;
-    const xmm = this.xmmInstances[target];
+    // train model
+    // @todo - clean this f****** messy Mano / RapidMix / Xmm convertion
+    const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(processedExamples);
+
+    const learningConfig = this.state.get('learningConfig'); // mano
+    this.processor.setConfig(learningConfig)
+    const rapidMixConfig = this.processor.getConfig(); // rapidMix
+    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(rapidMixConfig); // xmm
+
+    // get (gmm|hhmm) xmm instance
+    const xmm = this.xmmInstances[learningConfig.payload.modelType];
 
     xmm.setConfig(xmmConfig);
     xmm.setTrainingSet(xmmTrainingSet);
 
+
+
     return new Promise((resolve, reject) => {
-      if (VERBOSE) {
-        console.log(`[session "${this.state.get('id')}"] training start \
-(input dimension: ${processedExamples.payload.inputDimension})}`);
-      }
-
-      const startTime = new Date().getTime();
-
       xmm.train((err, model) => {
         if (err) {
           reject(err);
         }
 
-        if (VERBOSE) {
-          console.log(`[session "${this.state.get('id')}"] training \
-finished (${new Date().getTime() - startTime}ms)`);
-        }
-
         const rapidMixModel = rapidMixAdapters.xmmToRapidMixModel(model);
         this.state.set({ examples: examples, model: rapidMixModel });
+
+        // ---------------------------------------
+        const trainingTime = new Date().getTime() - trainingStartTime;
+        console.log(`${logPrefix} training end\t\t(${trainingTime}ms)`);
+        // ---------------------------------------
 
         resolve();
       });

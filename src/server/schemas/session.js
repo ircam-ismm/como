@@ -55,5 +55,5 @@ export default {
       },
     },
   },
-  // this should belong to the "encoder / decoder"
+  // ...
 };

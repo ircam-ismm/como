@@ -121,9 +121,9 @@ class Project {
   }
 
 
-  async createGraph(session, player) {
+  async createGraph(session, player, slave) {
     const graphDescription = session.get('graph');
-    const graph = new Graph(this.como, graphDescription, session, player);
+    const graph = new Graph(this.como, graphDescription, session, player, slave);
     await graph.init();
 
     return graph;

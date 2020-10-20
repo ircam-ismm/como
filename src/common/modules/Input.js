@@ -9,7 +9,9 @@ class Input extends BaseModule {
   }
 
   // format raw data to `frame` format to propagate into graph.
-  execute(inputData) {
+  execute(inputFrameOrData) {
+    // @note - this is probably not very robust...
+    const inputData = inputFrameOrData.data ? inputFrameOrData.data : inputFrameOrData;
     const outputData = this.outputFrame.data;
 
     copyFrameData(inputData, outputData);
