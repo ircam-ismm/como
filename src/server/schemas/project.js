@@ -3,10 +3,6 @@ export default {
     type: 'any',
     default: [],
   },
-  presetNames: {
-    type: 'any',
-    default: [], // populated in `Projet.constructor
-  },
   metas: {
     type: 'any',
     default: {}, // { name, title, version,  }
@@ -19,9 +15,21 @@ export default {
     type: 'any',
     default: [],
   },
-  // to be implemented
-  preloadAudioFiles: {
+
+   // @note - defaults presets are populated in `Projet.constructor
+  graphPresets: {
     type: 'any',
     default: [],
-  }
+  },
+  learningPresets: {
+    type: 'any',
+    default: {},
+  },
+
+
+  // to be implemented
+  // preloadAudioFiles: {
+  //   type: 'any',
+  //   default: [],
+  // },
 }

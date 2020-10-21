@@ -77,8 +77,9 @@ class Session {
       'gmm': new xmm('gmm'),
       'hhmm': new xmm('hhmm'),
     };
-    // @note - only used for config formatting, this should be simplified
-    // the translation between xmm / mano / rapidmix config styles is messy
+    // @note - only used for config formatting
+    // this should be simplified, the translation between xmm / mano / rapidmix
+    // config format is really messy
     this.processor = new XmmProcessor();
   }
 

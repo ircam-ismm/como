@@ -32,7 +32,24 @@ export default {
     default: false,
   },
 
-  // @todo - this has to be rethinked and refactored (ok but why ?)
+  // override graph option on the player only
+  graphOptions: {
+    type: 'any',
+    default: {},
+  },
+  graphOptionsEvent: {
+    type: 'any',
+    default: {},
+    event: true,
+  },
+
+  // @todo - this has to be rethinked and refactored to allow multiple ML
+  // instances in the graph, these should be options of the ML Module.
+  //
+  // -> In general all these params that enable the control of modules should
+  // be generalized to module options.
+  //
+  // // @see also `session` schema
   recordingState: {
     type: 'enum',
     list: ['idle', 'armed', 'recording', 'pending', 'confirm', 'cancel'],
@@ -50,44 +67,15 @@ export default {
     default: false,
   },
 
-
   //
   streamSource: {
     type: 'boolean',
     default: false,
   },
-
+  // @todo - rename to recordStream (this is silly)
   streamRecord: {
     type: 'boolean',
     default: false,
   },
-
-  // override graph option on the player only
-  graphOptions: {
-    type: 'any',
-    default: {},
-  },
-  graphOptionsEvent: {
-    type: 'any',
-    default: {},
-    event: true,
-  },
 };
 
-
-// audioRendering: {
-//   volume: 0, // dB
-//   mute: true,
-// },
-// record: {
-//   state: 'idle',
-//   label: '',
-//   preview: false,
-// },
-// streams: {
-//   sensors: false,
-//   decoding: false,
-// },
-// // as mapping are related to the project, this is populated
-// // when the client is added to the project. (cf. appStore::addPlayerToProject)
-// mappings: {},

@@ -27,7 +27,7 @@ class Project {
     return this.state.get(name);
   }
 
-  async createSession(sessionName, presetName) {
+  async createSession(sessionName, graphPreset) {
     return new Promise((resolve, reject) => {
       const ackChannel = `como:project:createSession:ack`;
       const errChannel = `como:project:createSession:err`;
@@ -44,7 +44,7 @@ class Project {
         resolvePromise(null);
       });
 
-      this.como.client.socket.send(`como:project:createSession:req`, sessionName, presetName);
+      this.como.client.socket.send(`como:project:createSession:req`, sessionName, graphPreset);
     });
   }
 

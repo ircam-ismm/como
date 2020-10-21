@@ -114,8 +114,8 @@ class CoMo {
   addClient(client) {
     this.idClientMap.set(client.id, client);
 
-    client.socket.addListener(`como:project:createSession:req`, async (sessionName, sessionPreset) => {
-      const uuid = await this.project.createSession(sessionName, sessionPreset);
+    client.socket.addListener(`como:project:createSession:req`, async (sessionName, graphPreset) => {
+      const uuid = await this.project.createSession(sessionName, graphPreset);
 
       if (uuid !== null) {
         client.socket.send(`como:project:createSession:ack`, uuid);

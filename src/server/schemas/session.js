@@ -28,6 +28,13 @@ export default {
   },
 
   // this should belong to the "encoder / decoder"
+  // this needs to be discussed further... what would be clean
+  // architecture / strategy for that, e.g.
+  // - we don't want to dispatch the examples everywhere,
+  // - how to attach an example to a particular encoder / decoder instance,
+  // - same for config, etc.
+  //
+  // @see also `player` schema
   model: {
     type: 'any',
     default: null,

@@ -42,7 +42,7 @@ class Project {
 
   async init() {
     // parse existing presets
-    this.presets = new Map();
+    this.graphPresets = new Map();
     const fileTree = this.como.fileWatcher.state.get('presets');
 
     for (let i = 0; i < fileTree.children.length; i++) {
@@ -53,11 +53,11 @@ class Project {
         const dataGraph = await db.read(path.join(leaf.path, 'graph-data.json'));
         const audioGraph = await db.read(path.join(leaf.path, 'graph-audio.json'));
         const preset = { data: dataGraph, audio: audioGraph };
-        this.presets.set(presetName, preset);
+        this.graphPresets.set(presetName, preset);
       }
     }
 
-    projectSchema.presetNames.default = Array.from(this.presets.keys());
+    projectSchema.graphPresets.default = Array.from(this.graphPresets.keys());
 
     this.como.server.stateManager.registerSchema('project', projectSchema);
     this.como.server.stateManager.registerSchema(`session`, sessionSchema);
@@ -158,7 +158,7 @@ class Project {
   // -----------------------------------------------------------------------
   // SESSIONS
   // -----------------------------------------------------------------------
-  async createSession(sessionName, sessionPreset) {
+  async createSession(sessionName, graphPreset) {
     const overview = this.get('sessionsOverview');
     // @note - this could probably be more robust
     const id = slugify(sessionName);
@@ -169,7 +169,7 @@ class Project {
 
     if (index === -1) {
       const audioFiles = this.get('audioFiles');
-      const graph = this.presets.get(sessionPreset);
+      const graph = this.graphPresets.get(graphPreset);
       const session = await Session.create(this.como, id, sessionName, graph, audioFiles);
 
       this.sessions.set(id, session);
@@ -275,7 +275,6 @@ class Project {
   // because if I duplicate and control another player on the controller, the
   // route will be broken if one or the other is deleted.
   async createStreamRoute(from, to) {
-    console.log('createStreamRoute', from, to);
     const streamsRouting = this.get('streamsRouting');
     const index = streamsRouting.findIndex(r => r[0] === from && r[1] === to);
 
@@ -285,8 +284,6 @@ class Project {
       streamsRouting.push(created);
 
       this.set({ streamsRouting });
-
-      console.log(Array.from(this.players.keys()));
       // notify player that it should start to stream its source
       if (!isSourceStreaming) {
         const player = this.players.get(from);
