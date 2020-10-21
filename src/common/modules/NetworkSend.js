@@ -12,6 +12,9 @@ class NetworkSend extends BaseModule {
         this.streamSource = updates['streamSource'];
       }
     });
+
+    // init with current strema value
+    this.streamSource = this.graph.player.get('streamSource');
   }
 
   destroy() {

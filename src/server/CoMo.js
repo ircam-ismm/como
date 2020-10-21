@@ -212,6 +212,7 @@ class CoMo {
 
   deleteClient(client) {
     this.idClientMap.delete(client.id, client);
+    this.project.clearStreamRouting(null, client.id); // clear routing where client is the target
   }
 }
 

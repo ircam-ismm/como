@@ -81,7 +81,7 @@ class Project {
         const playerId = playerState.get('id');
 
         playerState.onDetach(() => {
-          this.clearStreamRouting(playerId);
+          this.clearStreamRouting(playerId, null); // clear routing where player is the source
           this.players.delete(playerId)
         });
 
@@ -279,10 +279,10 @@ class Project {
   // ROUTING
   // -----------------------------------------------------------------------
 
-  // @todo - should should of form [fromPlayer, toPlayer] and not [fromPlayer, toNode]
-  // the map [fromPlayer, toNode] should therefore be maintained from this list
-  // because if I duplicate and control another player on the controller, the
-  // route will be broken if one or the other is deleted.
+  /**
+   * from - playerId - the logical client, CoMo player instance
+   * to - nodeId - the physical client, soundworks client instance
+   */
   async createStreamRoute(from, to) {
     const streamsRouting = this.get('streamsRouting');
     const index = streamsRouting.findIndex(r => r[0] === from && r[1] === to);
@@ -292,6 +292,7 @@ class Project {
       const created = [from, to];
       streamsRouting.push(created);
 
+      // console.log('createStreamRoute', streamsRouting);
       this.set({ streamsRouting });
       // notify player that it should start to stream its source
       if (!isSourceStreaming) {
@@ -313,6 +314,7 @@ class Project {
       const deleted = streamsRouting[index];
       streamsRouting.splice(index, 1);
 
+      // console.log('deleteStreamRoute', streamsRouting);
       await this.set({ streamsRouting });
 
       const isSourceStreaming = streamsRouting.reduce((acc, r) => acc || r[0] === from, false);
@@ -329,19 +331,20 @@ class Project {
     return false;
   }
 
-  async clearStreamRouting(playerId) {
+  async clearStreamRouting(from = null, to = null) {
     const streamsRouting = this.get('streamsRouting');
     const deleted = [];
 
     for (let i = streamsRouting.length - 1; i >= 0; i--) {
       const route = streamsRouting[i];
 
-      if (route[0] === playerId || route[1] === playerId) {
+      if (route[0] === from || route[1] === to) {
         deleted.push(route);
         streamsRouting.splice(i, 1);
       }
     }
 
+    // console.log('clearStreamRoute', streamsRouting);
     this.set({ streamsRouting });
 
     // notify possible sources that they should stop streaming

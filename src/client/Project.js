@@ -123,7 +123,6 @@ class Project {
 
   async createGraph(session, player, slave) {
     const graphDescription = session.get('graph');
-    console.log(graphDescription, session, player, slave);
     const graph = new Graph(this.como, graphDescription, session, player, slave);
     await graph.init();
 
