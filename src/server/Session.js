@@ -215,6 +215,12 @@ class Session {
 
             break;
           }
+
+          case 'learningConfig': {
+            const examples = this.state.get('examples');
+            this._updateModel(examples);
+            break;
+          }
         }
 
         await this.persist(name);

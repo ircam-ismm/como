@@ -21,6 +21,10 @@ class Project {
     this.state = null;
     this.players = new Map();
     this.sessions = new Map();
+
+    this.como.server.stateManager.registerSchema('project', projectSchema);
+    this.como.server.stateManager.registerSchema(`session`, sessionSchema);
+    this.como.server.stateManager.registerSchema('player', playerSchema);
   }
 
   // `State` interface
@@ -43,11 +47,14 @@ class Project {
   async init() {
     // parse existing presets
     this.graphPresets = new Map();
+    let learningPresets = {};
+
     const fileTree = this.como.fileWatcher.state.get('presets');
 
     for (let i = 0; i < fileTree.children.length; i++) {
       const leaf = fileTree.children[i];
 
+      // graph presets
       if (leaf.type === 'directory') {
         const presetName = leaf.name;
         const dataGraph = await db.read(path.join(leaf.path, 'graph-data.json'));
@@ -55,15 +62,17 @@ class Project {
         const preset = { data: dataGraph, audio: audioGraph };
         this.graphPresets.set(presetName, preset);
       }
+
+      // learning presets
+      if (leaf.type === 'file' && leaf.name === 'learning-presets.json') {
+        learningPresets = await db.read(leaf.path);
+      }
     }
 
-    projectSchema.graphPresets.default = Array.from(this.graphPresets.keys());
-
-    this.como.server.stateManager.registerSchema('project', projectSchema);
-    this.como.server.stateManager.registerSchema(`session`, sessionSchema);
-    this.como.server.stateManager.registerSchema('player', playerSchema);
-
-    this.state = await this.como.server.stateManager.create('project');
+    this.state = await this.como.server.stateManager.create('project', {
+      graphPresets: Array.from(this.graphPresets.keys()),
+      learningPresets: learningPresets,
+    });
 
     this.como.server.stateManager.observe(async (schemaName, stateId, nodeId) => {
       // track players
@@ -82,7 +91,7 @@ class Project {
             switch (name) {
               // reset player state when it change session
               // @note - this could be a kind of reducer provided by
-              // the stateManager itself
+              // the stateManager itself (soundworks/core issue)
               case 'sessionId': {
                 const sessionId = values;
 
@@ -190,7 +199,7 @@ class Project {
       this.sessions.delete(id);
       await session.delete();
 
-      // We can come from 2 path here:
+      // We can come from 2 paths here:
       // 1. if the file still exists, the method has been called programmatically so
       // we need to remove the file. This will trigger `_updateSessionsFromFileSystem`
       // but nothing should append there, that's why we update the
