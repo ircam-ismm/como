@@ -1,10 +1,60 @@
 import diffArrays from '../common/utils/diffArrays.js';
 
+class LabelAudioFileTable {
+  constructor(session) {
+    this.session = session;
+  }
+
+  query(label) {
+    const result = [];
+    const labelAudioFileTable = this.session.get('labelAudioFileTable');
+
+    for (let [_label, filename] of labelAudioFileTable) {
+      if (label === _label) {
+        result.push(filename);
+      }
+    }
+
+    return result;
+  }
+
+  queryBuffers(label) {
+    const result = this.query(label);
+    return result.map(filename => this.session.audioBuffers[filename]);
+  }
+
+  delete(label = null, filename = null) {
+
+  }
+
+  insert(label, filename) {
+
+  }
+}
+
 // we should maybe have a parent StateDecorator class
 class Session {
   constructor(como, sessionState) {
     this.como = como;
     this.state = sessionState;
+
+    this.audioBuffers = {};
+    this.labelAudioFileTable = new LabelAudioFileTable(this);
+  }
+
+  async init() {
+    await this.updateAudioFiles();
+
+    this.state.subscribe(updates => {
+      for (let name in updates) {
+        switch (name) {
+          case 'audioFiles': {
+            this.updateAudioFiles();
+            break;
+          }
+        }
+      }
+    });
   }
 
   getValues() {
@@ -51,6 +101,7 @@ class Session {
     this.como.client.socket.send(`como:session:deleteExample`, sessionId, exampleUuid);
   }
 
+  // @todo - mix these two ones
   clearExamples() {
     const sessionId = this.state.get('id');
     this.como.client.socket.send(`como:session:clearExamples`, sessionId);
@@ -70,39 +121,47 @@ class Session {
     return graphOptions[moduleId];
   }
 
+  createLabel(label) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:createLabel`, sessionId, label);
+  }
+
+  updateLabel(oldLabel, newLabel) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:updateLabel`, sessionId, oldLabel, newLabel);
+  }
+
+  deleteLabel(label) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:deleteLabel`, sessionId, label);
+  }
+
+  toggleAudioFile(filename, active) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:toggleAudioFile`, sessionId, filename, active);
+  }
+
+  createLabelAudioFileRow(row) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:createLabelAudioFileRow`, sessionId, row);
+  }
+
+  deleteLabelAudioFileRow(row) {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:deleteLabelAudioFileRow`, sessionId, row);
+  }
+
   async updateAudioFiles() {
     const audioFiles = this.state.get('audioFiles');
     const audioBufferLoader = this.como.experience.plugins['audio-buffer-loader'];
 
     const activeAudioFiles = audioFiles.filter(audioFile => audioFile.active);
-    const activeUrls = activeAudioFiles.map(audioFile => audioFile.url);
-    const current = Object.keys(audioBufferLoader.data);
+    const filesToLoad = {};
+    activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
 
-    const { created, deleted } = diffArrays(current, activeUrls);
-    // release deactivated buffer
-    deleted.forEach(url => delete audioBufferLoader.data[url]);
-    // load new files
-    const toLoad = {};
-    created.forEach(url => toLoad[url] = url);
-
-    await audioBufferLoader.load(toLoad);
-
-    // recreate <label, Buffers[]> pairs
-    this.audioFilesByLabel = {};
-
-    activeAudioFiles.forEach(audioFile => {
-      const { label, url } = audioFile;
-      const buffer = audioBufferLoader.data[url];
-
-      if (!this.audioFilesByLabel[label]) {
-        this.audioFilesByLabel[label] = [buffer];
-      } else {
-        this.audioFilesByLabel[label].push(buffer)
-      }
-    });
-
+    this.audioBuffers = await audioBufferLoader.load(filesToLoad);
     // clear audio buffer loader cache
-    // audioBufferLoader.data = {};
+    audioBufferLoader.data = {};
   }
 
 }

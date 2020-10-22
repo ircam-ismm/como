@@ -8,10 +8,10 @@ class Project {
   }
 
   async init() {
+    this.state = await this.como.client.stateManager.attach('project');
+
     this.players = new Players(this.como);
     this.sessions = new Sessions(this.como);
-
-    this.state = await this.como.client.stateManager.attach('project');
   }
 
   subscribe(func) {

@@ -180,7 +180,7 @@ class CoMo {
 
 
     // ------------------------------------------------------------
-    // session / examples
+    // session management
     client.socket.addListener(`como:session:addExample`, async (sessionId, example) => {
       if (this.project.sessions.has(sessionId)) {
         const session = this.project.sessions.get(sessionId);
@@ -206,6 +206,48 @@ class CoMo {
       if (this.project.sessions.has(sessionId)) {
         const session = this.project.sessions.get(sessionId);
         session.clearExamples();
+      }
+    });
+
+    client.socket.addListener(`como:session:createLabel`, async (sessionId, label) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.createLabel(label);
+      }
+    });
+
+    client.socket.addListener(`como:session:updateLabel`, async (sessionId, oldLabel, newLabel) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.updateLabel(oldLabel, newLabel);
+      }
+    });
+
+    client.socket.addListener(`como:session:deleteLabel`, async (sessionId, label) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.deleteLabel(label);
+      }
+    });
+
+    client.socket.addListener(`como:session:toggleAudioFile`, async (sessionId, filename, active) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.toggleAudioFile(filename, active);
+      }
+    });
+
+    client.socket.addListener(`como:session:createLabelAudioFileRow`, async (sessionId, row) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.createLabelAudioFileRow(row);
+      }
+    });
+
+    client.socket.addListener(`como:session:deleteLabelAudioFileRow`, async (sessionId, row) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.deleteLabelAudioFileRow(row);
       }
     });
   }

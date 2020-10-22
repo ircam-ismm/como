@@ -15,54 +15,58 @@ import clonedeep from 'lodash.clonedeep';
 class Session {
 
   /** factory methods */
-  static async create(como, id, name, graph, audioFiles) {
+  static async create(como, id, name, graph, fsAudioFiles) {
     const session = new Session(como, id);
     await session.init({ name, graph });
-    await session.updateAudioFilesFromFileSystem(audioFiles);
+    await session.updateAudioFilesFromFileSystem(fsAudioFiles);
 
+    // by default (to be backward usage compatible):
+    // - labels are the audio files names without extension
+    // - a row <label, audioFile> is inserted in the `labelAudioFileTable`
+    const registeredAudioFiles = session.get('audioFiles');
+    const labels = [];
+    const labelAudioFileTable = [];
+
+    registeredAudioFiles.forEach(audioFile => {
+      const label = audioFile.name;
+      const row = [label, audioFile.name];
+      labels.push(label);
+      labelAudioFileTable.push(row);
+    });
+
+    await session.set({ labels, labelAudioFileTable });
     await session.persist();
+
     return session;
   }
 
-  static async fromFileSystem(como, dirname, audioFiles) {
-    let configFileExists;
-    let id;
-    let config;
+  static async fromFileSystem(como, dirname, fsAudioFiles) {
+    // @note - version 0.0.0 (cf.metas)
+    const metas = await db.read(path.join(dirname, 'metas.json'));
+    const dataGraph = await db.read(path.join(dirname, `graph-data.json`));
+    const audioGraph = await db.read(path.join(dirname, `graph-audio.json`));
+    const labels = await db.read(path.join(dirname, 'labels.json'));
+    const labelAudioFileTable = await db.read(path.join(dirname, 'label-audio-files-table.json'));
+    const learningConfig = await db.read(path.join(dirname, 'ml-config.json'));
+    const examples = await db.read(path.join(dirname, '.ml-examples.json'));
+    const model = await db.read(path.join(dirname, '.ml-model.json'));
+    const audioFiles = await db.read(path.join(dirname, '.audio-files.json'));
 
-    // facilitate moving from old config format to new one
-    if (fs.existsSync(path.join(dirname, 'config.json'))) {
-      const json = await db.read(path.join(dirname, 'config.json'));
-      id = json.id;
-      config = json;
-      configFileExists = true;
-    } else {
-      // version 0.0.0
-      const metas = await db.read(path.join(dirname, 'metas.json'));
-      const dataGraph = await db.read(path.join(dirname, `graph-data.json`));
-      const audioGraph = await db.read(path.join(dirname, `graph-audio.json`));
-      const learningConfig = await db.read(path.join(dirname, 'ml-config.json'));
-      const examples = await db.read(path.join(dirname, '.ml-examples.json'));
-      const model = await db.read(path.join(dirname, '.ml-model.json'));
-
-      id = metas.id;
-      config = {
-        name: metas.name,
-        graph: { data: dataGraph, audio: audioGraph },
-        learningConfig,
-        examples,
-        model,
-      };
-      configFileExists = false;
-    }
+    const id = metas.id;
+    const config = {
+      name: metas.name,
+      graph: { data: dataGraph, audio: audioGraph },
+      labels,
+      labelAudioFileTable,
+      learningConfig,
+      examples,
+      model,
+      audioFiles,
+    };
 
     const session = new Session(como, id);
     await session.init(config);
-    await session.updateAudioFilesFromFileSystem(audioFiles);
-
-    // delete old config file
-    if (configFileExists) {
-      await db.delete(path.join(dirname, 'config.json'));
-    }
+    await session.updateAudioFilesFromFileSystem(fsAudioFiles);
 
     return session;
   }
@@ -89,6 +93,16 @@ class Session {
     if (key === null || key === 'name') {
       const { id, name } = values;
       await db.write(path.join(this.directory, 'metas.json'), { id, name, version: '0.0.0' });
+    }
+
+    if (key === null || key === 'labels') {
+      const { labels } = values;
+      await db.write(path.join(this.directory, 'labels.json'), labels);
+    }
+
+    if (key === null || key === 'labelAudioFileTable') {
+      const { labelAudioFileTable } = values;
+      await db.write(path.join(this.directory, 'label-audio-files-table.json'), labelAudioFileTable);
     }
 
     if (key === null || key === 'graph' || key === 'graphOptions') {
@@ -136,6 +150,14 @@ class Session {
     return this.state.get(name);
   }
 
+  getValues() {
+    return this.state.getValues();
+  }
+
+  async set(updates) {
+    await this.state.set(updates);
+  }
+
   subscribe(func) {
     return this.state.subscribe(func);
   }
@@ -169,29 +191,6 @@ class Session {
     this.state.subscribe(async updates => {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
-          // if updates['audioFiles'] => handle labels (old / new) and retrain model if needed
-          // @todo - we should also take into account the `active` label
-          // @note - this should probably be cleaned up when updated from file system too, TBC
-          case 'audioFiles': {
-            const examples = this.state.get('examples');
-            const labels = values.map(file => file.label);
-            let dirty = false;
-            // delete examples with a label that does not exists anymore
-            for (let uuid in examples) {
-              const exampleLabel = examples[uuid].label;
-
-              if (labels.indexOf(exampleLabel) === -1) {
-                delete examples[uuid];
-                dirty = true;
-              }
-            }
-
-            if (dirty) {
-              this._updateModel(examples);
-            }
-            break;
-          }
-
           case 'graphOptionsEvent': {
             const graphOptions = this.state.get('graphOptions');
 
@@ -199,7 +198,7 @@ class Session {
               // delete scriptParams on scriptName change
               if ('scriptName' in values[moduleId]) {
                 delete graphOptions[moduleId].scriptParams;
-                // @todo - update the model when a dataScript is upated...
+                // @todo - update the model when a dataScript is updated...
                 // this._updateModel(this.state.get('examples'));
               }
 
@@ -235,16 +234,14 @@ class Session {
   async updateAudioFilesFromFileSystem(audioFileTree) {
     const audioFiles = this.state.get('audioFiles');
     const { deleted, created } = diffArrays(audioFiles, audioFileTree, f => f.url);
-    // created
+
     created.forEach(createdFile => {
       const copy = Object.assign({}, createdFile);
       copy.active = true;
-      copy.label = createdFile.name;
 
       audioFiles.push(copy);
     });
 
-    // deleted
     deleted.forEach(deletedFile => {
       const index = audioFiles.findIndex(f => f.url === deletedFile.url);
       audioFiles.splice(index, 1);
@@ -270,6 +267,9 @@ class Session {
     }
   }
 
+  // ---------------------------------------------------------------
+  // @todo - mix and rename clearExamples & clearLabel
+  // ---------------------------------------------------------------
   clearExamples() {
     const examples = {};
     this._updateModel(examples);
@@ -287,6 +287,97 @@ class Session {
     }
 
     this._updateModel(examples);
+  }
+
+
+  createLabel(label) {
+    const labels = this.state.get('labels');
+
+    if (labels.indexOf(label) === -1) {
+      labels.push(label);
+
+      this.state.set({ labels });
+    }
+  }
+
+  updateLabel(oldLabel, newLabel) {
+    const { labels, labelAudioFileTable, examples } = this.state.getValues();
+
+    if (labels.indexOf(oldLabel) !== -1 && labels.indexOf(newLabel) === -1) {
+      const updatedLabels = labels.map(label => label === oldLabel ? newLabel : label);
+      const updatedTable = labelAudioFileTable.map(row => {
+        if (row[0] === oldLabel) {
+          row[0] = newLabel;
+        }
+
+        return row;
+      });
+
+      // updates labels of existing examples
+      for (let uuid in examples) {
+        const example = examples[uuid];
+
+        if (example.label === oldLabel) {
+          example.label = newLabel;
+        }
+      }
+
+      this._updateModel(examples);
+      this.state.set({
+        labels: updatedLabels,
+        labelAudioFileTable: updatedTable,
+      });
+    }
+  }
+
+  deleteLabel(label) {
+    const { labels, labelAudioFileTable, examples } = this.state.getValues();
+
+    if (labels.indexOf(label) !== -1) {
+      // clean label / audio file table
+      const filteredLabels = labels.filter(l => l !== label);
+      const filteredTable = labelAudioFileTable.filter(row => row[0] !== label);
+
+      this.clearLabel(label); // this will retrain the model too
+      this.state.set({
+        labels: filteredLabels,
+        labelAudioFileTable: filteredTable,
+      });
+    }
+  }
+
+  toggleAudioFile(filename, active) {
+    const { audioFiles, labelAudioFileTable } = this.state.getValues();
+
+    const audioFile = audioFiles.find(f => f.name === filename);
+    audioFile.active = active;
+
+    const updatedTable = labelAudioFileTable.filter(row => row[1] !== filename);
+    console.log(audioFile);
+
+    this.state.set({
+      audioFiles,
+      labelAudioFileTable: updatedTable,
+    });
+  }
+
+  createLabelAudioFileRow(row) {
+    const labelAudioFileTable = this.state.get('labelAudioFileTable');
+    const index = labelAudioFileTable.findIndex(r => r[0] === row[0] && r[1] === row[1]);
+
+    if (index === -1) {
+      labelAudioFileTable.push(row);
+      this.state.set({ labelAudioFileTable });
+    }
+  }
+
+  deleteLabelAudioFileRow(row) {
+    const labelAudioFileTable = this.state.get('labelAudioFileTable');
+    const filteredTable = labelAudioFileTable.filter(r => {
+      return r[0] === row[0] && r[1] === row[1] ? false : true;
+    });
+
+    this.state.set({ labelAudioFileTable: filteredTable });
   }
 
   async _updateModel(examples) {

@@ -11,6 +11,16 @@ export default {
     type: 'any',
     default: [],
   },
+  labels: {
+    type: 'any',
+    default: [],
+  },
+  // @note - provide an abstraction to access that
+  labelAudioFileTable: {
+    type: 'any',
+    default: [],
+  },
+
   graph: {
     type: 'any',
     default: {},

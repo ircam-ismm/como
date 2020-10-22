@@ -103,14 +103,9 @@ class Project {
                     playerState.set({ sessionId: null });
                     return;
                   }
-                  // pick a default label for the new player
-                  // @todo - this should be updated on any `audioFiles.label` update
-                  const defaultLabel = session.state.get('audioFiles')
-                    .map(file => file.label)
-                    .filter((label, index, arr) => arr.indexOf(label) === index)
-                    .sort()[0];
 
-                  const graphOptions = session.state.get('graphOptions');
+                  const defaultLabel = session.get('labels')[0];
+                  const graphOptions = session.get('graphOptions');
 
                   playerState.set({
                     label: defaultLabel,
