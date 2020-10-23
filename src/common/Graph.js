@@ -17,6 +17,7 @@ class Graph {
     this.como = como;
     this.session = session;
     this.player = player;
+    this.slave = slave;
 
     this.registeredModules = {};
     this.modules = {}; // <id, module>
