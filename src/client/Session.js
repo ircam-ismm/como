@@ -101,15 +101,9 @@ class Session {
     this.como.client.socket.send(`como:session:deleteExample`, sessionId, exampleUuid);
   }
 
-  // @todo - mix these two ones
-  clearExamples() {
+  clearExamples(label = null) {
     const sessionId = this.state.get('id');
-    this.como.client.socket.send(`como:session:clearExamples`, sessionId);
-  }
-
-  clearLabel(label) {
-    const sessionId = this.state.get('id');
-    this.como.client.socket.send(`como:session:clearLabel`, sessionId, label);
+    this.como.client.socket.send(`como:session:clearExamples`, sessionId, label);
   }
 
   setGraphOptions(moduleId, updates) {

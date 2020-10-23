@@ -195,17 +195,10 @@ class CoMo {
       }
     });
 
-    client.socket.addListener(`como:session:clearLabel`, async (sessionId, label) => {
+    client.socket.addListener(`como:session:clearExamples`, async (sessionId, label = null) => {
       if (this.project.sessions.has(sessionId)) {
-        const session = this.project.sessions.get(sessionId);
-        session.clearLabel(label);
-      }
-    });
-
-    client.socket.addListener(`como:session:clearExamples`, async (sessionId) => {
-      if (this.project.sessions.has(sessionId)) {
-        const session = this.project.sessions.get(sessionId);
-        session.clearExamples();
+        const session = this.project.sessions.get(sessionId, label);
+        session.clearExamples(label);
       }
     });
 

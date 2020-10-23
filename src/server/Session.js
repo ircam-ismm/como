@@ -267,28 +267,21 @@ class Session {
     }
   }
 
-  // ---------------------------------------------------------------
-  // @todo - mix and rename clearExamples & clearLabel
-  // ---------------------------------------------------------------
-  clearExamples() {
-    const examples = {};
-    this._updateModel(examples);
-  }
+  clearExamples(label = null) {
+    const clearedExamples = {};
 
-  clearLabel(label) {
-    const examples = this.state.get('examples');
+    if (label !== null) {
+      const examples = this.state.get('examples');
 
-    for (let uuid in examples) {
-      const example = examples[uuid];
-
-      if (example.label === label) {
-        delete examples[uuid];
+      for (let uuid in examples) {
+        if (examples[uuid].label !== label) {
+          clearedExamples[uuid] = examples[uuid];
+        }
       }
     }
 
-    this._updateModel(examples);
+    this._updateModel(clearedExamples);
   }
-
 
   createLabel(label) {
     const labels = this.state.get('labels');
@@ -338,7 +331,7 @@ class Session {
       const filteredLabels = labels.filter(l => l !== label);
       const filteredTable = labelAudioFileTable.filter(row => row[0] !== label);
 
-      this.clearLabel(label); // this will retrain the model too
+      this.clearExamples(label); // this retrains the model
       this.state.set({
         labels: filteredLabels,
         labelAudioFileTable: filteredTable,
