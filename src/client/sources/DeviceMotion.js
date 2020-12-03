@@ -5,12 +5,12 @@ class DeviceMotion extends BaseSource {
   constructor(como, streamId = null) {
     super();
 
-    if (streamId === null) {
-      throw new Error('DeviceMotion source requires a streamId');
+    if (!como.hasDeviceMotion) {
+      throw new Error('DeviceMotion source requires access to the device motion API');
     }
 
-    if (!como.hasDeviceMotion) {
-      throw new Error('DeviceMotion source requires access to deviceMotion');
+    if (streamId === null) {
+      throw new Error('DeviceMotion source requires a streamId');
     }
 
     this.como = como;

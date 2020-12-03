@@ -9,6 +9,7 @@ import pluginSyncFactory from '@soundworks/plugin-sync/server';
 import pluginScriptingFactory from '@soundworks/plugin-scripting/server';
 import pluginLoggerFactory from '@soundworks/plugin-logger/server';
 
+import sources from './sources/index.js';
 import modules from '../common/modules/index.js';
 
 import Project from './Project.js';
@@ -21,6 +22,8 @@ class CoMo {
     this.projectName = projectName;
     this.projectDirectory = path.join(projectsDirectory, projectName);
     this.project = null;
+
+    this.sources = sources;
     this.modules = modules;
 
     this.idClientMap = new Map();
@@ -159,6 +162,8 @@ class CoMo {
 
     // streams routing
     client.socket.addBinaryListener('stream', frame => {
+      // @todo - we need to move this into `Projet` so that it can be called
+      // directly from server side with an arbitrary frame...
       const routes = this.project.get('streamsRouting');
       const fromId = frame[0];
 

@@ -27,9 +27,9 @@
     "url": "https://github.com/ircam-ismm/como"
   },
   "dependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+    "@babel/cli": "^7.12.8",
+    "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@ircam/devicemotion": "^1.2.0",
     "@ircam/parameters": "^1.2.2",
     "@ircam/ticker": "^1.0.6",
@@ -38,7 +38,7 @@
     "@soundworks/plugin-checkin": "^1.0.1",
     "@soundworks/plugin-filesystem": "^1.0.0",
     "@soundworks/plugin-logger": "^1.0.0",
-    "@soundworks/plugin-platform": "^1.0.0",
+    "@soundworks/plugin-platform": "^1.0.1",
     "@soundworks/plugin-scripting": "^1.0.1",
     "@soundworks/plugin-sync": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
@@ -46,11 +46,11 @@
     "rapid-mix-adapters": "github:ircam-rnd/rapid-mix-adapters#v1.2.2",
     "rimraf": "^3.0.0",
     "serve-static": "^1.14.1",
-    "uuidv4": "^6.0.0",
+    "uuidv4": "^6.2.5",
     "xmm-node": "github:ircam-rnd/xmm-node#napi"
   },
   "devDependencies": {
-    "chokidar": "^3.2.2",
+    "chokidar": "^3.4.3",
     "chokidar-cli": "^2.0.0"
   }
 }

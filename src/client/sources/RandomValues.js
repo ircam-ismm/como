@@ -9,7 +9,6 @@ class RandomValues extends BaseSource {
     this.streamId = streamId;
     this.period = period;
 
-    this.buffer = new Float32Array(9);
     this.data = {
       metas: {},
       accelerationIncludingGravity: {},

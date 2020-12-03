@@ -6,9 +6,7 @@ export function copyFrameData(input, output) {
         output[name] = [];
       }
 
-      for (let i = 0; i < input[name].length; i++) {
-        output[name][i] = input[name][i];
-      }
+      output[name] = input[name].slice(0);
     // handle objects
     } else if (Object.prototype.toString.call(input[name]) === '[object Object]') {
       if (!output[name]) {
