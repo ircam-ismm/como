@@ -7,6 +7,7 @@ export function copyFrameData(input, output) {
       }
 
       output[name] = input[name].slice(0);
+      // output[name] = output[name].concat(input[name]);
     // handle objects
     } else if (Object.prototype.toString.call(input[name]) === '[object Object]') {
       if (!output[name]) {

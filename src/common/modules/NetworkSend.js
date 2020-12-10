@@ -13,7 +13,7 @@ class NetworkSend extends BaseModule {
       }
     });
 
-    // init with current strema value
+    // init with current stream value
     this.streamSource = this.graph.player.get('streamSource');
   }
 
@@ -38,7 +38,7 @@ class NetworkSend extends BaseModule {
       this.data[7] = frame.data.rotationRate.beta;
       this.data[8] = frame.data.rotationRate.gamma;
 
-      this.graph.como.client.socket.sendBinary('stream', this.data);
+      this.graph.como.project.propagateStreamFrame(this.data);
     }
   }
 }

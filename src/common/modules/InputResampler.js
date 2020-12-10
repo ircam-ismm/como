@@ -40,7 +40,7 @@ class InputResampler extends BaseModule {
     // copy inputFrame.data into new object as the source reuses the same instance
     copyFrameData(inputData, copy);
 
-    // papre `outputFrame.data` structure to simplify logic in `proapgate`
+    // prepare `outputFrame.data` structure to simplify logic in `propagate`
     for (let name in inputData) {
       if (Array.isArray(inputData[name])) {
         if (!(name in this.outputFrame.data)) {

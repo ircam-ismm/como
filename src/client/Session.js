@@ -157,7 +157,6 @@ class Session {
     // clear audio buffer loader cache
     audioBufferLoader.data = {};
   }
-
 }
 
 export default Session;

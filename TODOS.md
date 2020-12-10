@@ -1,3 +1,7 @@
+## Controller
+
+when we change labels, it seems the drop down menu for chosing labels with recordings is not updated
+
 # TODOS
 
 ## ScriptData.js (line: 100)

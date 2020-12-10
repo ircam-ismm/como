@@ -199,7 +199,7 @@ class Session {
               if ('scriptName' in values[moduleId]) {
                 delete graphOptions[moduleId].scriptParams;
                 // @todo - update the model when a dataScript is updated...
-                // this._updateModel(this.state.get('examples'));
+                // this.updateModel(this.state.get('examples'));
               }
 
               Object.assign(graphOptions[moduleId], values[moduleId]);
@@ -216,8 +216,7 @@ class Session {
           }
 
           case 'learningConfig': {
-            const examples = this.state.get('examples');
-            this._updateModel(examples);
+            this.updateModel();
             break;
           }
         }
@@ -226,9 +225,22 @@ class Session {
       }
     });
 
+
+    // init graph
+    const graphDescription = this.state.get('graph');
+    const dataGraph = clonedeep(graphDescription.data);
+
+    dataGraph.modules.forEach(module => {
+      if (module.type === 'MLDecoder') {
+        module.type = 'Buffer';
+      }
+    });
+
+    this.graph = new Graph(this.como, { data: dataGraph }, this, null, true);
+    await this.graph.init();
+
     // init model
-    const examples = this.state.get('examples');
-    await this._updateModel(examples);
+    await this.updateModel();
   }
 
   async updateAudioFilesFromFileSystem(audioFileTree) {
@@ -255,7 +267,7 @@ class Session {
     const examples = this.state.get('examples');
     examples[uuid] = example;
 
-    this._updateModel(examples);
+    this.updateModel(examples);
   }
 
   deleteExample(uuid) {
@@ -263,7 +275,7 @@ class Session {
 
     if (uuid in examples) {
       delete examples[uuid];
-      this._updateModel(examples);
+      this.updateModel(examples);
     }
   }
 
@@ -280,7 +292,7 @@ class Session {
       }
     }
 
-    this._updateModel(clearedExamples);
+    this.updateModel(clearedExamples);
   }
 
   createLabel(label) {
@@ -315,7 +327,7 @@ class Session {
         }
       }
 
-      this._updateModel(examples);
+      this.updateModel(examples);
       this.state.set({
         labels: updatedLabels,
         labelAudioFileTable: updatedTable,
@@ -346,7 +358,6 @@ class Session {
     audioFile.active = active;
 
     const updatedTable = labelAudioFileTable.filter(row => row[1] !== filename);
-    console.log(audioFile);
 
     this.state.set({
       audioFiles,
@@ -373,7 +384,11 @@ class Session {
     this.state.set({ labelAudioFileTable: filteredTable });
   }
 
-  async _updateModel(examples) {
+  async updateModel(examples = null) {
+    if (examples === null) {
+      examples = this.state.get('examples');
+    }
+
     // ---------------------------------------
     const logPrefix = `[session "${this.state.get('id')}"]`;
     // ---------------------------------------
@@ -384,33 +399,27 @@ class Session {
     console.log(`${logPrefix} processing start\t(# examples: ${Object.keys(examples).length})`);
     // ---------------------------------------
 
-    const graphDescription = this.state.get('graph');
-    const graphData = clonedeep(graphDescription.data);
-
     // replace MLDecoder w/ DestBuffer in graph for recording transformed stream
-    // @note - we concentrate on case w/ 1 or 0 decoder,
-    //         we will handle cases w/ 2 or more decoders later.
+    // @note - this can only work w/ 1 or 0 decoder,
+    // @todo - handle cases w/ 2 or more decoders later.
     let hasDecoder = false;
-    let bufferId = null;
+    let buffer = null;
 
-    graphData.modules.forEach(module => {
-      if (module.type === 'MLDecoder') {
-        module.type = 'Buffer';
+    for (let id in this.graph.modules) {
+      const module = this.graph.modules[id];
 
+      if (module.type === 'Buffer') {
         hasDecoder = true;
-        bufferId = module.id;
+        buffer = module;
       }
-    });
+    }
 
-    if (!hasDecoder) {
+    if (buffer === null) {
       console.log(`\n${logPrefix} > graph does not contain any MLDecoder, abort traning...`);
       return Promise.resolve();
     }
 
-    const graph = new Graph(this.como, { data: graphData }, this, null, true);
-    await graph.init();
-
-    const buffer = graph.getModule(bufferId);
+    // const buffer = graph.getModule(bufferId);
     let offlineSource;
 
     // @note - mimic rapid-mix API, remove / update later
@@ -429,7 +438,7 @@ class Session {
       const example = examples[uuid];
 
       offlineSource = new OfflineSource(example.input);
-      graph.setSource(offlineSource);
+      this.graph.setSource(offlineSource);
 
       // run the graph offline, this MUST be synchronous
       offlineSource.run();
@@ -439,7 +448,7 @@ class Session {
         throw new Error(`${logPrefix} Error: incoherent example processing for example ${uuid}`);
       }
 
-      graph.removeSource(offlineSource);
+      this.graph.removeSource(offlineSource);
       buffer.reset();
 
       // add to processed examples

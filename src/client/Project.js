@@ -111,6 +111,10 @@ class Project {
     });
   }
 
+  propagateStreamFrame(frame) {
+    this.como.client.socket.sendBinary('stream', this.data)
+  }
+
   /**
    * @param {Int} playerId - Id of the player in the como application, the
    *  given `id` should be unique. In most case, the node id
@@ -120,7 +124,10 @@ class Project {
     return this.players.create(playerId);
   }
 
-
+  /**
+   * @note - this API is not a good thing, it prevents to add user / application
+   * defined modules
+   */
   async createGraph(session, player, slave) {
     const graphDescription = session.get('graph');
     const graph = new Graph(this.como, graphDescription, session, player, slave);

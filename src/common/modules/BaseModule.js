@@ -22,6 +22,8 @@ class BaseModule {
       id: this.id,
       data: {},
     };
+
+    this._listeners = new Map();
   }
 
   async init() {

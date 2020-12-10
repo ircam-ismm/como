@@ -10,5 +10,6 @@
 .DS_Store
 Thumbs.db
 
+dns/log
 # ...
 NOTES.md

@@ -102,7 +102,7 @@ class CoMo {
     const pluginsRequiringAudioContext = [
       'platform',
       'sync',
-    ]
+    ];
 
     plugins.forEach(pluginName => {
       if (!(pluginName in enableServices) || enableServices[pluginName] === true) {

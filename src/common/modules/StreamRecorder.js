@@ -3,7 +3,6 @@ import { copyFrameData } from './helpers';
 
 class StreamRecorder extends BaseModule {
   constructor(graph, type, id, options) {
-    console.log(type, id);
     options = Object.assign({
       name: `player`,
       bufferSize: 50,
@@ -19,7 +18,6 @@ class StreamRecorder extends BaseModule {
         if ('streamRecord' in updates) {
           if (updates['streamRecord'] === true) {
             const recordingName = `${this.options.name}-${graph.player.get('id')}`;
-            console.log(recordingName);
             const logger = graph.como.experience.plugins['logger'];
 
             this.writer = await logger.create(recordingName, {
@@ -46,6 +44,7 @@ class StreamRecorder extends BaseModule {
     if (this.writer !== null) {
       const copy = {}
       copyFrameData(inputFrame.data, copy);
+      console.log(copy);
       this.writer.write(copy);
     }
   }

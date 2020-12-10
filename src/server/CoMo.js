@@ -162,25 +162,7 @@ class CoMo {
 
     // streams routing
     client.socket.addBinaryListener('stream', frame => {
-      // @todo - we need to move this into `Projet` so that it can be called
-      // directly from server side with an arbitrary frame...
-      const routes = this.project.get('streamsRouting');
-      const fromId = frame[0];
-
-      for (let i = 0; i < routes.length; i++) {
-        const route = routes[i];
-        if (route[0] === fromId) {
-          const targetClient = this.idClientMap.get(route[1]);
-
-          // if we have a client with the right nodeId
-          if (targetClient) {
-            targetClient.socket.sendBinary('stream', frame);
-          } else {
-            // might be an OSC target client
-            // osc.send('/stream/${route[1]}/${route[0]}', frame);
-          }
-        }
-      }
+      this.project.propagateStreamFrame(frame);
     });
 
 

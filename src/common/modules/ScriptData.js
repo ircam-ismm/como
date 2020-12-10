@@ -11,10 +11,12 @@ class ScriptData extends BaseModule {
     this.scriptService = this.graph.como.experience.plugins['scripts-data'];
 
     this.script = null;
+    this._inited = false; // do not require model update on graph instanciation
   }
 
   async init() {
     await this.setScript(this.options.scriptName);
+    this._inited = true;
   }
 
   async destroy() {
@@ -91,6 +93,17 @@ class ScriptData extends BaseModule {
       }
 
       this.scriptModule = scriptModule;
+
+      // if we are server-side, we want to retrain the model
+      // we don't want to require model update on graph instanciation
+      if (this.graph.session.updateModel && this._inited) {
+        this.graph.session.updateModel();
+      }
+
+      // @todo - define how this should work
+      // if (this.options.scriptParams) {
+      //   this.updateOptions(this.options);
+      // }
     } catch(err) {
       console.log(err);
     }
@@ -99,6 +112,11 @@ class ScriptData extends BaseModule {
   execute(inputFrame) {
     if (this.scriptModule) {
       this.outputFrame = this.scriptModule.process(inputFrame, this.outputFrame);
+
+      if (this.outputFrame === undefined) {
+        this.outputFrame = {};
+        throw new Error(`script "${this.options.scriptName}" must return "outputFrame"`);
+      }
     }
 
     return this.outputFrame;
