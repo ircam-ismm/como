@@ -1,0 +1,15 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.scale = scale;
+
+function scale(minIn, maxIn, minOut, maxOut) {
+  const a = (maxOut - minOut) / (maxIn - minIn);
+  const b = minOut - a * minIn;
+  return x => a * x + b;
+}
+
+;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb21tb24vaGVscGVycy9tYXRoL3NjYWxlLmpzIl0sIm5hbWVzIjpbInNjYWxlIiwibWluSW4iLCJtYXhJbiIsIm1pbk91dCIsIm1heE91dCIsImEiLCJiIiwieCJdLCJtYXBwaW5ncyI6Ijs7Ozs7OztBQUFPLFNBQVNBLEtBQVQsQ0FBZUMsS0FBZixFQUFzQkMsS0FBdEIsRUFBNkJDLE1BQTdCLEVBQXFDQyxNQUFyQyxFQUE2QztBQUNsRCxRQUFNQyxDQUFDLEdBQUcsQ0FBQ0QsTUFBTSxHQUFHRCxNQUFWLEtBQXFCRCxLQUFLLEdBQUdELEtBQTdCLENBQVY7QUFDQSxRQUFNSyxDQUFDLEdBQUdILE1BQU0sR0FBR0UsQ0FBQyxHQUFHSixLQUF2QjtBQUNBLFNBQU9NLENBQUMsSUFBSUYsQ0FBQyxHQUFHRSxDQUFKLEdBQVFELENBQXBCO0FBQ0Q7O0FBQUEiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZnVuY3Rpb24gc2NhbGUobWluSW4sIG1heEluLCBtaW5PdXQsIG1heE91dCkge1xuICBjb25zdCBhID0gKG1heE91dCAtIG1pbk91dCkgLyAobWF4SW4gLSBtaW5Jbik7XG4gIGNvbnN0IGIgPSBtaW5PdXQgLSBhICogbWluSW47XG4gIHJldHVybiB4ID0+IGEgKiB4ICsgYjtcbn07XG4iXX0=

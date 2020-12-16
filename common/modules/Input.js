@@ -1,0 +1,34 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _BaseModule = _interopRequireDefault(require("./BaseModule"));
+
+var _helpers = require("./helpers");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// `Input` is almost a pass through node in which `Sources` are connected.
+// They just create module compliant frames from the given data.
+class Input extends _BaseModule.default {
+  constructor(graph, type, id, options) {
+    super(graph, type, id);
+  } // format raw data to `frame` format to propagate into graph.
+
+
+  execute(inputFrameOrData) {
+    // @note - this is probably not very robust...
+    const inputData = inputFrameOrData.data ? inputFrameOrData.data : inputFrameOrData;
+    const outputData = this.outputFrame.data;
+    (0, _helpers.copyFrameData)(inputData, outputData);
+    return this.outputFrame;
+  }
+
+}
+
+var _default = Input;
+exports.default = _default;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tb24vbW9kdWxlcy9JbnB1dC5qcyJdLCJuYW1lcyI6WyJJbnB1dCIsIkJhc2VNb2R1bGUiLCJjb25zdHJ1Y3RvciIsImdyYXBoIiwidHlwZSIsImlkIiwib3B0aW9ucyIsImV4ZWN1dGUiLCJpbnB1dEZyYW1lT3JEYXRhIiwiaW5wdXREYXRhIiwiZGF0YSIsIm91dHB1dERhdGEiLCJvdXRwdXRGcmFtZSJdLCJtYXBwaW5ncyI6Ijs7Ozs7OztBQUFBOztBQUNBOzs7O0FBRUE7QUFDQTtBQUNBLE1BQU1BLEtBQU4sU0FBb0JDLG1CQUFwQixDQUErQjtBQUM3QkMsRUFBQUEsV0FBVyxDQUFDQyxLQUFELEVBQVFDLElBQVIsRUFBY0MsRUFBZCxFQUFrQkMsT0FBbEIsRUFBMkI7QUFDcEMsVUFBTUgsS0FBTixFQUFhQyxJQUFiLEVBQW1CQyxFQUFuQjtBQUNELEdBSDRCLENBSzdCOzs7QUFDQUUsRUFBQUEsT0FBTyxDQUFDQyxnQkFBRCxFQUFtQjtBQUN4QjtBQUNBLFVBQU1DLFNBQVMsR0FBR0QsZ0JBQWdCLENBQUNFLElBQWpCLEdBQXdCRixnQkFBZ0IsQ0FBQ0UsSUFBekMsR0FBZ0RGLGdCQUFsRTtBQUNBLFVBQU1HLFVBQVUsR0FBRyxLQUFLQyxXQUFMLENBQWlCRixJQUFwQztBQUVBLGdDQUFjRCxTQUFkLEVBQXlCRSxVQUF6QjtBQUVBLFdBQU8sS0FBS0MsV0FBWjtBQUNEOztBQWQ0Qjs7ZUFpQmhCWixLIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEJhc2VNb2R1bGUgZnJvbSAnLi9CYXNlTW9kdWxlJztcbmltcG9ydCB7IGNvcHlGcmFtZURhdGEgfSBmcm9tICcuL2hlbHBlcnMnO1xuXG4vLyBgSW5wdXRgIGlzIGFsbW9zdCBhIHBhc3MgdGhyb3VnaCBub2RlIGluIHdoaWNoIGBTb3VyY2VzYCBhcmUgY29ubmVjdGVkLlxuLy8gVGhleSBqdXN0IGNyZWF0ZSBtb2R1bGUgY29tcGxpYW50IGZyYW1lcyBmcm9tIHRoZSBnaXZlbiBkYXRhLlxuY2xhc3MgSW5wdXQgZXh0ZW5kcyBCYXNlTW9kdWxlIHtcbiAgY29uc3RydWN0b3IoZ3JhcGgsIHR5cGUsIGlkLCBvcHRpb25zKSB7XG4gICAgc3VwZXIoZ3JhcGgsIHR5cGUsIGlkKTtcbiAgfVxuXG4gIC8vIGZvcm1hdCByYXcgZGF0YSB0byBgZnJhbWVgIGZvcm1hdCB0byBwcm9wYWdhdGUgaW50byBncmFwaC5cbiAgZXhlY3V0ZShpbnB1dEZyYW1lT3JEYXRhKSB7XG4gICAgLy8gQG5vdGUgLSB0aGlzIGlzIHByb2JhYmx5IG5vdCB2ZXJ5IHJvYnVzdC4uLlxuICAgIGNvbnN0IGlucHV0RGF0YSA9IGlucHV0RnJhbWVPckRhdGEuZGF0YSA/IGlucHV0RnJhbWVPckRhdGEuZGF0YSA6IGlucHV0RnJhbWVPckRhdGE7XG4gICAgY29uc3Qgb3V0cHV0RGF0YSA9IHRoaXMub3V0cHV0RnJhbWUuZGF0YTtcblxuICAgIGNvcHlGcmFtZURhdGEoaW5wdXREYXRhLCBvdXRwdXREYXRhKTtcblxuICAgIHJldHVybiB0aGlzLm91dHB1dEZyYW1lO1xuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IElucHV0O1xuIl19

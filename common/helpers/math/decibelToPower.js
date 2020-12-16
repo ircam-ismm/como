@@ -1,0 +1,13 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.decibelToPower = decibelToPower;
+
+function decibelToPower(val) {
+  return Math.exp(0.23025850929940458 * val); // pow(10, val / 10)
+}
+
+;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb21tb24vaGVscGVycy9tYXRoL2RlY2liZWxUb1Bvd2VyLmpzIl0sIm5hbWVzIjpbImRlY2liZWxUb1Bvd2VyIiwidmFsIiwiTWF0aCIsImV4cCJdLCJtYXBwaW5ncyI6Ijs7Ozs7OztBQUFPLFNBQVNBLGNBQVQsQ0FBd0JDLEdBQXhCLEVBQTZCO0FBQ2xDLFNBQU9DLElBQUksQ0FBQ0MsR0FBTCxDQUFTLHNCQUFzQkYsR0FBL0IsQ0FBUCxDQURrQyxDQUNVO0FBQzdDOztBQUFBIiwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IGZ1bmN0aW9uIGRlY2liZWxUb1Bvd2VyKHZhbCkge1xuICByZXR1cm4gTWF0aC5leHAoMC4yMzAyNTg1MDkyOTk0MDQ1OCAqIHZhbCk7IC8vIHBvdygxMCwgdmFsIC8gMTApXG59O1xuIl19

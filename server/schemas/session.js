@@ -1,0 +1,81 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = {
+  name: {
+    type: 'string',
+    default: ''
+  },
+  id: {
+    type: 'string',
+    default: ''
+  },
+  audioFiles: {
+    type: 'any',
+    default: []
+  },
+  labels: {
+    type: 'any',
+    default: []
+  },
+  // @note - provide an abstraction to access that
+  labelAudioFileTable: {
+    type: 'any',
+    default: []
+  },
+  graph: {
+    type: 'any',
+    default: {}
+  },
+  // these two are not persisted, they are mixed in "graph"
+  graphOptions: {
+    type: 'any',
+    default: {}
+  },
+  graphOptionsEvent: {
+    type: 'any',
+    default: {},
+    event: true
+  },
+  // this should belong to the "encoder / decoder"
+  // this needs to be discussed further... what would be clean
+  // architecture / strategy for that, e.g.
+  // - we don't want to dispatch the examples everywhere,
+  // - how to attach an example to a particular encoder / decoder instance,
+  // - same for config, etc.
+  //
+  // @see also `player` schema
+  model: {
+    type: 'any',
+    default: null,
+    nullable: true
+  },
+  examples: {
+    type: 'any',
+    default: {}
+  },
+  learningConfig: {
+    type: 'any',
+    // posture default for now...
+    default: {
+      target: {
+        name: 'xmm'
+      },
+      payload: {
+        modelType: 'gmm',
+        gaussians: 1,
+        absoluteRegularization: 0.01,
+        relativeRegularization: 0.01,
+        covarianceMode: 'full',
+        states: 1,
+        transitionMode: 'ergodic'
+      }
+    }
+  } // ...
+
+};
+exports.default = _default;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zZXJ2ZXIvc2NoZW1hcy9zZXNzaW9uLmpzIl0sIm5hbWVzIjpbIm5hbWUiLCJ0eXBlIiwiZGVmYXVsdCIsImlkIiwiYXVkaW9GaWxlcyIsImxhYmVscyIsImxhYmVsQXVkaW9GaWxlVGFibGUiLCJncmFwaCIsImdyYXBoT3B0aW9ucyIsImdyYXBoT3B0aW9uc0V2ZW50IiwiZXZlbnQiLCJtb2RlbCIsIm51bGxhYmxlIiwiZXhhbXBsZXMiLCJsZWFybmluZ0NvbmZpZyIsInRhcmdldCIsInBheWxvYWQiLCJtb2RlbFR5cGUiLCJnYXVzc2lhbnMiLCJhYnNvbHV0ZVJlZ3VsYXJpemF0aW9uIiwicmVsYXRpdmVSZWd1bGFyaXphdGlvbiIsImNvdmFyaWFuY2VNb2RlIiwic3RhdGVzIiwidHJhbnNpdGlvbk1vZGUiXSwibWFwcGluZ3MiOiI7Ozs7OztlQUFlO0FBQ2JBLEVBQUFBLElBQUksRUFBRTtBQUNKQyxJQUFBQSxJQUFJLEVBQUUsUUFERjtBQUVKQyxJQUFBQSxPQUFPLEVBQUU7QUFGTCxHQURPO0FBS2JDLEVBQUFBLEVBQUUsRUFBRTtBQUNGRixJQUFBQSxJQUFJLEVBQUUsUUFESjtBQUVGQyxJQUFBQSxPQUFPLEVBQUU7QUFGUCxHQUxTO0FBU2JFLEVBQUFBLFVBQVUsRUFBRTtBQUNWSCxJQUFBQSxJQUFJLEVBQUUsS0FESTtBQUVWQyxJQUFBQSxPQUFPLEVBQUU7QUFGQyxHQVRDO0FBYWJHLEVBQUFBLE1BQU0sRUFBRTtBQUNOSixJQUFBQSxJQUFJLEVBQUUsS0FEQTtBQUVOQyxJQUFBQSxPQUFPLEVBQUU7QUFGSCxHQWJLO0FBaUJiO0FBQ0FJLEVBQUFBLG1CQUFtQixFQUFFO0FBQ25CTCxJQUFBQSxJQUFJLEVBQUUsS0FEYTtBQUVuQkMsSUFBQUEsT0FBTyxFQUFFO0FBRlUsR0FsQlI7QUF1QmJLLEVBQUFBLEtBQUssRUFBRTtBQUNMTixJQUFBQSxJQUFJLEVBQUUsS0FERDtBQUVMQyxJQUFBQSxPQUFPLEVBQUU7QUFGSixHQXZCTTtBQTRCYjtBQUNBTSxFQUFBQSxZQUFZLEVBQUU7QUFDWlAsSUFBQUEsSUFBSSxFQUFFLEtBRE07QUFFWkMsSUFBQUEsT0FBTyxFQUFFO0FBRkcsR0E3QkQ7QUFpQ2JPLEVBQUFBLGlCQUFpQixFQUFFO0FBQ2pCUixJQUFBQSxJQUFJLEVBQUUsS0FEVztBQUVqQkMsSUFBQUEsT0FBTyxFQUFFLEVBRlE7QUFHakJRLElBQUFBLEtBQUssRUFBRTtBQUhVLEdBakNOO0FBdUNiO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQUMsRUFBQUEsS0FBSyxFQUFFO0FBQ0xWLElBQUFBLElBQUksRUFBRSxLQUREO0FBRUxDLElBQUFBLE9BQU8sRUFBRSxJQUZKO0FBR0xVLElBQUFBLFFBQVEsRUFBRTtBQUhMLEdBL0NNO0FBb0RiQyxFQUFBQSxRQUFRLEVBQUU7QUFDUlosSUFBQUEsSUFBSSxFQUFFLEtBREU7QUFFUkMsSUFBQUEsT0FBTyxFQUFFO0FBRkQsR0FwREc7QUF3RGJZLEVBQUFBLGNBQWMsRUFBRTtBQUNkYixJQUFBQSxJQUFJLEVBQUUsS0FEUTtBQUVkO0FBQ0FDLElBQUFBLE9BQU8sRUFBRTtBQUNQYSxNQUFBQSxNQUFNLEVBQUU7QUFDTmYsUUFBQUEsSUFBSSxFQUFFO0FBREEsT0FERDtBQUlQZ0IsTUFBQUEsT0FBTyxFQUFFO0FBQ1BDLFFBQUFBLFNBQVMsRUFBRSxLQURKO0FBRVBDLFFBQUFBLFNBQVMsRUFBRSxDQUZKO0FBR1BDLFFBQUFBLHNCQUFzQixFQUFFLElBSGpCO0FBSVBDLFFBQUFBLHNCQUFzQixFQUFFLElBSmpCO0FBS1BDLFFBQUFBLGNBQWMsRUFBRSxNQUxUO0FBTVBDLFFBQUFBLE1BQU0sRUFBRSxDQU5EO0FBT1BDLFFBQUFBLGNBQWMsRUFBRTtBQVBUO0FBSkY7QUFISyxHQXhESCxDQTBFYjs7QUExRWEsQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBkZWZhdWx0IHtcbiAgbmFtZToge1xuICAgIHR5cGU6ICdzdHJpbmcnLFxuICAgIGRlZmF1bHQ6ICcnLFxuICB9LFxuICBpZDoge1xuICAgIHR5cGU6ICdzdHJpbmcnLFxuICAgIGRlZmF1bHQ6ICcnLFxuICB9LFxuICBhdWRpb0ZpbGVzOiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDogW10sXG4gIH0sXG4gIGxhYmVsczoge1xuICAgIHR5cGU6ICdhbnknLFxuICAgIGRlZmF1bHQ6IFtdLFxuICB9LFxuICAvLyBAbm90ZSAtIHByb3ZpZGUgYW4gYWJzdHJhY3Rpb24gdG8gYWNjZXNzIHRoYXRcbiAgbGFiZWxBdWRpb0ZpbGVUYWJsZToge1xuICAgIHR5cGU6ICdhbnknLFxuICAgIGRlZmF1bHQ6IFtdLFxuICB9LFxuXG4gIGdyYXBoOiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDoge30sXG4gIH0sXG5cbiAgLy8gdGhlc2UgdHdvIGFyZSBub3QgcGVyc2lzdGVkLCB0aGV5IGFyZSBtaXhlZCBpbiBcImdyYXBoXCJcbiAgZ3JhcGhPcHRpb25zOiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDoge30sXG4gIH0sXG4gIGdyYXBoT3B0aW9uc0V2ZW50OiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDoge30sXG4gICAgZXZlbnQ6IHRydWUsXG4gIH0sXG5cbiAgLy8gdGhpcyBzaG91bGQgYmVsb25nIHRvIHRoZSBcImVuY29kZXIgLyBkZWNvZGVyXCJcbiAgLy8gdGhpcyBuZWVkcyB0byBiZSBkaXNjdXNzZWQgZnVydGhlci4uLiB3aGF0IHdvdWxkIGJlIGNsZWFuXG4gIC8vIGFyY2hpdGVjdHVyZSAvIHN0cmF0ZWd5IGZvciB0aGF0LCBlLmcuXG4gIC8vIC0gd2UgZG9uJ3Qgd2FudCB0byBkaXNwYXRjaCB0aGUgZXhhbXBsZXMgZXZlcnl3aGVyZSxcbiAgLy8gLSBob3cgdG8gYXR0YWNoIGFuIGV4YW1wbGUgdG8gYSBwYXJ0aWN1bGFyIGVuY29kZXIgLyBkZWNvZGVyIGluc3RhbmNlLFxuICAvLyAtIHNhbWUgZm9yIGNvbmZpZywgZXRjLlxuICAvL1xuICAvLyBAc2VlIGFsc28gYHBsYXllcmAgc2NoZW1hXG4gIG1vZGVsOiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDogbnVsbCxcbiAgICBudWxsYWJsZTogdHJ1ZSxcbiAgfSxcbiAgZXhhbXBsZXM6IHtcbiAgICB0eXBlOiAnYW55JyxcbiAgICBkZWZhdWx0OiB7fSxcbiAgfSxcbiAgbGVhcm5pbmdDb25maWc6IHtcbiAgICB0eXBlOiAnYW55JyxcbiAgICAvLyBwb3N0dXJlIGRlZmF1bHQgZm9yIG5vdy4uLlxuICAgIGRlZmF1bHQ6IHtcbiAgICAgIHRhcmdldDoge1xuICAgICAgICBuYW1lOiAneG1tJyxcbiAgICAgIH0sXG4gICAgICBwYXlsb2FkOiB7XG4gICAgICAgIG1vZGVsVHlwZTogJ2dtbScsXG4gICAgICAgIGdhdXNzaWFuczogMSxcbiAgICAgICAgYWJzb2x1dGVSZWd1bGFyaXphdGlvbjogMC4wMSxcbiAgICAgICAgcmVsYXRpdmVSZWd1bGFyaXphdGlvbjogMC4wMSxcbiAgICAgICAgY292YXJpYW5jZU1vZGU6ICdmdWxsJyxcbiAgICAgICAgc3RhdGVzOiAxLFxuICAgICAgICB0cmFuc2l0aW9uTW9kZTogJ2VyZ29kaWMnLFxuICAgICAgfSxcbiAgICB9LFxuICB9LFxuICAvLyAuLi5cbn07XG4iXX0=

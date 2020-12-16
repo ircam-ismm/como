@@ -1,0 +1,84 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = {
+  id: {
+    type: 'integer',
+    default: null,
+    nullable: true
+  },
+  nodeId: {
+    type: 'integer',
+    default: null,
+    nullable: true
+  },
+  stateId: {
+    type: 'integer',
+    default: null,
+    nullable: true
+  },
+  metas: {
+    // store user defined informations (cf. emodemos -> index, name)
+    type: 'any',
+    default: {}
+  },
+  sessionId: {
+    type: 'string',
+    default: null,
+    nullable: true
+  },
+  loading: {
+    type: 'boolean',
+    default: false
+  },
+  hasDeviceMotion: {
+    type: 'boolean',
+    default: false
+  },
+  // override graph option on the player only
+  graphOptions: {
+    type: 'any',
+    default: {}
+  },
+  graphOptionsEvent: {
+    type: 'any',
+    default: {},
+    event: true
+  },
+  // @todo - this has to be rethinked and refactored to allow multiple ML
+  // instances in the graph, these should be options of the ML Module.
+  //
+  // -> In general all these params that enable the control of modules should
+  // be generalized to module options.
+  //
+  // // @see also `session` schema
+  recordingState: {
+    type: 'enum',
+    list: ['idle', 'armed', 'recording', 'pending', 'confirm', 'cancel'],
+    default: 'idle'
+  },
+  label: {
+    type: 'string',
+    default: null,
+    nullable: true
+  },
+  preview: {
+    type: 'boolean',
+    default: false
+  },
+  //
+  streamSource: {
+    type: 'boolean',
+    default: false
+  },
+  // @todo - rename to recordStream (this is silly)
+  streamRecord: {
+    type: 'boolean',
+    default: false
+  }
+};
+exports.default = _default;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zZXJ2ZXIvc2NoZW1hcy9wbGF5ZXIuanMiXSwibmFtZXMiOlsiaWQiLCJ0eXBlIiwiZGVmYXVsdCIsIm51bGxhYmxlIiwibm9kZUlkIiwic3RhdGVJZCIsIm1ldGFzIiwic2Vzc2lvbklkIiwibG9hZGluZyIsImhhc0RldmljZU1vdGlvbiIsImdyYXBoT3B0aW9ucyIsImdyYXBoT3B0aW9uc0V2ZW50IiwiZXZlbnQiLCJyZWNvcmRpbmdTdGF0ZSIsImxpc3QiLCJsYWJlbCIsInByZXZpZXciLCJzdHJlYW1Tb3VyY2UiLCJzdHJlYW1SZWNvcmQiXSwibWFwcGluZ3MiOiI7Ozs7OztlQUFlO0FBQ2JBLEVBQUFBLEVBQUUsRUFBRTtBQUNGQyxJQUFBQSxJQUFJLEVBQUUsU0FESjtBQUVGQyxJQUFBQSxPQUFPLEVBQUUsSUFGUDtBQUdGQyxJQUFBQSxRQUFRLEVBQUU7QUFIUixHQURTO0FBTWJDLEVBQUFBLE1BQU0sRUFBRTtBQUNOSCxJQUFBQSxJQUFJLEVBQUUsU0FEQTtBQUVOQyxJQUFBQSxPQUFPLEVBQUUsSUFGSDtBQUdOQyxJQUFBQSxRQUFRLEVBQUU7QUFISixHQU5LO0FBV2JFLEVBQUFBLE9BQU8sRUFBRTtBQUNQSixJQUFBQSxJQUFJLEVBQUUsU0FEQztBQUVQQyxJQUFBQSxPQUFPLEVBQUUsSUFGRjtBQUdQQyxJQUFBQSxRQUFRLEVBQUU7QUFISCxHQVhJO0FBZ0JiRyxFQUFBQSxLQUFLLEVBQUU7QUFBRTtBQUNQTCxJQUFBQSxJQUFJLEVBQUUsS0FERDtBQUVMQyxJQUFBQSxPQUFPLEVBQUU7QUFGSixHQWhCTTtBQW9CYkssRUFBQUEsU0FBUyxFQUFFO0FBQ1ROLElBQUFBLElBQUksRUFBRSxRQURHO0FBRVRDLElBQUFBLE9BQU8sRUFBRSxJQUZBO0FBR1RDLElBQUFBLFFBQVEsRUFBRTtBQUhELEdBcEJFO0FBeUJiSyxFQUFBQSxPQUFPLEVBQUU7QUFDUFAsSUFBQUEsSUFBSSxFQUFFLFNBREM7QUFFUEMsSUFBQUEsT0FBTyxFQUFFO0FBRkYsR0F6Qkk7QUE2QmJPLEVBQUFBLGVBQWUsRUFBRTtBQUNmUixJQUFBQSxJQUFJLEVBQUUsU0FEUztBQUVmQyxJQUFBQSxPQUFPLEVBQUU7QUFGTSxHQTdCSjtBQWtDYjtBQUNBUSxFQUFBQSxZQUFZLEVBQUU7QUFDWlQsSUFBQUEsSUFBSSxFQUFFLEtBRE07QUFFWkMsSUFBQUEsT0FBTyxFQUFFO0FBRkcsR0FuQ0Q7QUF1Q2JTLEVBQUFBLGlCQUFpQixFQUFFO0FBQ2pCVixJQUFBQSxJQUFJLEVBQUUsS0FEVztBQUVqQkMsSUFBQUEsT0FBTyxFQUFFLEVBRlE7QUFHakJVLElBQUFBLEtBQUssRUFBRTtBQUhVLEdBdkNOO0FBNkNiO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0FDLEVBQUFBLGNBQWMsRUFBRTtBQUNkWixJQUFBQSxJQUFJLEVBQUUsTUFEUTtBQUVkYSxJQUFBQSxJQUFJLEVBQUUsQ0FBQyxNQUFELEVBQVMsT0FBVCxFQUFrQixXQUFsQixFQUErQixTQUEvQixFQUEwQyxTQUExQyxFQUFxRCxRQUFyRCxDQUZRO0FBR2RaLElBQUFBLE9BQU8sRUFBRTtBQUhLLEdBcERIO0FBMERiYSxFQUFBQSxLQUFLLEVBQUU7QUFDTGQsSUFBQUEsSUFBSSxFQUFFLFFBREQ7QUFFTEMsSUFBQUEsT0FBTyxFQUFFLElBRko7QUFHTEMsSUFBQUEsUUFBUSxFQUFFO0FBSEwsR0ExRE07QUFnRWJhLEVBQUFBLE9BQU8sRUFBRTtBQUNQZixJQUFBQSxJQUFJLEVBQUUsU0FEQztBQUVQQyxJQUFBQSxPQUFPLEVBQUU7QUFGRixHQWhFSTtBQXFFYjtBQUNBZSxFQUFBQSxZQUFZLEVBQUU7QUFDWmhCLElBQUFBLElBQUksRUFBRSxTQURNO0FBRVpDLElBQUFBLE9BQU8sRUFBRTtBQUZHLEdBdEVEO0FBMEViO0FBQ0FnQixFQUFBQSxZQUFZLEVBQUU7QUFDWmpCLElBQUFBLElBQUksRUFBRSxTQURNO0FBRVpDLElBQUFBLE9BQU8sRUFBRTtBQUZHO0FBM0VELEMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZGVmYXVsdCB7XG4gIGlkOiB7XG4gICAgdHlwZTogJ2ludGVnZXInLFxuICAgIGRlZmF1bHQ6IG51bGwsXG4gICAgbnVsbGFibGU6IHRydWUsXG4gIH0sXG4gIG5vZGVJZDoge1xuICAgIHR5cGU6ICdpbnRlZ2VyJyxcbiAgICBkZWZhdWx0OiBudWxsLFxuICAgIG51bGxhYmxlOiB0cnVlLFxuICB9LFxuICBzdGF0ZUlkOiB7XG4gICAgdHlwZTogJ2ludGVnZXInLFxuICAgIGRlZmF1bHQ6IG51bGwsXG4gICAgbnVsbGFibGU6IHRydWUsXG4gIH0sXG4gIG1ldGFzOiB7IC8vIHN0b3JlIHVzZXIgZGVmaW5lZCBpbmZvcm1hdGlvbnMgKGNmLiBlbW9kZW1vcyAtPiBpbmRleCwgbmFtZSlcbiAgICB0eXBlOiAnYW55JyxcbiAgICBkZWZhdWx0OiB7fSxcbiAgfSxcbiAgc2Vzc2lvbklkOiB7XG4gICAgdHlwZTogJ3N0cmluZycsXG4gICAgZGVmYXVsdDogbnVsbCxcbiAgICBudWxsYWJsZTogdHJ1ZSxcbiAgfSxcbiAgbG9hZGluZzoge1xuICAgIHR5cGU6ICdib29sZWFuJyxcbiAgICBkZWZhdWx0OiBmYWxzZSxcbiAgfSxcbiAgaGFzRGV2aWNlTW90aW9uOiB7XG4gICAgdHlwZTogJ2Jvb2xlYW4nLFxuICAgIGRlZmF1bHQ6IGZhbHNlLFxuICB9LFxuXG4gIC8vIG92ZXJyaWRlIGdyYXBoIG9wdGlvbiBvbiB0aGUgcGxheWVyIG9ubHlcbiAgZ3JhcGhPcHRpb25zOiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDoge30sXG4gIH0sXG4gIGdyYXBoT3B0aW9uc0V2ZW50OiB7XG4gICAgdHlwZTogJ2FueScsXG4gICAgZGVmYXVsdDoge30sXG4gICAgZXZlbnQ6IHRydWUsXG4gIH0sXG5cbiAgLy8gQHRvZG8gLSB0aGlzIGhhcyB0byBiZSByZXRoaW5rZWQgYW5kIHJlZmFjdG9yZWQgdG8gYWxsb3cgbXVsdGlwbGUgTUxcbiAgLy8gaW5zdGFuY2VzIGluIHRoZSBncmFwaCwgdGhlc2Ugc2hvdWxkIGJlIG9wdGlvbnMgb2YgdGhlIE1MIE1vZHVsZS5cbiAgLy9cbiAgLy8gLT4gSW4gZ2VuZXJhbCBhbGwgdGhlc2UgcGFyYW1zIHRoYXQgZW5hYmxlIHRoZSBjb250cm9sIG9mIG1vZHVsZXMgc2hvdWxkXG4gIC8vIGJlIGdlbmVyYWxpemVkIHRvIG1vZHVsZSBvcHRpb25zLlxuICAvL1xuICAvLyAvLyBAc2VlIGFsc28gYHNlc3Npb25gIHNjaGVtYVxuICByZWNvcmRpbmdTdGF0ZToge1xuICAgIHR5cGU6ICdlbnVtJyxcbiAgICBsaXN0OiBbJ2lkbGUnLCAnYXJtZWQnLCAncmVjb3JkaW5nJywgJ3BlbmRpbmcnLCAnY29uZmlybScsICdjYW5jZWwnXSxcbiAgICBkZWZhdWx0OiAnaWRsZSdcbiAgfSxcblxuICBsYWJlbDoge1xuICAgIHR5cGU6ICdzdHJpbmcnLFxuICAgIGRlZmF1bHQ6IG51bGwsXG4gICAgbnVsbGFibGU6IHRydWUsXG4gIH0sXG5cbiAgcHJldmlldzoge1xuICAgIHR5cGU6ICdib29sZWFuJyxcbiAgICBkZWZhdWx0OiBmYWxzZSxcbiAgfSxcblxuICAvL1xuICBzdHJlYW1Tb3VyY2U6IHtcbiAgICB0eXBlOiAnYm9vbGVhbicsXG4gICAgZGVmYXVsdDogZmFsc2UsXG4gIH0sXG4gIC8vIEB0b2RvIC0gcmVuYW1lIHRvIHJlY29yZFN0cmVhbSAodGhpcyBpcyBzaWxseSlcbiAgc3RyZWFtUmVjb3JkOiB7XG4gICAgdHlwZTogJ2Jvb2xlYW4nLFxuICAgIGRlZmF1bHQ6IGZhbHNlLFxuICB9LFxufTtcblxuIl19
