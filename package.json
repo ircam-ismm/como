@@ -16,8 +16,7 @@
     "dev:client": "chokidar src/client/ -c \"npm run build:client\"",
     "dev:server": "chokidar src/server/ -c \"npm run build:server\"",
     "dev:common": "chokidar src/common/ -c \"npm run build:common\"",
-    "dev": "npm run clean && npm run build &&  (npm run dev:client & npm run dev:server & npm run dev:common)",
-    "postinstall": "npm run build"
+    "dev": "npm run clean && npm run build &&  (npm run dev:client & npm run dev:server & npm run dev:common)"
   },
   "publishConfig": {
     "access": "public"
