@@ -2,7 +2,7 @@
 // algos
 import MovingAverage from './algo/MovingAverage.js';
 import MovingMedian from './algo/MovingMedian.js';
-import MovingStd from './algo/MovingStd.js';
+import MovingMeanStd from './algo/MovingMeanStd.js';
 import MovingDelta from './algo/MovingDelta.js';
 
 // math
@@ -16,7 +16,7 @@ export default {
   algo: {
     MovingAverage,
     MovingMedian,
-    MovingStd,
+    MovingMeanStd,
     MovingDelta,
   },
   math: {
