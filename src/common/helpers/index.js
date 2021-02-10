@@ -2,6 +2,8 @@
 // algos
 import MovingAverage from './algo/MovingAverage.js';
 import MovingMedian from './algo/MovingMedian.js';
+import MovingMeanStd from './algo/MovingMeanStd.js';
+import MovingDelta from './algo/MovingDelta.js';
 
 // math
 import decibelToLinear from './math/decibelToLinear.js';
@@ -14,6 +16,8 @@ export default {
   algo: {
     MovingAverage,
     MovingMedian,
+    MovingMeanStd,
+    MovingDelta,
   },
   math: {
     decibelToLinear,
