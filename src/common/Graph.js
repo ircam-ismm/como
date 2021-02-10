@@ -93,6 +93,7 @@ class Graph {
             for (let moduleId in values) {
               Object.assign(this.options[moduleId], values[moduleId]);
               const module = this.modules[moduleId];
+
               // @note - we need this check because some graphs may not have all
               // the modules instanciated (e.g. server-side audio graph nodes).
               if (module) {

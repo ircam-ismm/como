@@ -16,3 +16,6 @@ if (outputFrame !== undefined) {
 
 - remove `this.outputFrame`, does not make sens
 
+## ScriptOptions
+
+- are sometimes strings, sometimes objects, this should be coersed to objects cleanly

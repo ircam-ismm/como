@@ -1,5 +1,4 @@
 import BaseModule from './BaseModule.js';
-import helpers from '../helpers/index.js';
 import JSON5 from 'json5';
 
 class ScriptData extends BaseModule {
@@ -81,7 +80,7 @@ class ScriptData extends BaseModule {
     try {
       const scriptModule = this.script.execute(
         this.graph,
-        helpers,
+        this.graph.como.helpers,
         this.outputFrame
       );
 

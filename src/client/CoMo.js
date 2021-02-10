@@ -11,6 +11,7 @@ import devicemotion from '@ircam/devicemotion';
 
 import modules from './modules/index.js';
 import sources from './sources/index.js';
+import helpers from './helpers/index.js';
 
 import Project from './Project.js';
 
@@ -19,6 +20,7 @@ class CoMo {
     // expose constructors of available sources and nodes
     this.sources = sources;
     this.modules = modules;
+    this.helpers = helpers;
 
     // register device motion feature
     pluginPlatformFactory.addFeatureDefinition({

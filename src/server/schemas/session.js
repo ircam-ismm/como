@@ -15,7 +15,7 @@ export default {
     type: 'any',
     default: [],
   },
-  // @note - provide an abstraction to access that
+
   labelAudioFileTable: {
     type: 'any',
     default: [],
@@ -26,7 +26,8 @@ export default {
     default: {},
   },
 
-  // these two are not persisted, they are mixed in "graph"
+  // these two are not persisted as is, they are mixed in the "graph"
+  // @todo - document this behavior, this is hard to understand
   graphOptions: {
     type: 'any',
     default: {},

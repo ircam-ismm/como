@@ -11,6 +11,7 @@ import pluginLoggerFactory from '@soundworks/plugin-logger/server';
 
 import sources from './sources/index.js';
 import modules from '../common/modules/index.js';
+import helpers from '../common/helpers/index.js';
 
 import Project from './Project.js';
 
@@ -25,6 +26,7 @@ class CoMo {
 
     this.sources = sources;
     this.modules = modules;
+    this.helpers = helpers;
 
     this.idClientMap = new Map();
 

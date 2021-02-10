@@ -1,5 +1,4 @@
 import AudioModule from './AudioModule.js';
-import helpers from '../helpers/index.js';
 import JSON5 from 'json5';
 
 // extend AudioModule to have the bypass node
@@ -82,7 +81,7 @@ class ScriptAudio extends AudioModule {
     try {
       const scriptModule = this.script.execute(
         this.graph,
-        helpers,
+        this.graph.como.helpers,
         this.passThroughInNode,
         this.passThroughOutNode,
         this.outputFrame
