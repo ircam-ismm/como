@@ -139,6 +139,10 @@ class Session {
         }
       }
 
+      if (updates['learningConfig']) {
+        const examples = this.state.get('examples');
+        await this.trainModel(examples);
+      }
       // retrain on graph update, for now is only usefull on scripts updates
     });
 
