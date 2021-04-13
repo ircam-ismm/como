@@ -34,13 +34,16 @@ export default {
         name: 'xmm',
       },
       payload: {
-        modelType: 'gmm',
+        modelType: 'hhmm',
         gaussians: 1,
-        absoluteRegularization: 0.01,
-        relativeRegularization: 0.01,
+        absoluteRegularization: 0.1, // 0.01
+        relativeRegularization: 0.1, // 0.01
         covarianceMode: 'full',
-        states: 1,
-        transitionMode: 'ergodic',
+        hierarchical: true,
+        states: 4, // 1
+        transitionMode: 'leftright',
+        regressionEstimator: 'full',
+        likelihoodWindow: 10,
       },
     },
   },

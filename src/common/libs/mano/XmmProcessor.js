@@ -4,13 +4,13 @@ import rapidMixAdapters from 'rapid-mix-adapters';
 const knownTargets = [ 'gmm', 'gmr', 'hhmm', 'hhmr' ];
 
 const defaultXmmConfig = {
-  modelType: 'gmm',
+  modelType: 'hhmm',
   gaussians: 1,
-  absoluteRegularization: 0.01,
-  relativeRegularization: 0.01,
+  absoluteRegularization: 0.1, // 0.01
+  relativeRegularization: 0.1, // 0.01
   covarianceMode: 'full',
   hierarchical: true,
-  states: 1,
+  states: 4, // 1
   transitionMode: 'leftright',
   regressionEstimator: 'full',
   likelihoodWindow: 10,
