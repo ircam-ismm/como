@@ -3,7 +3,7 @@ import fs from 'fs';
 import { uuid as uuidv4 } from 'uuidv4';
 
 import xmm from 'xmm-node';
-import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
+// import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
 import rapidMixAdapters from 'rapid-mix-adapters';
 
 import db from './utils/db';
@@ -81,10 +81,6 @@ class Session {
       'gmm': new xmm('gmm'),
       'hhmm': new xmm('hhmm'),
     };
-    // @note - only used for config formatting
-    // this should be simplified, the translation between xmm / mano / rapidmix
-    // config format is really messy
-    this.processor = new XmmProcessor();
   }
 
   async persist(key = null) {
@@ -477,10 +473,7 @@ class Session {
     const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(processedExamples);
 
     const learningConfig = this.state.get('learningConfig'); // mano
-    this.processor.setConfig(learningConfig)
-    const rapidMixConfig = this.processor.getConfig(); // rapidMix
-    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(rapidMixConfig); // xmm
-
+    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(learningConfig); // xmm
     // get (gmm|hhmm) xmm instance
     const xmm = this.xmmInstances[learningConfig.payload.modelType];
 

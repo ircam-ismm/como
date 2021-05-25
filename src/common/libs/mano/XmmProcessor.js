@@ -1,8 +1,14 @@
 import * as Xmm from 'xmm-client';
 import rapidMixAdapters from 'rapid-mix-adapters';
 
+/**
+ * This class is only used as a shortcut for xmm client-side
+ */
+
 const knownTargets = [ 'gmm', 'gmr', 'hhmm', 'hhmr' ];
 
+// this is not used
+// see, `server/schemas/session` for real defaults
 const defaultXmmConfig = {
   modelType: 'gmm',
   gaussians: 1,
