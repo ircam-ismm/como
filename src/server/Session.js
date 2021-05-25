@@ -131,6 +131,11 @@ class Session {
       await db.write(path.join(this.directory, '.ml-examples.json'), examples, false);
     }
 
+   if (key === null || key === 'processedExamples') {
+      const { processedExamples } = values;
+      await db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
+    }
+
     if (key === null || key === 'model') {
       const { model } = values;
       await db.write(path.join(this.directory, '.ml-model.json'), model, false);
@@ -419,7 +424,7 @@ class Session {
     let offlineSource;
 
     // @note - mimic rapid-mix API, remove / update later
-    const processedExamples = {
+    const rapidMixExamples = {
       docType: 'rapid-mix:ml-training-set',
       docVersion: '1.0.0',
       payload: {
@@ -428,6 +433,9 @@ class Session {
         data: [],
       }
     }
+
+    // for persistency, display
+    const processedExamples = {}
 
     // process examples raw data in pre-processing graph
     for (let uuid in examples) {
@@ -447,16 +455,18 @@ class Session {
       this.graph.removeSource(offlineSource);
       buffer.reset();
 
-      // add to processed examples
-      processedExamples.payload.data.push({
+      const processedExample = {
         label: example.label,
         output: example.output,
         input: transformedStream,
-      });
+      };
+      // add to processed examples
+      rapidMixExamples.payload.data.push(processedExample);
+      processedExamples[uuid] = processedExample;
     }
 
-    if (processedExamples.payload.data[0]) {
-      processedExamples.payload.inputDimension = processedExamples.payload.data[0].input[0].length;
+    if (rapidMixExamples.payload.data[0]) {
+      rapidMixExamples.payload.inputDimension = rapidMixExamples.payload.data[0].input[0].length;
     }
 
     // ---------------------------------------
@@ -464,22 +474,23 @@ class Session {
     console.log(`${logPrefix} processing end\t\t(${processingTime}ms)`);
     // ---------------------------------------
     const trainingStartTime = new Date().getTime();
-    const numInputDimensions = processedExamples.payload.inputDimension;
+    const numInputDimensions = rapidMixExamples.payload.inputDimension;
     console.log(`${logPrefix} training start\t\t(# input dimensions: ${numInputDimensions})`);
     // ---------------------------------------
 
     // train model
     // @todo - clean this f****** messy Mano / RapidMix / Xmm convertion
-    const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(processedExamples);
+    const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(rapidMixExamples);
 
     const learningConfig = this.state.get('learningConfig'); // mano
     const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(learningConfig); // xmm
+    console.log(logPrefix, 'xmm config', xmmConfig);
     // get (gmm|hhmm) xmm instance
     const xmm = this.xmmInstances[learningConfig.payload.modelType];
 
     xmm.setConfig(xmmConfig);
     xmm.setTrainingSet(xmmTrainingSet);
-
+    // console.log(xmm.getConfig());
 
     return new Promise((resolve, reject) => {
       xmm.train((err, model) => {
@@ -488,7 +499,11 @@ class Session {
         }
 
         const rapidMixModel = rapidMixAdapters.xmmToRapidMixModel(model);
-        this.state.set({ examples: examples, model: rapidMixModel });
+        this.state.set({
+          examples,
+          processedExamples,
+          model: rapidMixModel,
+        });
 
         // ---------------------------------------
         const trainingTime = new Date().getTime() - trainingStartTime;

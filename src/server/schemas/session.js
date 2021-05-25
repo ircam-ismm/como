@@ -51,10 +51,17 @@ export default {
     default: null,
     nullable: true,
   },
+  // raw sensors examples
   examples: {
     type: 'any',
     default: {},
   },
+  // processed examples
+  processedExamples: {
+    type: 'any',
+    default: {},
+  },
+
   learningConfig: {
     type: 'any',
     // posture default for now...
