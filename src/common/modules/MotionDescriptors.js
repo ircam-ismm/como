@@ -41,7 +41,7 @@ class MotionDescriptors extends BaseModule {
     this.eventIn = new EventIn({
       frameType: 'vector',
       frameSize: 9,
-      frameRate: 1, // dummy value updated on first received frame
+      frameRate: 1 / this.options.resamplingPeriod,
     });
 
     this.accGyroSelect = new Select({ indexes: [0, 1, 2, 3, 4, 5] });
@@ -126,7 +126,6 @@ class MotionDescriptors extends BaseModule {
   }
 
   async init() {
-    this.eventIn.streamParams.frameRate = 1 / this.options.resamplingPeriod;
     await this.eventIn.init();
     await this.eventIn.start();
   }

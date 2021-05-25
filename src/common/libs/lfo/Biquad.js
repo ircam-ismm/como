@@ -292,6 +292,7 @@ class Biquad extends BaseLfo {
 
     // if no `sampleRate` or `sampleRate` is 0 we shall halt!
     const sampleRate = this.streamParams.sourceSampleRate;
+    console.log(sampleRate);
 
     if (!sampleRate || sampleRate <= 0)
       throw new Error('Invalid sampleRate value (0) for biquad');
