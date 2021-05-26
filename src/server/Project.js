@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import JSON5 from 'json5';
-import { uuid as uuidv4 } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import slugify from '@sindresorhus/slugify';
 
 import Session from './Session';

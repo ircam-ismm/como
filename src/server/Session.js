@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { uuid as uuidv4 } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 import xmm from 'xmm-node';
 // import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
