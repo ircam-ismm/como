@@ -2,7 +2,6 @@ import path from 'path';
 import { uuid as uuidv4 } from 'uuidv4';
 
 import xmm from 'xmm-node';
-import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
 import rapidMixAdapters from 'rapid-mix-adapters';
 
 import db from './utils/db';
@@ -101,6 +100,7 @@ class Session {
 
     this.directory = path.join(this.como.projectDirectory, 'sessions', id);
     this.configFullPath = path.join(this.directory, `config.json`);
+    this.processedExamplesFullPath = path.join(this.directory, `processed-examples.json`);
   }
 
   async delete() {
@@ -178,8 +178,7 @@ class Session {
       'gmm': new xmm('gmm'),
       'hhmm': new xmm('hhmm'),
     };
-    // used for config formatting
-    this.processor = new XmmProcessor();
+
     // retrain model on instanciation
     const examples = this.state.get('examples');
     await this.trainModel(examples);
@@ -265,6 +264,7 @@ class Session {
     }
 
     const startTime = new Date().getTime();
+    const recordProcessedExamples = {};
 
     // process examples raw data in pre-processing graph
     for (let uuid in examples) {
@@ -290,6 +290,7 @@ class Session {
 
       // add to processed examples
       processedExamples.payload.data.push(processedExample);
+      recordProcessedExamples[uuid] = processedExample;
 
       this.graph.modules['script-select-descriptors'].disconnect();
       this.graph.removeSource(offlineSource);
@@ -309,14 +310,6 @@ finished (${new Date().getTime() - startTime}ms)`);
 
     const model = {};
 
-    // @note - these 2 guys are not really different...,
-    // removing `this.processor` should not be a impossible problem
-    const learningConfig = this.state.get('learningConfig');
-    this.processor.setConfig(learningConfig);
-    const rapidMixConfig = this.processor.getConfig();
-    // console.log(learningConfig);
-    // console.log(rapidMixConfig);
-
     if (processedExamples.payload.data[0]) {
       processedExamples.payload.inputDimension = processedExamples.payload.data[0].input[0].length;
     } else {
@@ -324,13 +317,16 @@ finished (${new Date().getTime() - startTime}ms)`);
     }
 
     const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(processedExamples);
-    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(rapidMixConfig);
+
+    const learningConfig = this.state.get('learningConfig');
+    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(learningConfig);
 
     const target = learningConfig.payload.modelType;
     const xmm = this.xmmInstances[target];
 
     xmm.setConfig(xmmConfig);
     xmm.setTrainingSet(xmmTrainingSet);
+    console.log(`[session "${this.state.get('id')}"]`, 'xmm config', xmm.getConfig());
 
     return new Promise((resolve, reject) => {
       if (VERBOSE) {
@@ -340,7 +336,7 @@ finished (${new Date().getTime() - startTime}ms)`);
 
       const startTime = new Date().getTime();
 
-      xmm.train((err, model) => {
+      xmm.train(async (err, model) => {
         if (err) {
           reject(err);
         }
@@ -352,6 +348,9 @@ finished (${new Date().getTime() - startTime}ms)`);
 
         const rapidMixModel = rapidMixAdapters.xmmToRapidMixModel(model);
         this.state.set({ examples: examples, model: rapidMixModel });
+
+        // store processed examples for debugging
+        await db.write(this.processedExamplesFullPath, recordProcessedExamples);
 
         resolve();
       });
