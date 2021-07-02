@@ -245,7 +245,7 @@ class Session {
   }
 
   async updateAudioFilesFromFileSystem(audioFileTree) {
-    const audioFiles = this.state.get('audioFiles');
+    const { audioFiles, labelAudioFileTable } = this.state.getValues();
     const { deleted, created } = diffArrays(audioFiles, audioFileTree, f => f.url);
 
     created.forEach(createdFile => {
@@ -253,11 +253,21 @@ class Session {
       copy.active = true;
 
       audioFiles.push(copy);
+
+      // create label and default [label, file] row entry
+      this.createLabel(createdFile.name);
+      this.createLabelAudioFileRow([createdFile.name, createdFile.name]);
     });
 
     deleted.forEach(deletedFile => {
       const index = audioFiles.findIndex(f => f.url === deletedFile.url);
       audioFiles.splice(index, 1);
+
+      // delete label
+      this.deleteLabel(deletedFile.name);
+      // delete rows where audio file appears
+      const rows = labelAudioFileTable.filter(r => r[1] === deletedFile.name);
+      rows.forEach(row => this.deleteLabelAudioFileRow(row));
     });
 
     await this.state.set({ audioFiles });
