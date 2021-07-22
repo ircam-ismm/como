@@ -6,3 +6,5 @@ example
 jsdoc.json
 # .babelrc
 .editorconfig
+
+push-master.sh

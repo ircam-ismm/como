@@ -112,7 +112,7 @@ class Project {
   }
 
   propagateStreamFrame(frame) {
-    this.como.client.socket.sendBinary('stream', this.data)
+    this.como.client.socket.sendBinary('stream', frame)
   }
 
   /**

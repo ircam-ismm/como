@@ -13,3 +13,5 @@ Thumbs.db
 dns/log
 # ...
 NOTES.md
+
+push-master.sh
