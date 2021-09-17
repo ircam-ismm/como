@@ -147,13 +147,22 @@ class Session {
 
   async updateAudioFiles() {
     const audioFiles = this.state.get('audioFiles');
+    const activeAudioFiles = audioFiles.filter(audioFile => audioFile.active);
     const audioBufferLoader = this.como.experience.plugins['audio-buffer-loader'];
 
-    const activeAudioFiles = audioFiles.filter(audioFile => audioFile.active);
-    const filesToLoad = {};
-    activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
+    if (this.como.project.get('preloadAudioFiles')) {
+      // pick audio files from audio-buffer-load cache
+      this.audioBuffers = {};
 
-    this.audioBuffers = await audioBufferLoader.load(filesToLoad);
+      activeAudioFiles.forEach(file => {
+        this.audioBuffers[file.name] = audioBufferLoader.data[file.name];
+      });
+    } else {
+      const filesToLoad = {};
+      activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
+
+      this.audioBuffers = await audioBufferLoader.load(filesToLoad);
+    }
     // clear audio buffer loader cache
     audioBufferLoader.data = {};
   }

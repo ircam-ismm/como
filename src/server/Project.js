@@ -157,6 +157,24 @@ class Project {
 
     await this._updateAudioFilesFromFileSystem(this.como.fileWatcher.state.get('audio'));
     await this._updateSessionsFromFileSystem(this.como.fileWatcher.state.get('sessions'));
+
+    if (this.como.server.config.como.preloadAudioFiles) {
+      const activeAudioFiles = [];
+
+      for (let [id, session] of this.sessions.entries()) {
+        const audioFiles = session.get('audioFiles');
+
+        audioFiles.forEach(audioFile => {
+          const index = activeAudioFiles.findIndex(a => a.url === audioFile.url);
+
+          if (index === -1 && audioFile.active) {
+            activeAudioFiles.push(audioFile);
+          }
+        });
+      }
+
+      this.state.set({ preloadAudioFiles: true, activeAudioFiles });
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -262,7 +280,7 @@ class Project {
     const sessionsOverview = Array.from(this.sessions.values())
       .map(session => {
         const stateId = session.state.id;
-        const { id, name } = session.state.getValues();
+        const { id, name } = session.getValues();
 
         return { id, name, stateId };
       });
@@ -309,7 +327,6 @@ class Project {
       const deleted = streamsRouting[index];
       streamsRouting.splice(index, 1);
 
-      // console.log('deleteStreamRoute', streamsRouting);
       await this.set({ streamsRouting });
 
       const isSourceStreaming = streamsRouting.reduce((acc, r) => acc || r[0] === from, false);
@@ -339,7 +356,6 @@ class Project {
       }
     }
 
-    // console.log('clearStreamRoute', streamsRouting);
     this.set({ streamsRouting });
 
     // notify possible sources that they should stop streaming

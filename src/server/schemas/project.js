@@ -26,10 +26,16 @@ export default {
     default: {},
   },
 
+  // list of all active audio files at server startup, bypass loading between sessions
+  // usefull for concert situations (cf. `config/project-*.json` files)
+  preloadAudioFiles: {
+    type: 'boolean',
+    default: false,
+  },
 
-  // to be implemented
-  // preloadAudioFiles: {
-  //   type: 'any',
-  //   default: [],
-  // },
+  activeAudioFiles: {
+    type: 'any',
+    default: null,
+    nullable: true,
+  },
 }

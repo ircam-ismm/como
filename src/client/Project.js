@@ -9,9 +9,15 @@ class Project {
 
   async init() {
     this.state = await this.como.client.stateManager.attach('project');
-
     this.players = new Players(this.como);
     this.sessions = new Sessions(this.como);
+
+    if (this.state.get('preloadAudioFiles')) {
+      const activeAudioFiles = this.state.get('activeAudioFiles');
+      const filesToLoad = {};
+      activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
+      await this.como.experience.plugins['audio-buffer-loader'].load(filesToLoad);
+    }
   }
 
   subscribe(func) {
