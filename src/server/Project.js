@@ -159,21 +159,9 @@ class Project {
     await this._updateSessionsFromFileSystem(this.como.fileWatcher.state.get('sessions'));
 
     if (this.como.server.config.como.preloadAudioFiles) {
-      const activeAudioFiles = [];
-
-      for (let [id, session] of this.sessions.entries()) {
-        const audioFiles = session.get('audioFiles');
-
-        audioFiles.forEach(audioFile => {
-          const index = activeAudioFiles.findIndex(a => a.url === audioFile.url);
-
-          if (index === -1 && audioFile.active) {
-            activeAudioFiles.push(audioFile);
-          }
-        });
-      }
-
-      this.state.set({ preloadAudioFiles: true, activeAudioFiles });
+      // this will preload all files of the project, so that sessions can just
+      // pick their buffers in the audio-buffer-loader cache.
+      this.state.set({ preloadAudioFiles: true });
     }
   }
 

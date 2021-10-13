@@ -32,10 +32,4 @@ export default {
     type: 'boolean',
     default: false,
   },
-
-  activeAudioFiles: {
-    type: 'any',
-    default: null,
-    nullable: true,
-  },
 }

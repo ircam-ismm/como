@@ -158,13 +158,14 @@ class Session {
         this.audioBuffers[file.name] = audioBufferLoader.data[file.name];
       });
     } else {
+      // load active files from session
       const filesToLoad = {};
       activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
 
       this.audioBuffers = await audioBufferLoader.load(filesToLoad);
+      // clear audio buffer loader cache
+      audioBufferLoader.data = {};
     }
-    // clear audio buffer loader cache
-    audioBufferLoader.data = {};
   }
 }
 

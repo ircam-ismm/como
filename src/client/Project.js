@@ -12,11 +12,18 @@ class Project {
     this.players = new Players(this.como);
     this.sessions = new Sessions(this.como);
 
+    /**
+     * @note: if preloadAudioFiles is true, we load all the audio files, so
+     * that we can still update active and inactive files per session without
+     * having to restart the server each time.
+     */
     if (this.state.get('preloadAudioFiles')) {
-      const activeAudioFiles = this.state.get('activeAudioFiles');
-      const filesToLoad = {};
-      activeAudioFiles.forEach(file => filesToLoad[file.name] = file.url);
-      await this.como.experience.plugins['audio-buffer-loader'].load(filesToLoad);
+      const audioFiles = this.state.get('audioFiles').reduce((acc, file) => {
+        acc[file.name] = file.url;
+        return acc;
+      }, {});
+
+      await this.como.experience.plugins['audio-buffer-loader'].load(audioFiles);
     }
   }
 
