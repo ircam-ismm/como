@@ -52,6 +52,20 @@ class Session {
     const model = await db.read(path.join(dirname, '.ml-model.json'));
     const audioFiles = await db.read(path.join(dirname, '.audio-files.json'));
 
+    // remove examples that are not in labels
+    let saveExamples = false;
+    console.log(''); // just a line break in the console
+
+    for (let uuid in examples) {
+      const label = examples[uuid].label;
+      if (labels.indexOf(label) === -1) {
+        console.warn(`[session "${metas.name}"] > WARNING - Example with label "${label}" deleted, label does exists in labels: [${labels.join(', ')}]`);
+
+        delete examples[uuid];
+        saveExamples = true;
+      }
+    }
+
     const id = metas.id;
     const config = {
       name: metas.name,
@@ -66,6 +80,11 @@ class Session {
 
     const session = new Session(como, id);
     await session.init(config);
+
+    if (saveExamples) {
+      session.persist('examples');
+    }
+
     await session.updateAudioFilesFromFileSystem(fsAudioFiles);
 
     return session;
@@ -86,22 +105,22 @@ class Session {
   async persist(key = null) {
     const values = this.state.getValues();
 
-    if (key === null || key === 'name') {
+    if (key === null || key === 'name') {
       const { id, name } = values;
       await db.write(path.join(this.directory, 'metas.json'), { id, name, version: '0.0.0' });
     }
 
-    if (key === null || key === 'labels') {
+    if (key === null || key === 'labels') {
       const { labels } = values;
       await db.write(path.join(this.directory, 'labels.json'), labels);
     }
 
-    if (key === null || key === 'labelAudioFileTable') {
+    if (key === null || key === 'labelAudioFileTable') {
       const { labelAudioFileTable } = values;
       await db.write(path.join(this.directory, 'label-audio-files-table.json'), labelAudioFileTable);
     }
 
-    if (key === null || key === 'graph' || key === 'graphOptions') {
+    if (key === null || key === 'graph' || key === 'graphOptions') {
       // reapply current graph options into graph definitions
       const { graph, graphOptions } = values;
       const types = ['data', 'audio'];
@@ -120,28 +139,28 @@ class Session {
       }
     }
 
-    if (key === null || key === 'learningConfig') {
+    if (key === null || key === 'learningConfig') {
       const { learningConfig } = values;
       await db.write(path.join(this.directory, 'ml-config.json'), learningConfig);
     }
 
     // generated files, keep them hidden
-    if (key === null || key === 'examples') {
+    if (key === null || key === 'examples') {
       const { examples } = values;
       await db.write(path.join(this.directory, '.ml-examples.json'), examples, false);
     }
 
-   if (key === null || key === 'processedExamples') {
+   if (key === null || key === 'processedExamples') {
       const { processedExamples } = values;
       await db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
     }
 
-    if (key === null || key === 'model') {
+    if (key === null || key === 'model') {
       const { model } = values;
       await db.write(path.join(this.directory, '.ml-model.json'), model, false);
     }
 
-    if (key === null || key === 'audioFiles') {
+    if (key === null || key === 'audioFiles') {
       const { audioFiles } = values;
       await db.write(path.join(this.directory, '.audio-files.json'), audioFiles, false);
     }
@@ -183,7 +202,7 @@ class Session {
     const modules = [...initValues.graph.data.modules, ...initValues.graph.audio.modules];
 
     initValues.graphOptions = modules.reduce((acc, desc) => {
-      acc[desc.id] = desc.options || {};
+      acc[desc.id] = desc.options || {};
       return acc;
     }, {});
 
@@ -192,30 +211,6 @@ class Session {
     this.state.subscribe(async updates => {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
-          case 'graphOptionsEvent': {
-            const graphOptions = this.state.get('graphOptions');
-
-            for (let moduleId in values) {
-              // delete scriptParams on scriptName change
-              if ('scriptName' in values[moduleId]) {
-                delete graphOptions[moduleId].scriptParams;
-                // @todo - update the model when a dataScript is updated...
-                // this.updateModel(this.state.get('examples'));
-              }
-
-              Object.assign(graphOptions[moduleId], values[moduleId]);
-            }
-
-            this.state.set({ graphOptions });
-
-            // forward event to players attached to the session
-            Array.from(this.como.project.players.values())
-              .filter(player => player.get('sessionId') === this.id)
-              .forEach(player => player.set({ graphOptionsEvent: values }));
-
-            break;
-          }
-
           case 'learningConfig': {
             this.updateModel();
             break;
@@ -225,7 +220,6 @@ class Session {
         await this.persist(name);
       }
     });
-
 
     // init graph
     const graphDescription = this.state.get('graph');
@@ -312,6 +306,7 @@ class Session {
     if (labels.indexOf(label) === -1) {
       labels.push(label);
 
+      console.log('> labels', labels);
       this.state.set({ labels });
     }
   }
@@ -509,6 +504,7 @@ class Session {
         }
 
         const rapidMixModel = rapidMixAdapters.xmmToRapidMixModel(model);
+
         this.state.set({
           examples,
           processedExamples,

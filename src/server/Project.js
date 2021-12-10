@@ -74,6 +74,102 @@ class Project {
       learningPresets: learningPresets,
     });
 
+    this.como.server.stateManager.registerUpdateHook('session', (updates, currentValues) => {
+      for (let [name, values] of Object.entries(updates)) {
+        switch (name) {
+          case 'graphOptionsEvent': {
+            const graphOptions = currentValues.graphOptions;
+
+            for (let moduleId in values) {
+              // delete scriptParams on scriptName change
+              if ('scriptName' in values[moduleId]) {
+                delete graphOptions[moduleId].scriptParams;
+                // @todo - update the model when a dataScript is updated...
+                // this.updateModel(this.state.get('examples'));
+              }
+
+              Object.assign(graphOptions[moduleId], values[moduleId]);
+            }
+
+            // forward event to players attached to the session
+            Array.from(this.players.values())
+              .filter(player => player.get('sessionId') === currentValues.id)
+              .forEach(player => player.set({ graphOptionsEvent: values }));
+
+            return {
+              ...updates,
+              graphOptions,
+            };
+
+            break;
+          }
+        }
+      }
+    });
+
+    this.como.server.stateManager.registerUpdateHook('player', (updates, currentValues) => {
+      for (let [name, values] of Object.entries(updates)) {
+        switch (name) {
+          case 'sessionId': {
+            const sessionId = values;
+
+            if (sessionId !== null) {
+              const session = this.sessions.get(sessionId);
+
+              if (!session) {
+                console.warn(`[como] required session "${sessionId}" does not exists`);
+                return {
+                  ...updates,
+                  sessionId: null
+                };
+              }
+
+              const labels = session.get('labels');
+              let defaultLabel = '';
+
+              if (labels.length) {
+                defaultLabel = labels[0];
+              }
+
+              const graphOptions = session.get('graphOptions');
+
+              return {
+                ...updates,
+                label: defaultLabel,
+                recordingState: 'idle',
+                graphOptions,
+              };
+            } else {
+              return {
+                ...updates,
+                label: '',
+                recordingState: 'idle',
+                graphOptions: null,
+              };
+            }
+
+            break;
+          }
+
+          case 'graphOptionsEvent': {
+            const optionsUpdates = values;
+            const graphOptions = currentValues.graphOptions;
+
+            for (let moduleId in optionsUpdates) {
+              Object.assign(graphOptions[moduleId], optionsUpdates[moduleId]);
+            }
+
+            return {
+              ...updates,
+              graphOptions,
+            };
+
+            break;
+          }
+        }
+      }
+    });
+
     this.como.server.stateManager.observe(async (schemaName, stateId, nodeId) => {
       // track players
       if (schemaName === 'player') {
@@ -83,58 +179,6 @@ class Project {
         playerState.onDetach(() => {
           this.clearStreamRouting(playerId, null); // clear routing where player is the source
           this.players.delete(playerId)
-        });
-
-        // maybe move this in Session, would be more logical...
-        playerState.subscribe(updates => {
-          for (let [name, values] of Object.entries(updates)) {
-            switch (name) {
-              // reset player state when it change session
-              // @note - this could be a kind of reducer provided by
-              // the stateManager itself (soundworks/core issue)
-              case 'sessionId': {
-                const sessionId = values;
-
-                if (sessionId !== null) {
-                  const session = this.sessions.get(sessionId);
-
-                  if (!session) {
-                    console.warn(`[como] required session "${sessionId}" does not exists`);
-                    playerState.set({ sessionId: null });
-                    return;
-                  }
-
-                  const defaultLabel = session.get('labels')[0];
-                  const graphOptions = session.get('graphOptions');
-
-                  playerState.set({
-                    label: defaultLabel,
-                    recordingState: 'idle',
-                    graphOptions,
-                  });
-                } else {
-                  playerState.set({
-                    label: '',
-                    recordingState: 'idle',
-                    graphOptions: null,
-                  });
-                }
-                break;
-              }
-
-              case 'graphOptionsEvent': {
-                const optionsUpdates = values;
-                const graphOptions = playerState.get('graphOptions');
-
-                for (let moduleId in optionsUpdates) {
-                  Object.assign(graphOptions[moduleId], optionsUpdates[moduleId]);
-                }
-
-                playerState.set({ graphOptions });
-                break;
-              }
-            }
-          }
         });
 
         this.players.set(playerId, playerState);
@@ -259,7 +303,7 @@ class Project {
     }
 
     // update overview if some sessions have been created or deleted
-    if (created.length || deleted.length) {
+    if (created.length || deleted.length) {
       this._updateSessionsOverview();
     }
   }
@@ -338,7 +382,7 @@ class Project {
     for (let i = streamsRouting.length - 1; i >= 0; i--) {
       const route = streamsRouting[i];
 
-      if (route[0] === from || route[1] === to) {
+      if (route[0] === from || route[1] === to) {
         deleted.push(route);
         streamsRouting.splice(i, 1);
       }

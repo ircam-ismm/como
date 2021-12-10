@@ -26,13 +26,7 @@ class Player {
   }
 
   onDetach(func) {
-    // @note - just a decorator for log
-    const callback = () => {
-      console.log('@todo - clean session audio buffers');
-      func();
-    }
-
-    this.state.onDetach(callback);
+    this.state.onDetach(func);
   }
 
   onDelete(func) {

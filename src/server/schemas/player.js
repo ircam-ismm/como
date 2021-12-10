@@ -36,6 +36,7 @@ export default {
   graphOptions: {
     type: 'any',
     default: {},
+    nullable: true,
   },
   graphOptionsEvent: {
     type: 'any',
