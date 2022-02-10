@@ -146,6 +146,10 @@ class Session {
   }
 
   async updateAudioFiles() {
+    if (!this.como.experience.plugins['audio-buffer-loader']) {
+      return
+    }
+
     const audioFiles = this.state.get('audioFiles');
     const activeAudioFiles = audioFiles.filter(audioFile => audioFile.active);
     const audioBufferLoader = this.como.experience.plugins['audio-buffer-loader'];

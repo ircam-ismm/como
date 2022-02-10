@@ -17,7 +17,7 @@ class Project {
      * that we can still update active and inactive files per session without
      * having to restart the server each time.
      */
-    if (this.state.get('preloadAudioFiles')) {
+    if (this.state.get('preloadAudioFiles') && this.como.experience.plugins['audio-buffer-loader']) {
       const audioFiles = this.state.get('audioFiles').reduce((acc, file) => {
         acc[file.name] = file.url;
         return acc;
