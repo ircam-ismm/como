@@ -16,7 +16,7 @@ class BaseSource {
   }
 
   removeListener(callback) {
-    this.listeners.add(callback);
+    this.listeners.delete(callback);
   }
 
   removeAllListeners() {
