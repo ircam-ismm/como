@@ -8,7 +8,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -Rf client && rm -Rf server && rm -Rf common",
-    "version": "npm run clean && npm run build && npm run doc && git add docs",
+    "version": "npm run clean && npm run build",
     "build:client": "babel src/client --out-dir client",
     "build:server": "babel src/server --out-dir server",
     "build:common": "babel src/common --out-dir common",
