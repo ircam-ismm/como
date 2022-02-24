@@ -211,6 +211,9 @@ class Session {
     this.state.subscribe(async updates => {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
+          case 'name':
+            this.como.project._updateSessionsOverview();
+            break;
           case 'learningConfig': {
             this.updateModel();
             break;
@@ -305,8 +308,7 @@ class Session {
 
     if (labels.indexOf(label) === -1) {
       labels.push(label);
-
-      console.log('> labels', labels);
+      // console.log('> labels', labels);
       this.state.set({ labels });
     }
   }
