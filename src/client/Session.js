@@ -111,7 +111,7 @@ class Session {
   }
 
   getGraphOptions(moduleId) {
-    graphOptions = this.state.get('graphOptions');
+    const graphOptions = this.state.get('graphOptions');
     return graphOptions[moduleId];
   }
 
