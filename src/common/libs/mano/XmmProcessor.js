@@ -10,10 +10,10 @@ const knownTargets = [ 'gmm', 'gmr', 'hhmm', 'hhmr' ];
 // this is not used
 // see, `server/schemas/session` for real defaults
 const defaultXmmConfig = {
-  modelType: 'gmm',
+  modelType: 'hhmm',
   gaussians: 1,
-  absoluteRegularization: 0.01,
-  relativeRegularization: 0.01,
+  absoluteRegularization: 0.1,
+  relativeRegularization: 0.1,
   covarianceMode: 'full',
   hierarchical: true,
   states: 1,
