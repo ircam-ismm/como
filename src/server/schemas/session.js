@@ -72,8 +72,8 @@ export default {
       payload: {
         modelType: 'hhmm',
         gaussians: 1,
-        absoluteRegularization: 0.01,
-        relativeRegularization: 0.01,
+        absoluteRegularization: 0.1,
+        relativeRegularization: 0.1,
         covarianceMode: 'full',
         hierarchical: true,
         states: 4,
