@@ -15,3 +15,7 @@ dns/log
 NOTES.md
 
 push-master.sh
+
+client
+common
+server

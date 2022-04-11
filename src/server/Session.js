@@ -345,13 +345,20 @@ class Session {
 
   deleteLabel(label) {
     const { labels, labelAudioFileTable, examples } = this.state.getValues();
+    if (label === null) {
+      console.log('clear all labels');
+      this.clearExamples();
 
-    if (labels.indexOf(label) !== -1) {
+      this.state.set({
+        labels: [],
+        labelAudioFileTable: [],
+      });
+    } else if (labels.indexOf(label) !== -1) {
       // clean label / audio file table
       const filteredLabels = labels.filter(l => l !== label);
       const filteredTable = labelAudioFileTable.filter(row => row[0] !== label);
 
-      this.clearExamples(label); // this retrains the model
+      this.clearExamples(label); // retrain the model
       this.state.set({
         labels: filteredLabels,
         labelAudioFileTable: filteredTable,

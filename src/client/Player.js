@@ -17,8 +17,8 @@ class Player {
     return await this.state.set(values);
   }
 
-  subscribe(func) {
-    return this.state.subscribe(func);
+  subscribe(func, executeListener) {
+    return this.state.subscribe(func, executeListener);
   }
 
   async detach() {
