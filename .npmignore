@@ -1,10 +1,9 @@
 docs
-# src
+src
 tests
 example
 
 jsdoc.json
-# .babelrc
+.babelrc
 .editorconfig
 
-push-master.sh
