@@ -83,7 +83,7 @@ class Graph {
     this.description = graphDescription;
 
     const optionsSource = this.player ? this.player : this.session;
-    this.options = optionsSource.get('graphOptions');
+    this.options = optionsSource.get('graphOptions') || {};
 
     // @todo - replace w/ optionsSource
     this.unsubscribeOptions = optionsSource.subscribe(updates => {
@@ -91,12 +91,16 @@ class Graph {
         switch (name) {
           case 'graphOptionsEvent': {
             for (let moduleId in values) {
-              Object.assign(this.options[moduleId], values[moduleId]);
               const module = this.modules[moduleId];
-
-              // @note - we need this check because some graphs may not have all
+              // we need this check because some graphs may not have all
               // the modules instanciated (e.g. server-side audio graph nodes).
               if (module) {
+                if (!(moduleId in this.options)) {
+                  this.options[moduleId] = {};
+                }
+
+                Object.assign(this.options[moduleId], values[moduleId]);
+
                 module.updateOptions(values[moduleId]);
               }
             }
