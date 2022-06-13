@@ -56,11 +56,6 @@ export default {
     type: 'any',
     default: {},
   },
-  // processed examples
-  processedExamples: {
-    type: 'any',
-    default: {},
-  },
 
   learningConfig: {
     type: 'any',
