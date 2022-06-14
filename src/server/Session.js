@@ -1,13 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-
-// import xmm from 'xmm-node';
-// import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
-// import rapidMixAdapters from 'rapid-mix-adapters';
 import * as xmm from 'xmmjs';
-
-console.log(xmm);
 
 import db from './utils/db';
 import diffArrays from '../common/utils/diffArrays.js';
