@@ -1,6 +1,6 @@
 {
   "name": "@ircam/como",
-  "version": "0.1.1",
+  "version": "1.0.0-beta.1",
   "description": "high-level JS framework dedicated at creating movement based applications",
   "authors": [
     "Benjamin Matuszewski"
@@ -8,6 +8,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -Rf client && rm -Rf server && rm -Rf common",
+    "prepublishOnly": "npm run build",
     "version": "npm run clean && npm run build",
     "build:client": "babel src/client --out-dir client",
     "build:server": "babel src/server --out-dir server",
@@ -42,11 +43,10 @@
     "@soundworks/plugin-sync": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
     "mkdirp": "^1.0.4",
-    "rapid-mix-adapters": "github:ircam-rnd/rapid-mix-adapters#v1.2.2",
     "rimraf": "^3.0.0",
     "serve-static": "^1.14.1",
     "uuid": "^8.3.2",
-    "xmm-node": "github:ircam-rnd/xmm-node#napi"
+    "xmmjs": "0.0.3"
   },
   "devDependencies": {
     "chokidar": "^3.5.2",

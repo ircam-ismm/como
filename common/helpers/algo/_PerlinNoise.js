@@ -1,3 +1,0 @@
-// https://codepen.io/Tobsta/post/procedural-generation-part-1-1d-perlin-noise
-"use strict";
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb21tb24vaGVscGVycy9hbGdvL19QZXJsaW5Ob2lzZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSIsInNvdXJjZXNDb250ZW50IjpbIi8vIGh0dHBzOi8vY29kZXBlbi5pby9Ub2JzdGEvcG9zdC9wcm9jZWR1cmFsLWdlbmVyYXRpb24tcGFydC0xLTFkLXBlcmxpbi1ub2lzZVxuIl19

@@ -1,10 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-
-import xmm from 'xmm-node';
-// import XmmProcessor from '../common/libs/mano/XmmProcessor.js';
-import rapidMixAdapters from 'rapid-mix-adapters';
+import * as xmm from 'xmmjs';
 
 import db from './utils/db';
 import diffArrays from '../common/utils/diffArrays.js';
@@ -54,7 +51,8 @@ class Session {
 
     // remove examples that are not in labels
     let saveExamples = false;
-    console.log(''); // just a line break in the console
+    // just a line break in the console
+    console.log('');
 
     for (let uuid in examples) {
       const label = examples[uuid].label;
@@ -96,10 +94,10 @@ class Session {
 
     this.directory = path.join(this.como.projectDirectory, 'sessions', id);
 
-    this.xmmInstances = {
-      'gmm': new xmm('gmm'),
-      'hhmm': new xmm('hhmm'),
-    };
+    // this.xmmInstances = {
+    //   'gmm': new xmm('gmm'),
+    //   'hhmm': new xmm('hhmm'),
+    // };
   }
 
   async persist(key = null) {
@@ -148,11 +146,6 @@ class Session {
     if (key === null || key === 'examples') {
       const { examples } = values;
       await db.write(path.join(this.directory, '.ml-examples.json'), examples, false);
-    }
-
-   if (key === null || key === 'processedExamples') {
-      const { processedExamples } = values;
-      await db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
     }
 
     if (key === null || key === 'model') {
@@ -228,6 +221,7 @@ class Session {
     const graphDescription = this.state.get('graph');
     const dataGraph = clonedeep(graphDescription.data);
 
+    // replace decoder with a buffer, to be used as an input for training
     dataGraph.modules.forEach(module => {
       if (module.type === 'MLDecoder') {
         module.type = 'Buffer';
@@ -345,13 +339,20 @@ class Session {
 
   deleteLabel(label) {
     const { labels, labelAudioFileTable, examples } = this.state.getValues();
+    if (label === null) {
+      console.log('clear all labels');
+      this.clearExamples();
 
-    if (labels.indexOf(label) !== -1) {
+      this.state.set({
+        labels: [],
+        labelAudioFileTable: [],
+      });
+    } else if (labels.indexOf(label) !== -1) {
       // clean label / audio file table
       const filteredLabels = labels.filter(l => l !== label);
       const filteredTable = labelAudioFileTable.filter(row => row[0] !== label);
 
-      this.clearExamples(label); // this retrains the model
+      this.clearExamples(label); // retrain the model
       this.state.set({
         labels: filteredLabels,
         labelAudioFileTable: filteredTable,
@@ -423,34 +424,35 @@ class Session {
     }
 
     if (buffer === null) {
-      console.log(`\n${logPrefix} > graph does not contain any MLDecoder, abort traning...`);
+      console.log(`\n${logPrefix} > graph does not contain any MLDecoder, abort training...`);
       return Promise.resolve();
     }
 
-    // const buffer = graph.getModule(bufferId);
     let offlineSource;
 
     // @note - mimic rapid-mix API, remove / update later
-    const rapidMixExamples = {
-      docType: 'rapid-mix:ml-training-set',
-      docVersion: '1.0.0',
-      payload: {
-        inputDimension: 0,
-        outputDimension: 0,
-        data: [],
-      }
-    }
+    // const rapidMixExamples = {
+    //   docType: 'rapid-mix:ml-training-set',
+    //   docVersion: '1.0.0',
+    //   payload: {
+    //     inputDimension: 0,
+    //     outputDimension: 0,
+    //     data: [],
+    //   }
+    // }
 
-    // for persistency, display
-    const processedExamples = {}
+    // for persistency
+    const processedExamples = {};
+    // we need to know the input dimension to create the training set, so we do it later
+    let trainingSet = null;
 
     // process examples raw data in pre-processing graph
-    for (let uuid in examples) {
+    Object.keys(examples).forEach((uuid, index) => {
+      // pass the example through the graph to have the transformed stream
       const example = examples[uuid];
 
       offlineSource = new OfflineSource(example.input);
       this.graph.setSource(offlineSource);
-
       // run the graph offline, this MUST be synchronous
       offlineSource.run();
       const transformedStream = buffer.getData();
@@ -462,18 +464,30 @@ class Session {
       this.graph.removeSource(offlineSource);
       buffer.reset();
 
-      const processedExample = {
+      // instanciate training set for this run
+      if (trainingSet === null) {
+        const inputDimension = transformedStream[0].length;
+        trainingSet = xmm.TrainingSet({ inputDimension });
+      }
+
+      const phrase = trainingSet.push(index, example.label);
+      // populate phrase with processed example data
+      transformedStream.forEach(frame => phrase.push(frame));
+
+      // for log
+      processedExamples[uuid] = {
         label: example.label,
         output: example.output,
         input: transformedStream,
       };
-      // add to processed examples
-      rapidMixExamples.payload.data.push(processedExample);
-      processedExamples[uuid] = processedExample;
-    }
+    });
 
-    if (rapidMixExamples.payload.data[0]) {
-      rapidMixExamples.payload.inputDimension = rapidMixExamples.payload.data[0].input[0].length;
+    // persists processed examples for debug
+    await db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
+
+    // if no examples, create an empty trainng set
+    if (trainingSet === null) {
+      trainingSet = xmm.TrainingSet({ inputDimension: 0 });
     }
 
     // ---------------------------------------
@@ -481,46 +495,66 @@ class Session {
     console.log(`${logPrefix} processing end\t\t(${processingTime}ms)`);
     // ---------------------------------------
     const trainingStartTime = new Date().getTime();
-    const numInputDimensions = rapidMixExamples.payload.inputDimension;
-    console.log(`${logPrefix} training start\t\t(# input dimensions: ${numInputDimensions})`);
+    console.log(`${logPrefix} training start\t\t(# input dimensions: ${trainingSet.inputDimension})`);
     // ---------------------------------------
 
     // train model
-    // @todo - clean this f****** messy Mano / RapidMix / Xmm convertion
-    const xmmTrainingSet = rapidMixAdapters.rapidMixToXmmTrainingSet(rapidMixExamples);
+    // ---------------------------------------
+    /** `learningConfig`:
+     *  {
+     *    target: { name: 'xmm' },
+     *    payload: {
+     *      modelType: 'hhmm',
+     *      gaussians: 1,
+     *      absoluteRegularization: 0.1,
+     *      relativeRegularization: 0.1,
+     *      covarianceMode: 'full',
+     *      hierarchical: true,
+     *      states: 4,
+     *      transitionMode: 'leftright', // this is weird
+     *      regressionEstimator: 'full',
+     *      likelihoodWindow: 10
+     *    }
+     *  }
+     */
+    const learningConfig = this.state.get('learningConfig').payload; // mano
+    let model = null;
 
-    const learningConfig = this.state.get('learningConfig'); // mano
-    const xmmConfig = rapidMixAdapters.rapidMixToXmmConfig(learningConfig); // xmm
-    console.log(logPrefix, 'xmm config', xmmConfig);
-    // get (gmm|hhmm) xmm instance
-    const xmm = this.xmmInstances[learningConfig.payload.modelType];
+    if (learningConfig.modelType === 'gmm') {
+      // https://xmmjs.netlify.app/#gmmconfiguration
+      const config = {
+        gaussians: learningConfig.gaussians,
+        regularization: {
+          relative: learningConfig.relativeRegularization,
+          absolute: learningConfig.absoluteRegularization,
+        },
+        covarianceMode: learningConfig.covarianceMode,
+      };
 
-    xmm.setConfig(xmmConfig);
-    xmm.setTrainingSet(xmmTrainingSet);
-    // console.log(xmm.getConfig());
+      model = xmm.trainMulticlassGMM(trainingSet, config);
+    } else if (learningConfig.modelType === 'hhmm') {
+      // https://xmmjs.netlify.app/#hmmconfiguration
+      const config = {
+        states: learningConfig.states,
+        gaussians: learningConfig.gaussians,
+        regularization: {
+          relative: learningConfig.relativeRegularization,
+          absolute: learningConfig.absoluteRegularization,
+        },
+        covarianceMode: learningConfig.covarianceMode,
+      };
 
-    return new Promise((resolve, reject) => {
-      xmm.train((err, model) => {
-        if (err) {
-          reject(err);
-        }
+      model = xmm.trainMulticlassHMM(trainingSet, config);
+    } else {
+      console.error(`${logPrefix} undefined model type ${learningConfig.modelType}, should be gmm or hhmm`);
+    }
 
-        const rapidMixModel = rapidMixAdapters.xmmToRapidMixModel(model);
+    this.state.set({ examples, model });
 
-        this.state.set({
-          examples,
-          processedExamples,
-          model: rapidMixModel,
-        });
-
-        // ---------------------------------------
-        const trainingTime = new Date().getTime() - trainingStartTime;
-        console.log(`${logPrefix} training end\t\t(${trainingTime}ms)`);
-        // ---------------------------------------
-
-        resolve();
-      });
-    });
+    // ---------------------------------------
+    const trainingTime = new Date().getTime() - trainingStartTime;
+    console.log(`${logPrefix} training end\t\t(${trainingTime}ms)`);
+    // ---------------------------------------
   }
 }
 
