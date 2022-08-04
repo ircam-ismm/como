@@ -46,7 +46,7 @@ class CoMo {
     });
 
     this.client.pluginManager.register('checkin', pluginCheckinFactory);
-    this.client.pluginManager.register('file-watcher', pluginFileSystemFactory);
+    this.client.pluginManager.register('filesystem', pluginFileSystemFactory);
 
 
     this.client.pluginManager.register('scripts-data', pluginScriptingFactory);
@@ -91,7 +91,7 @@ class CoMo {
     this.experience.plugins = {};
 
     const plugins = [
-      // 'file-watcher', // we don't need that client-side
+      'filesystem',
       'sync',
       'platform',
       'checkin',

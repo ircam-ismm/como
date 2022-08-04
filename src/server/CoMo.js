@@ -31,7 +31,7 @@ class CoMo {
     this.idClientMap = new Map();
 
     // register plugins needed for
-    this.server.pluginManager.register('file-watcher', pluginFileSystemFactory, {
+    this.server.pluginManager.register('filesystem', pluginFileSystemFactory, {
       directories: [
         {
           name: 'audio',
@@ -83,7 +83,7 @@ class CoMo {
     // open public route for audio files
     this.server.router.use('audio', serveStatic(path.join(this.projectDirectory, 'audio')));
     // projects needs the file watcher
-    this.fileWatcher = this.server.pluginManager.get('file-watcher');
+    this.fileWatcher = this.server.pluginManager.get('filesystem');
 
     return Promise.resolve(true);
   }
@@ -101,7 +101,7 @@ class CoMo {
     this.experience.plugins = {};
 
     const plugins = [
-      'file-watcher',
+      'filesystem',
       'sync',
       'platform',
       'checkin',
