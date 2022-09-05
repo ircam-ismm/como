@@ -72,6 +72,7 @@ class Project {
     this.state = await this.como.server.stateManager.create('project', {
       graphPresets: Array.from(this.graphPresets.keys()),
       learningPresets: learningPresets,
+      name: this.como.projectName,
     });
 
     this.como.server.stateManager.registerUpdateHook('session', (updates, currentValues) => {
