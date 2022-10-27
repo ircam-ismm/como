@@ -12,4 +12,7 @@ __This library is under heavy developmment__
 
 BSD-3-Clause
 
+## Acknowledgments
+This application has been supported by the project ANR-18-CE33-0002 ELEMENT
+
 
