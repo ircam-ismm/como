@@ -61,6 +61,27 @@ class Project {
     });
   }
 
+  async duplicateSession(sessionId) {
+    return new Promise((resolve, reject) => {
+      const ackChannel = `como:project:duplicateSession:ack`;
+      const errChannel = `como:project:duplicateSession:err`;
+
+      const resolvePromise = value => {
+        this.como.client.socket.removeAllListeners(ackChannel);
+        this.como.client.socket.removeAllListeners(errChannel);
+        resolve(value);
+      }
+
+      this.como.client.socket.addListener(ackChannel, resolvePromise);
+      this.como.client.socket.addListener(errChannel, err => {
+        console.log('project:duplicateSession error', err);
+        resolvePromise(null);
+      });
+
+      this.como.client.socket.send(`como:project:duplicateSession:req`, sessionId);
+    });
+  }
+
   async deleteSession(sessionId) {
     return new Promise((resolve, reject) => {
       const ackChannel = `como:project:deleteSession:ack`;

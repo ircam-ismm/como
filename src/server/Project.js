@@ -1,8 +1,11 @@
 import path from 'path';
 import fs from 'fs';
+
 import JSON5 from 'json5';
 import { v4 as uuidv4 } from 'uuid';
 import slugify from '@sindresorhus/slugify';
+import mkdirp from 'mkdirp';
+import readdir from 'recursive-readdir';
 
 import Session from './Session';
 import db from './utils/db';
@@ -234,6 +237,43 @@ class Project {
     }
 
     // console.log(`> session "${sessionName}" already exists`);
+    return null;
+  }
+
+  async duplicateSession(sessionId) {
+    const sessionsDirectory = path.join(this.como.projectDirectory, 'sessions');
+    const srcDir = path.join(sessionsDirectory, sessionId);
+    const copyId = sessionId + `-${Math.floor(Math.random() * 1000)}`;
+
+    const overview = this.get('sessionsOverview');
+    const index = overview.findIndex(overview => {
+      return overview.id === copyId;
+    });
+
+    if (index === -1) {
+      const distDir = path.join(sessionsDirectory, copyId);
+      const files = await readdir(srcDir, ['.DS_Store', 'Thumb.db']);
+
+      await mkdirp(distDir);
+
+      for (let src of files) {
+        const file = path.relative(srcDir, src);
+        const dest = path.join(distDir, file);
+
+        if (file !== 'metas.json') {
+          await mkdirp(path.dirname(dest));
+          fs.copyFileSync(src, dest);
+        } else {
+          const metas = JSON5.parse(fs.readFileSync(src));
+          metas.id = copyId;
+          metas.name = metas.name + ' Copy';
+          db.write(dest, metas);
+        }
+      }
+
+      return copyId;
+    }
+
     return null;
   }
 

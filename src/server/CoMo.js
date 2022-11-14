@@ -120,12 +120,22 @@ class CoMo {
     this.idClientMap.set(client.id, client);
 
     client.socket.addListener(`como:project:createSession:req`, async (sessionName, graphPreset) => {
-      const uuid = await this.project.createSession(sessionName, graphPreset);
+      const sessionId = await this.project.createSession(sessionName, graphPreset);
 
-      if (uuid !== null) {
-        client.socket.send(`como:project:createSession:ack`, uuid);
+      if (sessionId !== null) {
+        client.socket.send(`como:project:createSession:ack`, sessionId);
       } else {
         client.socket.send(`como:project:createSession:err`, 'session already exists');
+      }
+    });
+
+    client.socket.addListener(`como:project:duplicateSession:req`, async (sessionId) => {
+      const copyId = await this.project.duplicateSession(sessionId);
+
+      if (copyId !== null) {
+        client.socket.send(`como:project:duplicateSession:ack`, copyId);
+      } else {
+        client.socket.send(`como:project:duplicateSession:err`, 'something went wrong...');
       }
     });
 
