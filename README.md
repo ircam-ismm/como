@@ -8,6 +8,11 @@ An application template is available at https://github.com/ircam-ismm/como-templ
 
 __This library is under heavy developmment__
 
+
+## Possible breaking change
+
+plugin `file-watcher` renamed to `file-system`
+
 ## License
 
 BSD-3-Clause

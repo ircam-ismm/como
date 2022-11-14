@@ -31,7 +31,7 @@ class CoMo {
     this.idClientMap = new Map();
 
     // register plugins needed for
-    this.server.pluginManager.register('file-watcher', pluginFileSystemFactory, {
+    this.server.pluginManager.register('filesystem', pluginFileSystemFactory, {
       directories: [
         {
           name: 'audio',
@@ -83,7 +83,7 @@ class CoMo {
     // open public route for audio files
     this.server.router.use('audio', serveStatic(path.join(this.projectDirectory, 'audio')));
     // projects needs the file watcher
-    this.fileWatcher = this.server.pluginManager.get('file-watcher');
+    this.fileWatcher = this.server.pluginManager.get('filesystem');
 
     return Promise.resolve(true);
   }
@@ -101,7 +101,7 @@ class CoMo {
     this.experience.plugins = {};
 
     const plugins = [
-      'file-watcher',
+      'filesystem',
       'sync',
       'platform',
       'checkin',
@@ -120,12 +120,22 @@ class CoMo {
     this.idClientMap.set(client.id, client);
 
     client.socket.addListener(`como:project:createSession:req`, async (sessionName, graphPreset) => {
-      const uuid = await this.project.createSession(sessionName, graphPreset);
+      const sessionId = await this.project.createSession(sessionName, graphPreset);
 
-      if (uuid !== null) {
-        client.socket.send(`como:project:createSession:ack`, uuid);
+      if (sessionId !== null) {
+        client.socket.send(`como:project:createSession:ack`, sessionId);
       } else {
         client.socket.send(`como:project:createSession:err`, 'session already exists');
+      }
+    });
+
+    client.socket.addListener(`como:project:duplicateSession:req`, async (sessionId) => {
+      const copyId = await this.project.duplicateSession(sessionId);
+
+      if (copyId !== null) {
+        client.socket.send(`como:project:duplicateSession:ack`, copyId);
+      } else {
+        client.socket.send(`como:project:duplicateSession:err`, 'something went wrong...');
       }
     });
 

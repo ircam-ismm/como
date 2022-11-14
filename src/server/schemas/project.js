@@ -1,16 +1,19 @@
 export default {
+  name: {
+    type: 'string',
+    default: '',
+  },
+
   audioFiles: {
     type: 'any',
     default: [],
   },
-  metas: {
-    type: 'any',
-    default: {}, // { name, title, version,  }
-  },
+
   sessionsOverview: {
     type: 'any',
     default: [],
   },
+
   streamsRouting: {
     type: 'any',
     default: [],
@@ -21,6 +24,7 @@ export default {
     type: 'any',
     default: [],
   },
+
   learningPresets: {
     type: 'any',
     default: {},
@@ -32,4 +36,10 @@ export default {
     type: 'boolean',
     default: false,
   },
-}
+
+  // this is empty
+  metas: {
+    type: 'any',
+    default: {}, // { name, title, version,  }
+  },
+};

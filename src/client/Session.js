@@ -69,8 +69,8 @@ class Session {
     return await this.state.set(values);
   }
 
-  subscribe(func) {
-    return this.state.subscribe(func);
+  subscribe(func, executeListener = false) {
+    return this.state.subscribe(func, executeListener);
   }
 
   async detach() {
