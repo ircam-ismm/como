@@ -8,6 +8,7 @@ import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
 import pluginLoggerFactory from '@soundworks/plugin-logger/client';
 
 import devicemotion from '@ircam/devicemotion';
+import { Scheduler } from 'waves-masters';
 
 import modules from './modules/index.js';
 import sources from './sources/index.js';
@@ -21,6 +22,9 @@ class CoMo {
     this.sources = sources;
     this.modules = modules;
     this.helpers = helpers;
+
+    const scheduler = new Scheduler(() => audioContext.currentTime);
+    this.helpers.scheduler = scheduler;
 
     // register device motion feature
     pluginPlatformFactory.addFeatureDefinition({
