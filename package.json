@@ -1,6 +1,6 @@
 {
   "name": "@ircam/como",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "high-level JS framework dedicated at creating movement based applications",
   "authors": [
     "Benjamin Matuszewski"
