@@ -34,14 +34,20 @@ class MLDecoder extends BaseModule {
 
     // @todo - this should be related to module options, not to the session
     this.unsubscribeSession = this.graph.session.subscribe(updates => {
+      if ('learningConfig' in updates && this.decoder) {
+        const learningConfig = this.graph.session.get('learningConfig').payload;
+        this.decoder.setLikelihoodWindow(learningConfig.likelihoodWindow);
+      }
       if ('model' in updates) {
         const model = this.graph.session.get('model');
         const learningConfig = this.graph.session.get('learningConfig').payload;
 
         if (learningConfig.modelType ==='gmm') {
-          this.decoder = xmm.MulticlassGMMPredictor(model, learningConfig.likelihoodWindow);
+          this.decoder = xmm.MulticlassGMMPredictor(model);
+          this.decoder.setLikelihoodWindow(learningConfig.likelihoodWindow);
         } else if (learningConfig.modelType === 'hhmm') {
-          this.decoder = xmm.HierarchicalHMMPredictor(model, learningConfig.likelihoodWindow);
+          this.decoder = xmm.HierarchicalHMMPredictor(model);
+          this.decoder.setLikelihoodWindow(learningConfig.likelihoodWindow);
         } else {
           console.error(`MLDecoder undefined model type ${learningConfig.modelType}, should be gmm or hhmm`);
         }
