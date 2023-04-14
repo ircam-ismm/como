@@ -85,16 +85,14 @@ class MLDecoder extends BaseModule {
   }
 
   execute(inputFrame) {
+
     this.decoder.predict(inputFrame.data);
+
     this.outputFrame.data[this.id] = this.decoder.results;
 
     if (this.overrideLikeliest === true) {
       this.outputFrame.data[this.id].likeliest = this.graph.player.get('label');
     }
-
-    // testing
-    // this.outputFrame.data[this.id] = {}
-    // this.outputFrame.data[this.id].likeliest = this.graph.player.get('label');
 
     return this.outputFrame;
   }
