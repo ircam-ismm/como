@@ -8,7 +8,7 @@ import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
 import pluginLoggerFactory from '@soundworks/plugin-logger/client';
 
 import devicemotion from '@ircam/devicemotion';
-import { Scheduler } from 'waves-masters';
+import { Scheduler } from '@ircam/sc-scheduling';
 
 import modules from './modules/index.js';
 import sources from './sources/index.js';
@@ -22,9 +22,6 @@ class CoMo {
     this.sources = sources;
     this.modules = modules;
     this.helpers = helpers;
-
-    const scheduler = new Scheduler(() => audioContext.currentTime);
-    this.helpers.scheduler = scheduler;
 
     // register device motion feature
     pluginPlatformFactory.addFeatureDefinition({
@@ -61,8 +58,11 @@ class CoMo {
     // can be really poor (~80ms on samsung A3)
     //
     this.client.pluginManager.register('sync', pluginSyncFactory, {
-      // getTimeFunction: () => audioContext.currentTime,
       getTimeFunction: () => performance.now() * 0.001,
+    }, ['platform']);
+
+    this.client.pluginManager.register('sync-audio', pluginSyncFactory, {
+      getTimeFunction: () => audioContext.currentTime,
     }, ['platform']);
 
     this.client.pluginManager.register('logger', pluginLoggerFactory);
@@ -84,6 +84,13 @@ class CoMo {
   }
 
   async start() {
+    this.helpers.scheduler = new Scheduler(() => this.audioContext.currentTime);
+
+    const sync = this.experience.plugins['sync-audio'];
+    this.helpers.syncedScheduler = new Scheduler(() => sync.getSyncTime(), {
+      currentTimeToAudioTimeFunction: currentTime => sync.getLocalTime(currentTime),
+    });
+
     this.project = new Project(this);
     await this.project.init();
 
@@ -97,6 +104,7 @@ class CoMo {
     const plugins = [
       'filesystem',
       'sync',
+      'sync-audio',
       'platform',
       'checkin',
       'audio-buffer-loader',
@@ -107,7 +115,7 @@ class CoMo {
 
     const pluginsRequiringAudioContext = [
       'platform',
-      'sync',
+      'sync-audio',
     ];
 
     plugins.forEach(pluginName => {

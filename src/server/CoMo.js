@@ -69,6 +69,7 @@ class CoMo {
     });
 
     this.server.pluginManager.register('sync', pluginSyncFactory);
+    this.server.pluginManager.register('sync-audio', pluginSyncFactory);
     this.server.pluginManager.register('platform', pluginPlatformFactory);
     this.server.pluginManager.register('checkin', pluginCheckinFactory);
     this.server.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory);
@@ -103,6 +104,7 @@ class CoMo {
     const plugins = [
       'filesystem',
       'sync',
+      'sync-audio',
       'platform',
       'checkin',
       'audio-buffer-loader',

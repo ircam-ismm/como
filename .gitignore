@@ -5,12 +5,13 @@
 .DS_Store
 Thumbs.db
 
-dns/log
 # ...
 NOTES.md
 
 push-master.sh
 
-client
-common
-server
+/client
+/common
+/server
+
+

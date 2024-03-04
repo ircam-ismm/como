@@ -32,6 +32,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@ircam/devicemotion": "^1.2.0",
     "@ircam/parameters": "^1.2.2",
+    "@ircam/sc-scheduling": "^0.1.6",
     "@ircam/ticker": "^1.0.6",
     "@sindresorhus/slugify": "^1.1.2",
     "@soundworks/plugin-audio-buffer-loader": "^1.1.1",
@@ -47,7 +48,6 @@
     "rimraf": "^3.0.0",
     "serve-static": "^1.14.1",
     "uuid": "^8.3.2",
-    "waves-masters": "^2.3.1",
     "xmmjs": "0.0.3"
   },
   "devDependencies": {
