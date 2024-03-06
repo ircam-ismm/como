@@ -1,7 +1,7 @@
 
 class SyncedBufferPlayer {
-  constructor(syncedScheduler, audioContext) {
-    this.syncedScheduler = syncedScheduler;
+  constructor(pluginSync, audioContext) {
+    this.pluginSync = pluginSync;
     this.audioContext = audioContext;
     this.src = null;
     this.env = null;
@@ -21,8 +21,8 @@ class SyncedBufferPlayer {
     fadeInDuration = 1,
     loop = true,
   } = options) {
-    const syncTime = this.syncedScheduler.currentTime;
-    const audioTime = this.syncedScheduler.audioTime;
+    const syncTime = this.pluginSync.getSyncTime();
+    const audioTime = this.audioContext.currentTime;
     // we just compute offset according to sync origin
     const offset = syncTime % buffer.duration;
 
@@ -46,7 +46,7 @@ class SyncedBufferPlayer {
     fadeOutDuration = 1,
   } = options) {
     if (this.src && this.env) {
-      const audioTime = this.syncedScheduler.audioTime;
+      const audioTime = this.audioContext.currentTime;
 
       this.env.gain.cancelScheduledValues(audioTime);
       this.env.gain.setValueAtTime(1, audioTime);
