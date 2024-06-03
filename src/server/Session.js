@@ -208,7 +208,10 @@ class Session {
             this.como.project._updateSessionsOverview();
             break;
           case 'learningConfig': {
-            this.updateModel();
+            const examples = this.state.get('examples');
+            const trainingSet = this._getTrainingSet(examples);
+            const model = this._updateFullModel(trainingSet);
+            this.state.set({ model });
             break;
           }
         }
@@ -231,8 +234,14 @@ class Session {
     this.graph = new Graph(this.como, { data: dataGraph }, this, null, true);
     await this.graph.init();
 
-    // do not retrain model on startup, just rely on stored one
-    // await this.updateModel();
+    // create an empty model when the session is created but do not re-train
+    // model on startup, just rely on stored one
+    if (this.state.get('model') === null) {
+      const examples = this.state.get('examples');
+      const trainingSet = this._getTrainingSet(examples);
+      const model = this._updateFullModel(trainingSet);
+      this.state.set({ model });
+    }
   }
 
   async updateAudioFilesFromFileSystem(audioFileTree) {
@@ -266,35 +275,49 @@ class Session {
 
   addExample(example) {
     const uuid = uuidv4();
+    const label = example.label;
     const examples = this.state.get('examples');
     examples[uuid] = example;
 
-    this.updateModel(examples);
+    const trainingSet = this._getTrainingSet(examples, label);
+    const model = this._updateModelForLabel(trainingSet, label);
+    this.state.set({ examples, model });
   }
 
   deleteExample(uuid) {
     const examples = this.state.get('examples');
 
     if (uuid in examples) {
+      const label = examples[uuid].label;
       delete examples[uuid];
-      this.updateModel(examples);
+
+      const trainingSet = this._getTrainingSet(examples, label);
+      const model = this._updateFullModel(trainingSet, label);
+      this.state.set({ examples, model });
     }
   }
 
   clearExamples(label = null) {
-    const clearedExamples = {};
+    if (label === null) {
+      // update with empty model
+      const examples = {};
+      const trainingSet = this._getTrainingSet(examples);
+      const model = this._updateFullModel(trainingSet);
+      this.state.set({ examples, model });
+    } else {
+      const examples = {};
+      const oldExamples = this.state.get('examples');
 
-    if (label !== null) {
-      const examples = this.state.get('examples');
-
-      for (let uuid in examples) {
-        if (examples[uuid].label !== label) {
-          clearedExamples[uuid] = examples[uuid];
+      for (let uuid in oldExamples) {
+        if (oldExamples[uuid].label !== label) {
+          examples[uuid] = oldExamples[uuid];
         }
       }
+      // just remove the class from the model
+      const model = this.state.get('model');
+      delete model.classes[label];
+      this.state.set({ examples, model });
     }
-
-    this.updateModel(clearedExamples);
   }
 
   createLabel(label) {
@@ -302,13 +325,14 @@ class Session {
 
     if (labels.indexOf(label) === -1) {
       labels.push(label);
-      // console.log('> labels', labels);
       this.state.set({ labels });
     }
   }
 
   updateLabel(oldLabel, newLabel) {
-    const { labels, labelAudioFileTable, examples } = this.state.getValues();
+    const labels = this.state.get('labels');
+    const labelAudioFileTable = this.state.get('labelAudioFileTable');
+    const examples = this.state.get('examples');
 
     if (labels.indexOf(oldLabel) !== -1 && labels.indexOf(newLabel) === -1) {
       const updatedLabels = labels.map(label => label === oldLabel ? newLabel : label);
@@ -329,8 +353,14 @@ class Session {
         }
       }
 
-      this.updateModel(examples);
+      // just switch the class name in the model
+      const model = this.state.get('model');
+      model.classes[newLabel] = model.classes[oldLabel];
+      delete model.classes[oldLabel];
+
       this.state.set({
+        examples,
+        model,
         labels: updatedLabels,
         labelAudioFileTable: updatedTable,
       });
@@ -338,11 +368,11 @@ class Session {
   }
 
   deleteLabel(label) {
-    const { labels, labelAudioFileTable, examples } = this.state.getValues();
-    if (label === null) {
-      console.log('clear all labels');
-      this.clearExamples();
+    const labels = this.state.get('labels');
+    const labelAudioFileTable = this.state.get('labelAudioFileTable');
 
+    if (label === null) {
+      this.clearExamples();
       this.state.set({
         labels: [],
         labelAudioFileTable: [],
@@ -393,54 +423,38 @@ class Session {
     this.state.set({ labelAudioFileTable: filteredTable });
   }
 
-  async updateModel(examples = null) {
-    if (examples === null) {
-      examples = this.state.get('examples');
-    }
-
-    // ---------------------------------------
+  // process recorded examples through offline graph
+  // and return an XMM TrainingSet
+  _getTrainingSet(examples, label = null) {
     const logPrefix = `[session "${this.state.get('id')}"]`;
-    // ---------------------------------------
-    const labels = Object.values(examples).map(d => d.label).filter((d, i, arr) => arr.indexOf(d) === i);
-    console.log(`\n${logPrefix} > UPDATE MODEL - labels:`, labels);
-    // ---------------------------------------
-    const processingStartTime = new Date().getTime();
-    console.log(`${logPrefix} processing start\t(# examples: ${Object.keys(examples).length})`);
-    // ---------------------------------------
+    const labels = label !== null
+     ? [label]
+     : Object.values(examples).map(d => d.label).filter((d, i, arr) => arr.indexOf(d) === i);
 
-    // replace MLDecoder w/ DestBuffer in graph for recording transformed stream
-    // @note - this can only work w/ 1 or 0 decoder,
-    // @todo - handle cases w/ 2 or more decoders later.
-    let hasDecoder = false;
+    const processingStartTime = new Date().getTime();
+
+    console.log(`\n${logPrefix} > UPDATE MODEL - labels:`, labels);
+    console.log(`${logPrefix} processing start`);
+
+    // lake sure we have a recording buffer in the graph, in place of MLDecoder
     let buffer = null;
 
     for (let id in this.graph.modules) {
       const module = this.graph.modules[id];
 
       if (module.type === 'Buffer') {
-        hasDecoder = true;
         buffer = module;
       }
     }
 
     if (buffer === null) {
+      // if the graph does not have any ml capabilities (cf. cmoo-vox)
+      // just return an empty training set that the app behaves as expected
       console.log(`\n${logPrefix} > graph does not contain any MLDecoder, abort training...`);
-      return Promise.resolve();
+      return new xmm.TrainingSet({ inputDimension: 0 });
     }
 
     let offlineSource;
-
-    // @note - mimic rapid-mix API, remove / update later
-    // const rapidMixExamples = {
-    //   docType: 'rapid-mix:ml-training-set',
-    //   docVersion: '1.0.0',
-    //   payload: {
-    //     inputDimension: 0,
-    //     outputDimension: 0,
-    //     data: [],
-    //   }
-    // }
-
     // for persistency
     const processedExamples = {};
     // we need to know the input dimension to create the training set, so we do it later
@@ -450,6 +464,11 @@ class Session {
     Object.keys(examples).forEach((uuid, index) => {
       // pass the example through the graph to have the transformed stream
       const example = examples[uuid];
+
+      // if label given, process only the related examples
+      if (label !== null && example.label !== label) {
+        return;
+      }
 
       offlineSource = new OfflineSource(example.input);
       this.graph.setSource(offlineSource);
@@ -483,78 +502,84 @@ class Session {
     });
 
     // persists processed examples for debug
-    await db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
+    // @note - do not await, this is debug stuff
+    db.write(path.join(this.directory, '.ml-processed-examples.debug.json'), processedExamples, false);
 
     // if no examples, create an empty trainng set
     if (trainingSet === null) {
       trainingSet = xmm.TrainingSet({ inputDimension: 0 });
     }
 
-    // ---------------------------------------
     const processingTime = new Date().getTime() - processingStartTime;
-    console.log(`${logPrefix} processing end\t\t(${processingTime}ms)`);
-    // ---------------------------------------
+    console.log(`${logPrefix} processing end - ${processingTime}ms - trainingSet size ${trainingSet.size()}, ${trainingSet.labels()}`);
+
+    return trainingSet;
+  }
+
+  _updateModelForLabel(trainingSet, label) {
+    const logPrefix = `[session "${this.state.get('id')}"]`;
     const trainingStartTime = new Date().getTime();
-    console.log(`${logPrefix} training start\t\t(# input dimensions: ${trainingSet.inputDimension})`);
-    // ---------------------------------------
+    console.log(`${logPrefix} training start for label ${label} - input dimensions: ${trainingSet.inputDimension}`);
 
     // train model
-    // ---------------------------------------
-    /** `learningConfig`:
-     *  {
-     *    target: { name: 'xmm' },
-     *    payload: {
-     *      modelType: 'hhmm',
-     *      gaussians: 1,
-     *      absoluteRegularization: 0.1,
-     *      relativeRegularization: 0.1,
-     *      covarianceMode: 'full',
-     *      hierarchical: true,
-     *      states: 4,
-     *      transitionMode: 'leftright', // this is weird
-     *      regressionEstimator: 'full',
-     *      likelihoodWindow: 10
-     *    }
-     *  }
-     */
-    const learningConfig = this.state.get('learningConfig').payload; // mano
+    const learningConfig = this.state.get('learningConfig').payload;
+    const model = this.state.get('model');
+    // https://xmmjs.netlify.app/#gmmconfiguration
+    const config = {
+      gaussians: learningConfig.gaussians,
+      regularization: {
+        relative: learningConfig.relativeRegularization,
+        absolute: learningConfig.absoluteRegularization,
+      },
+      covarianceMode: learningConfig.covarianceMode,
+    };
+
+    if (learningConfig.modelType === 'gmm') {
+      model.classes[label] = xmm.trainGMM(trainingSet, config);
+    } else if (learningConfig.modelType === 'hhmm') {
+      config.states = learningConfig.states;
+      model.classes[label] = xmm.trainHMM(trainingSet, config);
+    } else {
+      console.error(`${logPrefix} undefined model type ${learningConfig.modelType}, should be gmm or hhmm`);
+    }
+
+    const trainingTime = new Date().getTime() - trainingStartTime;
+    console.log(`${logPrefix} training end\t\t(${trainingTime}ms)`);
+
+    return model;
+  }
+
+  _updateFullModel(trainingSet) {
+    const logPrefix = `[session "${this.state.get('id')}"]`;
+    const trainingStartTime = new Date().getTime();
+    console.log(`${logPrefix} training start - input dimensions: ${trainingSet.inputDimension}`);
+
+    // train model
+    const learningConfig = this.state.get('learningConfig').payload;
+    // https://xmmjs.netlify.app/#gmmconfiguration
+    const config = {
+      gaussians: learningConfig.gaussians,
+      regularization: {
+        relative: learningConfig.relativeRegularization,
+        absolute: learningConfig.absoluteRegularization,
+      },
+      covarianceMode: learningConfig.covarianceMode,
+    };
     let model = null;
 
     if (learningConfig.modelType === 'gmm') {
-      // https://xmmjs.netlify.app/#gmmconfiguration
-      const config = {
-        gaussians: learningConfig.gaussians,
-        regularization: {
-          relative: learningConfig.relativeRegularization,
-          absolute: learningConfig.absoluteRegularization,
-        },
-        covarianceMode: learningConfig.covarianceMode,
-      };
-
       model = xmm.trainMulticlassGMM(trainingSet, config);
     } else if (learningConfig.modelType === 'hhmm') {
-      // https://xmmjs.netlify.app/#hmmconfiguration
-      const config = {
-        states: learningConfig.states,
-        gaussians: learningConfig.gaussians,
-        regularization: {
-          relative: learningConfig.relativeRegularization,
-          absolute: learningConfig.absoluteRegularization,
-        },
-        covarianceMode: learningConfig.covarianceMode,
-      };
-
+      config.states = learningConfig.states;
       model = xmm.trainMulticlassHMM(trainingSet, config);
     } else {
       console.error(`${logPrefix} undefined model type ${learningConfig.modelType}, should be gmm or hhmm`);
     }
 
-    this.state.set({ examples, model });
-
-    // ---------------------------------------
     const trainingTime = new Date().getTime() - trainingStartTime;
-    console.log(`${logPrefix} training end\t\t(${trainingTime}ms)`);
-    // ---------------------------------------
+    console.log(`${logPrefix} training end - ${trainingTime}ms`);
+
+    return model;
   }
 }
 
