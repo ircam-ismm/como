@@ -14,4 +14,4 @@ push-master.sh
 /common
 /server
 
-
+_resources/*

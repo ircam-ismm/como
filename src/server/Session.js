@@ -231,8 +231,8 @@ class Session {
     this.graph = new Graph(this.como, { data: dataGraph }, this, null, true);
     await this.graph.init();
 
-    // init model
-    await this.updateModel();
+    // do not retrain model on startup, just rely on stored one
+    // await this.updateModel();
   }
 
   async updateAudioFilesFromFileSystem(audioFileTree) {
