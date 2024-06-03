@@ -316,6 +316,7 @@ class Session {
       // just remove the class from the model
       const model = this.state.get('model');
       delete model.classes[label];
+
       this.state.set({ examples, model });
     }
   }
