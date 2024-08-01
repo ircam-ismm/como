@@ -85,11 +85,11 @@ class Graph {
     const optionsSource = this.player ? this.player : this.session;
     this.options = optionsSource.get('graphOptions') || {};
 
-    // @todo - replace w/ optionsSource
     this.unsubscribeOptions = optionsSource.subscribe(updates => {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
           case 'graphOptionsEvent': {
+            console.log('Graph subscribe called', Object.keys(values));
             for (let moduleId in values) {
               const module = this.modules[moduleId];
               // we need this check because some graphs may not have all

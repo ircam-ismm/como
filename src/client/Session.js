@@ -106,6 +106,11 @@ class Session {
     this.como.client.socket.send(`como:session:clearExamples`, sessionId, label);
   }
 
+  retrain() {
+    const sessionId = this.state.get('id');
+    this.como.client.socket.send(`como:session:retrain`, sessionId);
+  }
+
   setGraphOptions(moduleId, updates) {
     this.state.set({ graphOptionsEvent: { [moduleId]: updates }});
   }

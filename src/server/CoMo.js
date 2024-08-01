@@ -198,8 +198,15 @@ class CoMo {
 
     client.socket.addListener(`como:session:clearExamples`, async (sessionId, label = null) => {
       if (this.project.sessions.has(sessionId)) {
-        const session = this.project.sessions.get(sessionId, label);
+        const session = this.project.sessions.get(sessionId);
         session.clearExamples(label);
+      }
+    });
+
+    client.socket.addListener(`como:session:retrain`, async (sessionId) => {
+      if (this.project.sessions.has(sessionId)) {
+        const session = this.project.sessions.get(sessionId);
+        session.retrain();
       }
     });
 

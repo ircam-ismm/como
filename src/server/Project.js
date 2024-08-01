@@ -82,6 +82,7 @@ class Project {
       for (let [name, values] of Object.entries(updates)) {
         switch (name) {
           case 'graphOptionsEvent': {
+            console.log('Project session update hook called', Object.keys(updates));
             const graphOptions = currentValues.graphOptions;
 
             for (let moduleId in values) {

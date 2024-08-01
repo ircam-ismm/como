@@ -321,6 +321,14 @@ class Session {
     }
   }
 
+  retrain() {
+    console.log('retrain');
+    const examples = this.state.get('examples');
+    const trainingSet = this._getTrainingSet(examples);
+    const model = this._updateFullModel(trainingSet);
+    this.state.set({ model });
+  }
+
   createLabel(label) {
     const labels = this.state.get('labels');
 
@@ -436,12 +444,12 @@ class Session {
 
     console.log(`\n${logPrefix} > UPDATE MODEL - labels:`, labels);
     console.log(`${logPrefix} processing start`);
-
     // lake sure we have a recording buffer in the graph, in place of MLDecoder
     let buffer = null;
 
     for (let id in this.graph.modules) {
       const module = this.graph.modules[id];
+      // console.log(id, this.graph.modules[id]);
 
       if (module.type === 'Buffer') {
         buffer = module;
@@ -512,7 +520,7 @@ class Session {
     }
 
     const processingTime = new Date().getTime() - processingStartTime;
-    console.log(`${logPrefix} processing end - ${processingTime}ms - trainingSet size ${trainingSet.size()}, ${trainingSet.labels()}`);
+    console.log(`${logPrefix} processing end - ${processingTime}ms - trainingSet size: ${trainingSet.size()} - labels: ${trainingSet.labels()}`);
 
     return trainingSet;
   }
