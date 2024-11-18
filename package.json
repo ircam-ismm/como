@@ -33,6 +33,7 @@
     "@ircam/devicemotion": "^1.2.0",
     "@ircam/parameters": "^1.2.2",
     "@ircam/sc-scheduling": "^0.1.6",
+    "@ircam/sc-utils": "^1.8.1",
     "@ircam/ticker": "^1.0.6",
     "@sindresorhus/slugify": "^1.1.2",
     "@soundworks/plugin-audio-buffer-loader": "^1.1.1",

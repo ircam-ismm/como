@@ -183,6 +183,7 @@ class CoMo {
     // ------------------------------------------------------------
     // session management
     client.socket.addListener(`como:session:addExample`, async (sessionId, example) => {
+      console.log(sessionId, example);
       if (this.project.sessions.has(sessionId)) {
         const session = this.project.sessions.get(sessionId);
         session.addExample(example);

@@ -38,7 +38,7 @@ class ExampleRecorder extends BaseModule {
     }
 
     this.currentState = recordingState;
-
+    console.log(recordingState);
     switch (recordingState) {
       case 'idle': {
         this.record = false;
@@ -62,6 +62,7 @@ class ExampleRecorder extends BaseModule {
         this.record = false;
         break;
       case 'confirm': {
+        console.log(this.example);
         // if input.length === 0, crashes xmm-node
         if (this.example.input.length > 0) {
           this.example.label = this.graph.player.get('label');
@@ -79,7 +80,7 @@ class ExampleRecorder extends BaseModule {
     }
   }
 
-  // override process and not execute to make sure they is no further node
+  // override process and not execute to make sure there is no further node
   // this is a deadend
   process(inputFrame) {
     if (this.record) {
