@@ -1,0 +1,10 @@
+name: create-source
+author: ""
+clients:
+  controller:
+    runtime: browser
+    default: true
+  thing:
+    runtime: node
+  mobile:
+    runtime: browser

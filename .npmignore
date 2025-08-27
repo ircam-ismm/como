@@ -1,0 +1,14 @@
+tests
+docs
+misc
+
+.github
+.data
+
+.jsdoc
+.editorconfig
+eslint.config.js
+tsconfig.json
+
+__*
+NOTES.md

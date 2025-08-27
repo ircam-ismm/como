@@ -1,0 +1,18 @@
+# dependencies
+/node_modules
+
+# junk files
+.DS_Store
+Thumbs.db
+.data
+docs
+
+# personnal files
+__*
+NOTES.md
+
+# testing
+.env
+
+# changelog
+# CHANGELOG.md

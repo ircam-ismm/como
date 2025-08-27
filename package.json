@@ -1,0 +1,53 @@
+{
+  "name": "@ircam/como",
+  "version": "2.0.0",
+  "exports": {
+    "./*.js": "./src/*.js"
+  },
+  "scripts": {
+    "lint": "npx eslint src",
+    "preversion": "node ./bin/ensure-not-dev-mode.js",
+    "test": "npx mocha tests/*.spec.js",
+    "test:only": "npx mocha",
+    "types": "rm -rf types && tsc"
+  },
+  "author": "Benjamin Matuszewski",
+  "license": "BSD-3-Clause",
+  "description": "",
+  "type": "module",
+  "imports": {
+    "#sources/SourceFactory.js": {
+      "module": "./src/sources/SourceFactory.browser.js",
+      "node": "./src/sources/SourceFactory.node.js"
+    }
+  },
+  "devDependencies": {
+    "@ircam/eslint-config": "^2.0.1",
+    "@soundworks/plugin-filesystem": "^5.0.1",
+    "@soundworks/plugin-logger": "^5.0.0",
+    "eslint": "^9.18.0",
+    "jsdoc": "^4.0.3",
+    "osc-min": "^2.1.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@ircam/comote-helpers": "^1.5.4",
+    "@ircam/devicemotion": "^1.3.1",
+    "@ircam/sc-components": "^3.4.0",
+    "@ircam/sc-motion": "^1.4.3",
+    "@ircam/sc-scheduling": "^1.0.0",
+    "@ircam/sc-utils": "^1.11.0",
+    "@soundworks/plugin-sync": "^5.0.0",
+    "chai": "^5.3.1",
+    "install": "^0.13.0",
+    "lit": "^3.3.1",
+    "mocha": "^11.7.1",
+    "node-osc": "^10.0.0",
+    "npm": "^11.5.2",
+    "plotly.js-basic-dist": "^3.1.0",
+    "usb": "^2.16.0"
+  },
+  "peerDependencies": {
+    "@soundworks/core": "^5.3.0"
+  }
+}
