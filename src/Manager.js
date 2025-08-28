@@ -1,6 +1,8 @@
 import CoMoNode from './ComoNode.js';
 import { isString } from '@ircam/sc-utils';
 
+// @todo - rename to AddOn
+
 // base class for component manager
 class Manager {
   #como;

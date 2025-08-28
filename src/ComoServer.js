@@ -7,6 +7,7 @@ import ServerPluginSync from '@soundworks/plugin-sync/server.js';
 // managers
 import SourceManagerServer from './sources/SourceManagerServer.js';
 import RecordingManagerServer from './recordings/RecordingManagerServer.js';
+import KeyValueStoreServer from './key-value-store/KeyValueStoreServer.js';
 
 export default class ComoServer extends CoMoNode {
   /**
@@ -23,6 +24,7 @@ export default class ComoServer extends CoMoNode {
 
     new SourceManagerServer(this);
     new RecordingManagerServer(this);
+    new KeyValueStoreServer(this);
   }
 
   // @todo - should be within soundworks

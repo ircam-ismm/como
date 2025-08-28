@@ -30,17 +30,20 @@ export default class RiotSource extends AbstractSource {
 
   async init() {
     const state = await this.como.stateManager.create('source', {
-      id: this.#config.sourceId,
+      id: this.#config.id,
       type: RiotSource.type,
       infos: {
-        // @tbd
+        receivePort: this.#config.port,
       }
     });
 
     super.init(state);
 
     this.#server.on('bundle', this.#onOscBundleBinded);
-    this.state.onDelete(() => this.#server.off(this.#onOscBundleBinded));
+    this.state.onDelete(() => {
+      clearTimeout(this.#activeTimeoutId);
+      this.#server.off(this.#onOscBundleBinded);
+    });
 
     return true;
   }
@@ -53,7 +56,7 @@ export default class RiotSource extends AbstractSource {
   #onOscBundle(bundle) {
     const { source, id } = getSourceAndIdFromBundle(bundle);
 
-    if (source === RiotSource.type && id === this.#config.sourceId) {
+    if (source === RiotSource.type && id === this.#config.id) {
       clearTimeout(this.#activeTimeoutId);
 
       if (!this.state.get('active')) {

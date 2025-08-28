@@ -38,7 +38,7 @@ describe('# Core', () => {
   });
 
   // this one crashes for an unknown reason... a priori, not a soundworks issue
-  it.only('should start and stop properly - client after server', async () => {
+  it('should start and stop properly - client after server', async () => {
     const server = new Server(config);
     // const server = new ComoServer(_server);
     await server.start();

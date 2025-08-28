@@ -33,7 +33,7 @@ export default class ComoteSource extends AbstractSource {
     this.#activeTimeout = interval * 10;
 
     const state = await this.como.node.stateManager.create('source', {
-      id: this.#config.sourceId,
+      id: this.#config.id,
       type: ComoteSource.type,
       // ```
       // id: 0,
@@ -46,7 +46,7 @@ export default class ComoteSource extends AbstractSource {
       // [webview: `http://${wifiInfos.ip}:${config.env.port}/webview`,]
       // ```
       infos: {
-        id: this.#config.sourceId,
+        id: this.#config.id,
         interval,
         ws: {
           hostname: os.hostname().split('.')[0] + '.local',
@@ -70,7 +70,7 @@ export default class ComoteSource extends AbstractSource {
   }
 
   #onData(data) {
-    if (data.source === ComoteSource.type && data.id === this.#config.sourceId) {
+    if (data.source === ComoteSource.type && data.id === this.#config.id) {
       clearTimeout(this.#activeTimeoutId);
 
       if (!this.state.get('active')) {

@@ -24,16 +24,17 @@ export default {
     type: 'boolean',
     default: false,
   },
-  // pause the update of the shared state from the underlying source
-  control: {
-    type: 'enum',
-    list: ['play', 'pause'],
-    default: 'pause',
-  },
   // for recordingManager
   record: {
     type: 'boolean',
     default: false,
+  },
+  // pause the update of the shared state from the underlying source
+  // @todo - define if we want for file-reader only or not...
+  control: {
+    type: 'enum',
+    list: ['play', 'pause'],
+    default: 'play',
   },
   // ---------------------------------------------------
   // for `file-reader` sources only
@@ -57,5 +58,10 @@ export default {
     type: 'float',
     event: true,
   },
+  duration: {
+    type: 'float',
+    default: null,
+    nullable: true,
+  }
   // ---------------------------------------------------
 }

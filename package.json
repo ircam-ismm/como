@@ -19,6 +19,10 @@
     "#sources/SourceFactory.js": {
       "module": "./src/sources/SourceFactory.browser.js",
       "node": "./src/sources/SourceFactory.node.js"
+    },
+    "#utils/EOL.js": {
+      "module": "./src/utils/eol.browser.js",
+      "node": "./src/utils/eol.node.js"
     }
   },
   "devDependencies": {

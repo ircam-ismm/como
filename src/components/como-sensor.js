@@ -213,7 +213,7 @@ class ComoSensor extends LitElement {
       let x = 0;
       const xDelta = this.#logicalWidth / (this.#buffer.length - 1);
       const normalize = value => (value + 9.81) / (2 * 9.81);
-      const colors = ['red', 'blue', 'green'];
+      const colors = ['steelblue', 'orange', 'green'];
 
       ['x', 'y', 'z'].forEach((field, index) => {
         this.#ctx.strokeStyle = colors[index];

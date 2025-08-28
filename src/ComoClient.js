@@ -6,6 +6,7 @@ import ClientPluginSync from '@soundworks/plugin-sync/client.js';
 // managers
 import SourceManagerClient from './sources/SourceManagerClient.js';
 import RecordingManagerClient from './recordings/RecordingManagerClient.js';
+import KeyValueStoreClient from './key-value-store/KeyValueStoreClient.js';
 
 export default class ComoClient extends CoMoNode {
   /**
@@ -20,5 +21,6 @@ export default class ComoClient extends CoMoNode {
 
     new SourceManagerClient(this);
     new RecordingManagerClient(this);
+    new KeyValueStoreClient(this);
   }
 }

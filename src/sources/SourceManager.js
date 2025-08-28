@@ -23,7 +23,7 @@ export default class SourceManager extends Manager {
 
     // collections
     this.#sources = await this.como.stateManager.getCollection('source',
-      ['id', 'type', 'infos', 'active', 'record']
+      ['id', 'type', 'infos', 'active', 'record', 'control']
     );
 
     this.como.setCommandHandler('createSource', this.createSource);

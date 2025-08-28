@@ -1,6 +1,8 @@
 import { Bundle } from 'node-osc';
 import { isPlainObject } from '@ircam/sc-utils';
 
+// This is node only !!
+
 /**
  * @param {Object} json JSON comote frame
  * @returns {Array|Bundle} Osc bundle from node-osc package, cf. https://www.npmjs.com/package/node-osc

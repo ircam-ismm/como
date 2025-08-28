@@ -22,11 +22,11 @@ const config = {
       },
     },
   }
-}
+};
 
 describe('# Commands: createSource', () => {
   describe('## Comote source', () => {
-    it.only('should create a source on the right node - server', async () => {
+    it('should create a source on the right node - server', async () => {
       const pkServer = new Server(config);
       const server = new ComoServer(pkServer);
       await server.start();

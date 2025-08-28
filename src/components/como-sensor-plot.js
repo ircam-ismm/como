@@ -1,6 +1,7 @@
 
 import { LitElement, html, css } from 'lit';
-import Plotly from 'plotly.js-basic-dist'
+import Plotly from 'plotly.js-basic-dist';
+import { parseTxtAsStream } from '../utils/parse-txt-as-stream';
 
 class ComoSensorPlot extends LitElement {
   #value = null;
@@ -43,14 +44,9 @@ class ComoSensorPlot extends LitElement {
 
   updateGraph() {
     const $container = this.shadowRoot.querySelector('.plot');
-    const data = this.#value
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line !== '')
-      .map(line => JSON.parse(line));
+    const data = parseTxtAsStream(this.#value);
 
-    console.log(data);
-
+    // @todo - handle all channel and all sensors
     let startTime = null;
     const timeseries = [];
     const x = [];
@@ -58,7 +54,7 @@ class ComoSensorPlot extends LitElement {
     const z = [];
 
     data.forEach(d => {
-      const { gravity } = d;
+      const { gravity } = d[0];
 
       if (startTime === null) {
         startTime = gravity.timestamp;

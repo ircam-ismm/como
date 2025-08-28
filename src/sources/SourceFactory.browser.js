@@ -37,15 +37,14 @@ export default class SourceFactory {
   }
 
   async stop() {
-    // stop the scheduler
-    // nothing special to do here
+    // @todo - delete all sources
+    // something else to do ?
+    throw new Error('@todo - browser SourceFactory#stop not implemented');
   }
 
-  // @todo - share through base class
+  // common node / browser
   async #createFilePlayerSource(payload) {
-    const { sourceId, data, verbose } = payload;
-    const config = { sourceId, data, verbose };
-    console.log('coucou');
+    const config = payload;
     const source = new FilePlayerSource(this.como, config);
     await source.init();
 

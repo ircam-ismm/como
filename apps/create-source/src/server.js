@@ -12,6 +12,10 @@ import ComoServer from '@ircam/como/ComoServer.js'
 
 const config = loadConfig(process.env.ENV, import.meta.url);
 
+import {
+  delay
+} from '@ircam/sc-utils';
+
 console.log(`
 --------------------------------------------------------
 - launching "${config.app.name}" in "${process.env.ENV || 'default'}" environment
@@ -27,21 +31,29 @@ await como.start();
 
 await como.requestCommand(como.nodeId, 'createSource', {
   type: 'comote',
-  sourceId: 'comote-test',
+  id: 'comote-test',
   port: 8001,
   verbose: false,
 });
 
 await como.requestCommand(como.nodeId, 'createSource', {
   type: 'riot',
-  sourceId: '0',
+  id: '0',
   port: 8002,
   verbose: true,
-  useBno55: true, // @todo
+  useBno55: true, // @todo - make this the default, this is far better...
 });
 
 await como.requestCommand(como.nodeId, 'createSource', {
   type: 'aggregated',
-  sourceId: 'aggregated',
-  sources: ['0', 'comote-test'],
+  id: 'aggregated',
+  sources: ['0', 'comote-test'], // @todo - rename to inputSources
+});
+
+await como.requestCommand(como.nodeId, 'createSource', {
+  type: 'osc-bridge',
+  id: 'osc-bridge',
+  inputSource: '0',
+  destIp: '127.0.0.1',
+  destPort: 8889
 });

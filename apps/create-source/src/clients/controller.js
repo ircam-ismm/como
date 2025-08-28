@@ -31,12 +31,12 @@ async function main($container) {
   como.sourceManager.sources.onChange(renderApp);
   como.recordingManager.onUpdate(renderApp);
 
-  const source = await como.sourceManager.getSource('comote-test');
-  source.onUpdate(updates => {
-    // if ('stream' in updates) {
-    //   console.log('stream', updates.stream);
-    // }
-  });
+  // const source = await como.sourceManager.getSource('comote-test');
+  // source.onUpdate(updates => {
+  //   // if ('stream' in updates) {
+  //   //   console.log('stream', updates.stream);
+  //   // }
+  // });
 
   const recordings = como.recordingManager.list();
   const firstRecord = recordings.children[0];
@@ -71,7 +71,16 @@ async function main($container) {
                         value=${rawLink(source.get('infos'))}
                       ></sc-qrcode>`
                     : ``}
+                  ${source.get('type') === 'file-player'
+                    ? html`
+                      <sc-transport
+                        value=${source.get('control')}
+                        @change=${e => source.set('control', e.detail.value)}
+                        .buttons=${source.getDescription('control').list}
+                      ></sc-transport>`
+                    : ``}
                   <div>
+                    <!-- This one creates a full attached instance -->
                     <como-sensor .como=${como} .sourceId=${source.get('id')}></como-sensor>
                   </div>
                   <div>

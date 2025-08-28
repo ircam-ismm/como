@@ -3,7 +3,6 @@ import AbstractSource from './AbstractSource.js';
 export default class AggregatedSource extends AbstractSource {
   static type = 'aggregated';
 
-  #como;
   #config;
   #sources = [];
   #secondaryFrames;
@@ -24,7 +23,7 @@ export default class AggregatedSource extends AbstractSource {
 
   async init() {
     const state = await this.como.node.stateManager.create('source', {
-      id: this.#config.sourceId,
+      id: this.#config.id,
       type: AggregatedSource.type,
       infos: {
         sources: this.#config.sources,
@@ -33,10 +32,10 @@ export default class AggregatedSource extends AbstractSource {
 
     super.init(state);
 
-
-    for (let [index, sourceId] of this.#config.sources.entries()) {
-      const source = await this.como.sourceManager.getSource(sourceId);
-      source.onUpdate(updates => this.#onSourceUpdate(sourceId, index, updates));
+    for (let [index, id] of this.#config.sources.entries()) {
+      const source = await this.como.sourceManager.getSource(id);
+      source.onUpdate(updates => this.#onSourceUpdate(id, index, updates));
+      this.#sources[index] = source;
     }
   }
 
@@ -48,12 +47,12 @@ export default class AggregatedSource extends AbstractSource {
     await this.state.delete();
   }
 
-  #onSourceUpdate(sourceId, index, updates) {
+  #onSourceUpdate(id, index, updates) {
     if (!('frame' in updates)) {
       return;
     }
 
-    const isPrimary = this.#config.sources[0] === sourceId;
+    const isPrimary = this.#config.sources[0] === id;
     const { frame } = updates;
 
     if (isPrimary) {
@@ -78,12 +77,13 @@ export default class AggregatedSource extends AbstractSource {
         // - Make more robust
         // - ...
         const secondary = this.#secondaryFrames[i];
-        secondary.forEach(channel => {
-          channel.timestamp = timestamp;
-          channel.frequency = frequency;
-          aggregated.push(channel);
-        });
-
+        if (secondary) {
+          secondary.forEach(channel => {
+            channel.timestamp = timestamp;
+            channel.frequency = frequency;
+            aggregated.push(channel);
+          });
+        }
       }
 
       this.state.set({ frame: aggregated });
