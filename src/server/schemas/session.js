@@ -59,7 +59,7 @@ export default {
 
   learningConfig: {
     type: 'any',
-    // posture default for now...
+    // (relatively) liong gesture
     default: {
       target: {
         name: 'xmm',
@@ -71,7 +71,7 @@ export default {
         relativeRegularization: 0.1,
         covarianceMode: 'full',
         hierarchical: true,
-        states: 4,
+        states: 10,
         transitionMode: 'leftright',
         regressionEstimator: 'full',
         likelihoodWindow: 10,
