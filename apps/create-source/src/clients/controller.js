@@ -43,8 +43,8 @@ async function main($container) {
   const recordData = await como.recordingManager.read(firstRecord.name);
   // const text
   await como.requestCommand(como.nodeId, 'createSource', {
-    type: 'file-player',
-    id: 'my-file-player',
+    type: 'stream-player',
+    id: 'my-stream-player',
     verbose: true,
     data: await recordData.text(),
   });

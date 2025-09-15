@@ -1,29 +1,29 @@
 {
   "name": "@ircam/como",
   "version": "2.0.0",
-  "exports": {
-    "./*.js": "./src/*.js"
-  },
-  "scripts": {
-    "lint": "npx eslint src",
-    "preversion": "node ./bin/ensure-not-dev-mode.js",
-    "test": "npx mocha tests/*.spec.js",
-    "test:only": "npx mocha",
-    "types": "rm -rf types && tsc"
-  },
   "author": "Benjamin Matuszewski",
   "license": "BSD-3-Clause",
   "description": "",
   "type": "module",
+  "exports": {
+    "./*.js": "./src/*.js"
+  },
   "imports": {
-    "#sources/SourceFactory.js": {
-      "module": "./src/sources/SourceFactory.browser.js",
-      "node": "./src/sources/SourceFactory.node.js"
+    "#sources/factory.js": {
+      "module": "./src/components/source-manager/sources/factory.browser.js",
+      "node": "./src/components/source-manager/sources/factory.node.js"
     },
     "#utils/EOL.js": {
-      "module": "./src/utils/eol.browser.js",
-      "node": "./src/utils/eol.node.js"
+      "module": "./src/components/source-manager/utils/eol.browser.js",
+      "node": "./src/components/source-manager/utils/eol.node.js"
     }
+  },
+  "scripts": {
+    "lint": "npx eslint src",
+    "preversion": "node ./bin/ensure-not-dev-mode.js",
+    "test": "npx mocha tests/**/*.spec.js",
+    "test:only": "npx mocha",
+    "types": "rm -rf types && tsc"
   },
   "devDependencies": {
     "@ircam/eslint-config": "^2.0.1",
@@ -43,6 +43,7 @@
     "@ircam/sc-utils": "^1.11.0",
     "@soundworks/plugin-sync": "^5.0.0",
     "chai": "^5.3.1",
+    "filenamify": "^7.0.0",
     "install": "^0.13.0",
     "lit": "^3.3.1",
     "mocha": "^11.7.1",
