@@ -28,7 +28,7 @@ export default class ComoteSource extends AbstractSource {
     // @todo - confirm this is a sensible default
     this.#activeTimeout = interval * 10;
 
-    const state = await this.como.node.stateManager.create('SourceManager:source', {
+    const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: ComoteSource.type,
       nodeId: this.como.nodeId,
@@ -56,12 +56,15 @@ export default class ComoteSource extends AbstractSource {
     super.init(state);
 
     this.#server.addWsListener(this.#onDataBinded);
-    this.state.onDelete(() => {
-      clearTimeout(this.#activeTimeoutId);
-      this.#server.removeWsListener(this.#onDataBinded);
-    });
 
     return true;
+  }
+
+  async delete() {
+    clearTimeout(this.#activeTimeoutId);
+    this.#server.removeWsListener(this.#onDataBinded);
+
+    await this.state.delete();
   }
 
   #onData(data) {

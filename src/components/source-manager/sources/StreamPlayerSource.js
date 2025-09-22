@@ -18,6 +18,7 @@ export default class StreamPlayerSource extends AbstractSource {
   // #firstFrameTime; // stream time
   #processorBinded;
   #timeoutId;
+  #forcePeriod = null; // useful for testing
 
   constructor(como, config) {
     super(como);
@@ -36,6 +37,10 @@ export default class StreamPlayerSource extends AbstractSource {
       }
     }
 
+    if (Number.isFinite(this.#config.forcePeriod)) {
+      this.#forcePeriod = Math.max(0.001, this.#config.forcePeriod / 1000);
+    }
+
     if (this.#stream.length < 2) {
        throw new Error(`Cannot construct StreamPlayerSource: Invalid stream, should contain at least 2 frames`);
     }
@@ -49,9 +54,7 @@ export default class StreamPlayerSource extends AbstractSource {
     const lastFrameTime = firstChannel[firstChannel.length - 1].timestamp / 1000; // sec
     const duration = lastFrameTime - firstFrameTime;
 
-    // this.#firstFrameTime = firstFrameTime;
-
-    const state = await this.como.stateManager.create('SourceManager:source', {
+    const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: StreamPlayerSource.type,
       nodeId: this.como.nodeId,
@@ -83,17 +86,15 @@ export default class StreamPlayerSource extends AbstractSource {
       }
     });
 
-    state.onDelete(() => {
-      if (this.como.scheduler.has(this.#processorBinded)) {
-        clearTimeout(this.#timeoutId);
-        this.como.scheduler.remove(this.#processorBinded);
-      }
-    });
-
     super.init(state);
   }
 
   async delete() {
+    if (this.como.scheduler.has(this.#processorBinded)) {
+      clearTimeout(this.#timeoutId);
+      this.como.scheduler.remove(this.#processorBinded);
+    }
+
     await this.state.delete();
   }
 
@@ -114,7 +115,9 @@ export default class StreamPlayerSource extends AbstractSource {
       if (this.#currentFrame >= this.#stream.length) {
         this.#currentFrame = 0;
         // take an arbitrary dt
-        const dt = (this.#stream[1][0].timestamp - this.#stream[0][0].timestamp) / 1000;
+        const dt = this.#forcePeriod === null
+          ? this.#forcePeriod
+          : (this.#stream[1][0].timestamp - this.#stream[0][0].timestamp) / 1000;
         return currentTime + dt;
       }
     }
@@ -130,7 +133,9 @@ export default class StreamPlayerSource extends AbstractSource {
     }
 
     const nextFrameTime = this.#stream[this.#currentFrame][0].timestamp / 1000;
-    const dt = nextFrameTime - frameTime;
+    const dt = this.#forcePeriod
+      ? this.#forcePeriod
+      : nextFrameTime - frameTime;
 
     return currentTime + dt;
   }

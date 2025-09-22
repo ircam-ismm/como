@@ -1,4 +1,4 @@
-import { EOL } from '#utils/EOL.js';
+import { EOL } from '#isomorphic-utils.js';
 
 export function parseTxtAsStream(txt) {
   const stream = txt.trim()

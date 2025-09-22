@@ -14,21 +14,26 @@
 
 ## Ontology
 
-- Node:
+- `ComoNode`:
   + a node / device in the network
-- Project:
+- `Project`:
   + set of soundfiles, scripts and sessions,
   + only 1 project can run at a given time
-- Session:
-  + subset of project soundfile
+- `Session`:
+  + subset of project soundfiles (actual loading should be done by `Player`)
   + default script
   + set of players
-- Source:
+  + placeholder for managers' data, e.g. xmm
+- `Player`:
+  + associated to a Node
+  + link a Source with a Script
+- `Source`:
   + a source of motion sensors
-- Script:
-  + dynamic script to process Sources and make sound
-- Player:
-  + tuple of Source + Script
+- `Script`:
+  + dynamic script to process Sources and make noises
+- `Topology`
+  + associate devices (cf. como.id) to players and sessions
+  + can be stored and recalled
 
 ## Scripts API
 

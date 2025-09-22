@@ -3,8 +3,8 @@ import ComoComponent from '../../core/ComoComponent.js';
 export default class ProjectManager extends ComoComponent {
   #projects;
 
-  constructor(como) {
-    super(como, 'projectManager');
+  constructor(como, name) {
+    super(como, name);
   }
 
   async start() {
@@ -22,7 +22,7 @@ export default class ProjectManager extends ComoComponent {
     return !!project;
   }
 
-  async createProject(name, templateDirname) {
+  async createProject(name, templateDirname = null) {
     return await this.como.requestRfc(this.como.constants.SERVER_ID, `${this.name}:createProject`, {
       name,
       templateDirname,

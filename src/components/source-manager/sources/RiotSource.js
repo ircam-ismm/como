@@ -22,7 +22,7 @@ export default class RiotSource extends AbstractSource {
   }
 
   async init() {
-    const state = await this.como.stateManager.create('SourceManager:source', {
+    const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: RiotSource.type,
       nodeId: this.como.nodeId,
@@ -35,12 +35,14 @@ export default class RiotSource extends AbstractSource {
 
     this.#server.on('bundle', this.#onOscBundle);
 
-    this.state.onDelete(() => {
-      clearTimeout(this.#activeTimeoutId);
-      this.#server.off('bundle', this.#onOscBundle);
-    });
-
     return true;
+  }
+
+  async delete() {
+    clearTimeout(this.#activeTimeoutId);
+    this.#server.off('bundle', this.#onOscBundle);
+
+    await this.state.delete();
   }
 
   #onOscBundle = bundle => {

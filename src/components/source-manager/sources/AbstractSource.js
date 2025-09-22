@@ -23,7 +23,5 @@ export default class AbstractSource {
     this.#state = state;
   }
 
-  async delete() {
-    await this.#state.delete();
-  }
+  async delete() {}
 }

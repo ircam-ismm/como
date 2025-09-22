@@ -6,7 +6,7 @@ export default class KeyValueStoreServer extends KeyValueStore {
   constructor(como) {
     super(como);
 
-    this.#db = this.como.node.createNamespacedDb('como');
+    this.#db = this.como.host.createNamespacedDb('como');
 
     this.como.setRfcHandler('store:get', this.#get);
     this.como.setRfcHandler('store:set', this.#set);

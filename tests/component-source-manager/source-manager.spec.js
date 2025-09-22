@@ -11,8 +11,6 @@ import ComoServer from '../../src/core/ComoServer.js';
 
 import config from '../config.js';
 
-const streamStr = fs.readFileSync('tests/stream-test.txt').toString();
-
 describe('# SourceManager', () => {
   let client, server;
 
@@ -32,7 +30,7 @@ describe('# SourceManager', () => {
     streamPlayer: {
       type: 'stream-player',
       id: 'stream-player-test',
-      stream: streamStr,
+      stream: fs.readFileSync('tests/stream-test.txt').toString(),
       verbose: false,
     },
     aggregated: {
@@ -354,9 +352,43 @@ describe('# SourceManager', () => {
 
   describe(`## getSource`, () => {
     it('should be able to create a source and get it right after on same node', async () => {
-      const sourceId = await client.sourceManager.createSource(configs.riot);
+      const sourceId = await client.sourceManager.createSource(configs.comote);
       const source = client.sourceManager.getSource(sourceId);
       assert.isNotNull(source);
+    });
+
+    it(`should return owned state if source was created on same node + stream should be dispatched synchronously`, async () => {
+      const sourceId = await client.sourceManager.createSource(configs.comote);
+      const source = await client.sourceManager.getSource(sourceId);
+      assert.isTrue(source.isOwner);
+
+      // ensure frame is dispatched synchronously
+      const steps = [];
+      source.onUpdate(updates => {
+        if (updates.frame) {
+          steps.push(2);
+        }
+      });
+
+      steps.push(1);
+      source.set({ frame: true });
+      steps.push(3);
+      assert.deepEqual(steps, [1, 2, 3]);
+    });
+
+    it(`should return attach state if "createSource" and "getSource" are called on different nodes`, async () => {
+      const sourceId = await client.sourceManager.createSource(configs.comote);
+      const source = await server.sourceManager.getSource(sourceId);
+      assert.isFalse(source.isOwner);
+    });
+  });
+
+  describe(`## sourceExists`, () => {
+    it('should work', async () => {
+      const sourceId = await client.sourceManager.createSource(configs.comote);
+
+      assert.isFalse(client.sourceManager.sourceExists('does-exists'));
+      assert.isTrue(client.sourceManager.sourceExists(sourceId));
     });
   });
 });

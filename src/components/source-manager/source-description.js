@@ -21,7 +21,9 @@ export default {
   // note that frame are multichannel: i.e. they can host several streams
   frame: {
     type: 'any',
-    event: true,
+    acknowledge: false,
+    default: null,
+    nullable: true,
   },
   // define if the underlying hardware is actually sending values
   active: {

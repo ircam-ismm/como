@@ -7,21 +7,30 @@ import {
 import {
   Scheduler,
 } from '@ircam/sc-scheduling';
+import {
+  serializeError,
+  deserializeError,
+} from 'serialize-error';
 
 import * as constants from './constants.js';
+import { getId } from '#isomorphic-utils.js';
 
 export default class ComoNode {
-  #node; // soundworks node
+  #host; // soundworks node
   #config;
   #constants = Object.freeze({
     ...constants,
   });
 
+  #node;
+  #nodes; // collection of node-infos
+
   #plugins = [];
   #components = new Map();
 
   // global shared states
-  #global;
+  #global; // @todo - rename to config
+  #project;
   #rfcMessageBus;
   #rfcIdGenerator = counter();
   #rfcPendingStore = new Map();
@@ -35,15 +44,15 @@ export default class ComoNode {
 
   /**
    *
-   * @param {Client|Server} node - Instance of soundworks client or server
+   * @param {Client|Server} host - Instance of soundworks client or server
    */
-  constructor(node, options) {
-    this.#node = node;
+  constructor(host, options) {
+    this.#host = host;
     this.#config = options;
   }
 
-  get node() {
-    return this.#node;
+  get host() {
+    return this.#host;
   }
 
   get options() {
@@ -54,12 +63,28 @@ export default class ComoNode {
     return this.#constants;
   }
 
-  get runtime() {
-    return this.#node.runtime;
+  /** soundworks id, uniquely generated at runtime */
+  get nodeId() {
+    return this.#node.get('nodeId');
   }
 
-  get nodeId() {
-    return this.#node.id;
+  /** topological id - can be fixed between different restart */
+  get id() {
+    return this.#node.get('id');
+  }
+
+  /** node | browser */
+  get runtime() {
+    return this.#node.get('runtime');
+  }
+
+  /** as defined in soundworks */
+  get role() {
+    return this.#node.get('role');
+  }
+
+  get nodes() {
+
   }
 
   get plugins() {
@@ -70,16 +95,20 @@ export default class ComoNode {
     return this.#global;
   }
 
+  get project() {
+    return this.#project;
+  }
+
   get components() {
     return this.#components;
   }
 
   get stateManager() {
-    return this.#node.stateManager;
+    return this.#host.stateManager;
   }
 
   get pluginManager() {
-    return this.#node.pluginManager;
+    return this.#host.pluginManager;
   }
 
   get scheduler() {
@@ -95,8 +124,8 @@ export default class ComoNode {
   }
 
   async init() {
-    if (this.#node.status === 'idle') {
-      await this.node.init();
+    if (this.#host.status === 'idle') {
+      await this.host.init();
 
       for (let component of this.#components.values()) {
         await component.init();
@@ -106,24 +135,35 @@ export default class ComoNode {
 
   async start() {
     await this.init();
-    await this.#node.start();
+    await this.#host.start();
+
+    // node own state
+    this.#node = await this.stateManager.create('como:node', {
+      nodeId: this.host.id,
+      id: getId(this.host.id),
+      runtime: this.host.id === this.constants.SERVER_ID ? 'node' : this.host.runtime,
+      role: this.host.id === this.constants.SERVER_ID ? 'server' : this.host.role,
+    });
 
     // create / attach to global shared states
-    const method = this.nodeId === -1 ? 'create' : 'attach';
-
     if (this.nodeId === this.constants.SERVER_ID) {
-      this.#global = await this.stateManager.create('global', {
+      // @todo - rename to config
+      this.#global = await this.stateManager.create('como:global', {
         ...this.#config,
       });
+      this.#project = await this.stateManager.create('como:project');
       // global command mechanism: send a command and await for its execution
-      this.#rfcMessageBus = await this.stateManager.create('rfc');
+      this.#rfcMessageBus = await this.stateManager.create('como:rfc');
       this.#rfcMessageBus.onUpdate(this.#handleRfc.bind(this));
     } else {
-      this.#global = await this.stateManager.attach('global');
+      this.#global = await this.stateManager.attach('como:global');
+      this.#project = await this.stateManager.attach('como:project');
       // global command mechanism: send a command and await for its execution
-      this.#rfcMessageBus = await this.stateManager.attach('rfc');
+      this.#rfcMessageBus = await this.stateManager.attach('como:rfc');
       this.#rfcMessageBus.onUpdate(this.#handleRfc.bind(this));
     }
+
+    this.#nodes = await this.stateManager.getCollection('como:node');
 
     for (let component of this.#components.values()) {
       await component.start();
@@ -140,11 +180,11 @@ export default class ComoNode {
       await component.stop();
     }
 
-    await this.#node.stop();
+    await this.#host.stop();
   }
 
-  async setProject(projectName) {
-    throw new Error('@todo - implement ComoNode#setProject');
+  async setProject(projectDirname) {
+    this.requestRfc(this.constants.SERVER_ID, 'como:setProject', { projectDirname });
   }
 
   /**
@@ -251,7 +291,7 @@ export default class ComoNode {
 
           // this will resolve even if responseAck is undefined
           if ('responseErr' in infos) {
-            reject(new Error(infos.responseErr));
+            reject(deserializeError(infos.responseErr));
           } else {
             resolve(infos.responseAck);
           }
@@ -262,6 +302,7 @@ export default class ComoNode {
     } else {
       // check if this node should execute the command
       const { executorNodeId, name, payload } = infos;
+
       if (executorNodeId === this.nodeId) {
         try {
           if (!this.#rfcHandlers.has(name)) {
@@ -281,14 +322,9 @@ export default class ComoNode {
 
           this.#rfcMessageBus.set(response);
         } catch (err) {
-          // this crashes a pre-version script, no way this can be published
-          if (this.constants.DEV_MODE) {
-            console.log(err.stack);
-          }
-
           this.#rfcMessageBus.set({
             settled: true,
-            responseErr: err.message,
+            responseErr: serializeError(err),
             ...infos
           });
         }

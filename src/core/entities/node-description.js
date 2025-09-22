@@ -1,18 +1,17 @@
 export default {
   id: {
+    type: 'string',
+    required: true,
+  },
+  nodeId: {
     type: 'integer',
     required: true,
   },
-  runtime: {
+  role: {
     type: 'string',
     required: true,
   },
-  hostname: {
-    type: 'string',
-    default: null,
-    nullable: true,
-  },
-  role: {
+  runtime: {
     type: 'string',
     required: true,
   },

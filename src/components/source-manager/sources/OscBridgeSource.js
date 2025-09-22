@@ -19,7 +19,7 @@ export default class OscBridgeSource extends AbstractSource {
     this.#inputSource = await this.como.sourceManager.getSource(this.#config.source);
     this.#inputSource.onUpdate(this.#onInputUpdate);
 
-    const state = await this.como.node.stateManager.create('SourceManager:source', {
+    const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       type: OscBridgeSource.type,
       id: this.#config.id,
       nodeId: this.como.nodeId,

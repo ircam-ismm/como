@@ -79,10 +79,10 @@ describe('# ProjectManager', () => {
       assert.isTrue(errored);
     });
 
-    it('## should throw if template pathname is not a string', async () => {
+    it('## should throw if template pathname is not null or not a string', async () => {
       let errored = false;
       try {
-        await client.projectManager.createProject('test', null);
+        await client.projectManager.createProject('test', {});
       } catch (err) {
         console.log(err.message);
         errored = true;

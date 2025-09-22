@@ -2,9 +2,9 @@ import SourceManager from './SourceManager.js';
 import sourceDescription from './source-description.js';
 
 export default class SourceManagerServer extends SourceManager {
-  constructor(como, entityName) {
-    super(como, entityName);
+  constructor(como, name) {
+    super(como, name);
 
-    this.como.stateManager.defineClass('SourceManager:source', sourceDescription);
+    this.como.stateManager.defineClass(`${this.name}:source`, sourceDescription);
   }
 }

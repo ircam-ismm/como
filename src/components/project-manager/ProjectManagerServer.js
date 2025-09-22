@@ -1,8 +1,11 @@
 import fs from 'node:fs';
 import * as fsPromises from 'node:fs/promises'
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { default as _filenamify } from 'filenamify';
+import {
+  default as _filenamify
+} from 'filenamify';
 import {
   isString
 } from '@ircam/sc-utils';
@@ -14,11 +17,13 @@ function filenamify(value) {
   return _filenamify(value).toLowerCase();
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default class ProjectManagerServer extends ProjectManager {
   #projectStore = new Set();
 
-  constructor(como) {
-    super(como);
+  constructor(como, name) {
+    super(como, name);
 
     this.como.stateManager.defineClass(`${this.name}:project`, projectDescription);
 
@@ -67,19 +72,35 @@ export default class ProjectManagerServer extends ProjectManager {
 
   #createProject = async ({ name, templateDirname }) => {
     if (!isString(name)) {
-      throw new Error(`Cannot execute "createProject" on ProjectManager: project name is not a string`);
+      throw new TypeError(`Cannot execute "createProject" on ProjectManager: project name is not a string`);
+    }
+
+    name = name.trim();
+
+    if (name === '') {
+      throw new TypeError(`Cannot execute "createProject" on ProjectManager: project name is empty`);
+    }
+
+    if (templateDirname === null) {
+      templateDirname = path.join(__dirname, 'template');
     }
 
     if (!isString(templateDirname)) {
-      throw new Error(`Cannot execute "createProject" on ProjectManager: template dirname is not a string`);
+      throw new TypeError(`Cannot execute "createProject" on ProjectManager: template dirname is not a string`);
+    }
+
+    templateDirname = templateDirname.trim();
+
+    if (templateDirname === '') {
+      throw new TypeError(`Cannot execute "createProject" on ProjectManager: template dirname is not a string`);
     }
 
     if (!fs.existsSync(templateDirname) || !fs.statSync(templateDirname).isDirectory()) {
-      throw new Error(`Cannot execute "createProject" on ProjectManager: template is not a directory`);
+      throw new DOMException(`Cannot execute "createProject" on ProjectManager: template is not a directory`, 'NotSupportedError');
     }
 
     if (this.projectExists(name)) {
-      throw new Error(`Cannot execute "createProject" on ProjectManager: a project with same name (${name}) already exists`);
+      throw new DOMException(`Cannot execute "createProject" on ProjectManager: a project with same name (${name}) already exists`, 'NotSupportedError');
     }
 
     const slug = filenamify(name);
@@ -105,8 +126,20 @@ export default class ProjectManagerServer extends ProjectManager {
       throw new Error(`Cannot execute "renameProject" on ProjectManager: oldName is not a string`);
     }
 
+    oldName = oldName.trim();
+
+    if (oldName === '') {
+      throw new TypeError(`Cannot execute "renameProject" on ProjectManager: oldName is empty`);
+    }
+
     if (!isString(newName)) {
       throw new Error(`Cannot execute "renameProject" on ProjectManager: newName is not a string`);
+    }
+
+    newName = newName.trim();
+
+    if (newName === '') {
+      throw new TypeError(`Cannot execute "renameProject" on ProjectManager: newName is empty`);
     }
 
     if (!this.projectExists(oldName)) {
@@ -132,6 +165,11 @@ export default class ProjectManagerServer extends ProjectManager {
       dirname,
       ...infos,
     });
+
+    // update current project
+    if (this.como.project.get('name') === oldName) {
+      await this.como.setProject(dirname);
+    }
   }
 
   #deleteProject = async ({ name }) => {
@@ -149,5 +187,9 @@ export default class ProjectManagerServer extends ProjectManager {
     await fsPromises.rm(project.get('dirname'), { recursive: true, force: true });
     // delete state
     await project.delete();
+    // reset current project
+    if (this.como.project.get('name') === name) {
+      await this.como.setProject(null);
+    }
   }
 };

@@ -23,8 +23,6 @@ export default class SourceFactory {
   #oscServers = new Map(); // <port, { Server, config }>
   #oscClients = new Map(); // <ip:port, { Server, config }>
   #wsServers = new Map(); // <port, { Server, config }>
-  // @todo - review
-  #store = new Map();
 
   constructor(como) {
     this.como = como;
@@ -63,28 +61,19 @@ export default class SourceFactory {
     }
   }
 
-  async deleteSource(como, config) {
-    throw new Error('@todo - node SourceFactory#deleteSource handler');
-  }
-
   async stop() {
-    for (let source of this.#store.values()) {
-      await source.delete();
+    for (let wsServer of this.#wsServers.values()) {
+      await wsServer.stop();
     }
 
-    for (let server of this.#wsServers.values()) {
-      await server.stop();
+    for (let oscClient of this.#oscClients.values()) {
+      await oscClient.close();
     }
 
-    for (let client of this.#oscClients.values()) {
-      await client.close();
+    for (let oscServer of this.#oscServers.values()) {
+      await oscServer.close();
     }
 
-    for (let server of this.#oscServers.values()) {
-      await server.close();
-    }
-
-    this.#store.clear();
     this.#wsServers.clear();
     this.#oscClients.clear();
     this.#oscServers.clear();
@@ -112,8 +101,7 @@ export default class SourceFactory {
     const source = new ComoteSource(this.como, server, config);
     await source.init();
 
-    this.#store.set(source.id, source);
-    return source.id;
+    return source;
   }
 
   async #createRiotSource(config) {
@@ -141,9 +129,7 @@ export default class SourceFactory {
     const source = new RiotSource(this.como, server, config);
     await source.init();
 
-    this.#store.set(source.id, source);
-
-    return source.id;
+    return source;
   }
 
   async #createAggregatedSource(config) {
@@ -158,9 +144,7 @@ export default class SourceFactory {
     const source = new AggregatedSource(this.como, config);
     await source.init();
 
-    this.#store.set(source.id, source);
-
-    return source.id;
+    return source;
   }
 
   async #createOscBridge(config) {
@@ -178,9 +162,7 @@ export default class SourceFactory {
     const source = new OscBridgeSource(this.como, oscClient, config);
     await source.init();
 
-    this.#store.set(source.id, source);
-
-    return source.id
+    return source;
   }
 
   // common node / browser
@@ -188,9 +170,7 @@ export default class SourceFactory {
     const source = new StreamPlayerSource(this.como, config);
     await source.init();
 
-    this.#store.set(source.id, source);
-
-    return source.id;
+    return source;
   }
 }
 

@@ -6,9 +6,7 @@
 // ```
 // To satisfy both node and the bundler, cf. package.json `imports` field
 
-import StreamPlayerSource from "./sources/StreamPlayerSource.js";
-// @todo - review
-const sourceStore = new Map();
+import StreamPlayerSource from "./StreamPlayerSource.js";
 
 export default class SourceFactory {
   constructor(como) {
@@ -32,10 +30,6 @@ export default class SourceFactory {
     }
   }
 
-  async deleteSource(como, config) {
-    throw new Error('@todo - browser SourceFactory#deleteSource handler');
-  }
-
   async stop() {
     // @todo - delete all sources
     // something else to do ?
@@ -47,8 +41,6 @@ export default class SourceFactory {
     const source = new StreamPlayerSource(this.como, config);
     await source.init();
 
-    sourceStore.set(source.id, source);
-
-    return source.id;
+    return source;
   }
 }

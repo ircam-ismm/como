@@ -11,7 +11,7 @@ export default class ComoComponent {
     }
 
     if (!isString(name)) {
-      throw new Error('Cannot construct ComoComponent: argument 2 is not a valid entity name');
+      throw new Error('Cannot construct ComoComponent: argument 2 is not a valid component name');
     }
 
     if (como.components.has(name)) {
@@ -40,5 +40,6 @@ export default class ComoComponent {
   async init() {}
   async start() {}
   async stop() {}
+
 }
 

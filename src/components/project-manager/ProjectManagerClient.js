@@ -4,8 +4,12 @@ import {
 
 import ProjectManager from './ProjectManager.js';
 
-if (isBrowser()) {
-  // register guis
-}
+export default class ProjectManagerClient extends ProjectManager {
+  async start() {
+    await super.start();
 
-export default class ProjectManagerClient extends ProjectManager {};
+    if (isBrowser()) {
+      await import('./gui/como-project-manager.js');
+    }
+  }
+};

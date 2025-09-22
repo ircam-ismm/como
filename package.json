@@ -13,22 +13,19 @@
       "module": "./src/components/source-manager/sources/factory.browser.js",
       "node": "./src/components/source-manager/sources/factory.node.js"
     },
-    "#utils/EOL.js": {
-      "module": "./src/components/source-manager/utils/eol.browser.js",
-      "node": "./src/components/source-manager/utils/eol.node.js"
+    "#isomorphic-utils.js": {
+      "module": "./src/isomorphic-utils/browser.js",
+      "node": "./src/isomorphic-utils/node.js"
     }
   },
   "scripts": {
     "lint": "npx eslint src",
-    "preversion": "node ./bin/ensure-not-dev-mode.js",
     "test": "npx mocha tests/**/*.spec.js",
     "test:only": "npx mocha",
     "types": "rm -rf types && tsc"
   },
   "devDependencies": {
     "@ircam/eslint-config": "^2.0.1",
-    "@soundworks/plugin-filesystem": "^5.0.1",
-    "@soundworks/plugin-logger": "^5.0.0",
     "eslint": "^9.18.0",
     "jsdoc": "^4.0.3",
     "osc-min": "^2.1.2",
@@ -41,16 +38,20 @@
     "@ircam/sc-motion": "^1.4.3",
     "@ircam/sc-scheduling": "^1.0.0",
     "@ircam/sc-utils": "^1.11.0",
+    "@soundworks/helpers": "^5.0.0",
+    "@soundworks/plugin-filesystem": "^5.0.2",
+    "@soundworks/plugin-logger": "^5.0.0",
+    "@soundworks/plugin-scripting": "^5.0.3",
     "@soundworks/plugin-sync": "^5.0.0",
     "chai": "^5.3.1",
     "filenamify": "^7.0.0",
-    "install": "^0.13.0",
     "lit": "^3.3.1",
     "mocha": "^11.7.1",
     "node-osc": "^10.0.0",
-    "npm": "^11.5.2",
     "plotly.js-basic-dist": "^3.1.0",
-    "usb": "^2.16.0"
+    "serialize-error": "^12.0.0",
+    "usb": "^2.16.0",
+    "uuid": "^13.0.0"
   },
   "peerDependencies": {
     "@soundworks/core": "^5.3.0"

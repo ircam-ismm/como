@@ -24,7 +24,7 @@ export default class AggregatedSource extends AbstractSource {
       this.#sources[index] = source;
     }
 
-    const state = await this.como.node.stateManager.create('SourceManager:source', {
+    const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: AggregatedSource.type,
       nodeId: this.como.nodeId,
@@ -34,17 +34,17 @@ export default class AggregatedSource extends AbstractSource {
     });
 
     super.init(state);
-
-    this.state.onDelete(async () => {
-      clearTimeout(this.#activeTimeoutId);
-
-      for (let source of this.#sources) {
-        source.delete();
-      }
-    });
   }
 
   async delete() {
+    for (let source of this.#sources) {
+      // detach from sources that are not owned
+      if (!source.isOwner) {
+        source.delete();
+      }
+    }
+    clearTimeout(this.#activeTimeoutId);
+
     await this.state.delete();
   }
 

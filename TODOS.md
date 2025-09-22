@@ -8,9 +8,14 @@
   + [x] loop
   + [ ] seek
   + [ ] loop start / loop end
-- [ ] Implement project manager
+- [x] Implement project manager
 - [ ] Move `RecordingManager` within `SourceManager`
 - [ ] sketch scripts : `enter` / `exit` / `defineParams` / `process`
+- [ ] Errors issues - are swallowed somehow...
+  + [ ] `como.setProject`
+  + [ ] `Player.setScript`
+- [ ] review `como.setProject` api
+- [ ] release comote-helpers
 - [ ] check options for all sources
 - [ ] name components at registration
 

@@ -1,14 +1,25 @@
 import path from 'node:path';
+import fs from 'node:fs';
+import fsPromises from 'node:fs/promises';
 
 import ServerPluginSync from '@soundworks/plugin-sync/server.js';
+import {
+  isString
+} from '@ircam/sc-utils';
 
 import CoMoNode from './ComoNode.js';
 
+// @todo - rename to config
 import globalDescription from './entities/global-description.js';
+import projectDescription from './entities/project-description.js';
+import nodeDescription from './entities/node-description.js';
 import rfcDescription from './entities/rfc-description.js';
 
 import SourceManagerServer from '../components/source-manager/SourceManagerServer.js';
 import ProjectManagerServer from '../components/project-manager/ProjectManagerServer.js';
+import ScriptManagerServer from '../components/script-manager/ScriptManagerServer.js';
+import PlayerManagerServer from '../components/player-manager/PlayerManagerServer.js';
+
 import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServer.js';
 // import RecordingManagerServer from '../components/recording-manager/RecordingManagerServer.js';
 
@@ -22,30 +33,68 @@ export default class ComoServer extends CoMoNode {
    */
   constructor(server, {
     // directory
-    projectsDirname = path.join(process.cwd(), 'projects'),
+    projectsDirname = 'projects',
   } = {}) {
     super(server, { projectsDirname });
 
     this.#projectsDirname = projectsDirname
 
-    this.node.pluginManager.register('sync', ServerPluginSync);
+    this.pluginManager.register('sync', ServerPluginSync);
 
     // register global shared states class descriptions
-    this.node.stateManager.defineClass('global', globalDescription);
-    this.node.stateManager.defineClass('rfc', rfcDescription);
+    this.stateManager.defineClass('como:global', globalDescription);
+    this.stateManager.defineClass('como:project', projectDescription);
+    this.stateManager.defineClass('como:node', nodeDescription);
+    this.stateManager.defineClass('como:rfc', rfcDescription);
 
-    new SourceManagerServer(this);
-    new ProjectManagerServer(this);
-    new KeyValueStoreServer(this);
+    new SourceManagerServer(this, 'sourceManager');
+    new ProjectManagerServer(this, 'projectManager');
+    new ScriptManagerServer(this, 'scriptManager');
+    new PlayerManagerServer(this, 'playerManager');
+
+    new KeyValueStoreServer(this, 'store');
     // new RecordingManagerServer(this);
+
+    this.setRfcHandler('como:setProject', this.#setProject);
   }
 
   async start() {
     await super.start();
   }
 
-  // @todo - should be within soundworks
-  get runtime() {
-    return 'node'; // this.node.runtime
+  #setProject = async ({ projectDirname }) => {
+    // allow to go to idle state
+    if (projectDirname === null) {
+      await this.project.set({ name: null, dirname: null });
+      return;
+    }
+
+    if (!isString(projectDirname)) {
+      throw new Error(`Cannot execute "setProject" on ComoServer: project directory (${projectDirname}) is not a string`);
+    }
+
+    if (!fs.existsSync(projectDirname)) {
+      throw new Error(`Cannot execute "setProject" on ComoServer: project directory (${projectDirname}) does not exists`);
+    }
+
+    const infosPathname = path.join(projectDirname, this.constants.PROJECT_INFOS_FILENAME);
+
+    if (!fs.existsSync(infosPathname)) {
+      throw new Error(`Cannot execute "setProject" on ComoServer: project directory (${projectDirname}) does not contain a ${this.constants.PROJECT_INFOS_FILENAME} file`);
+    }
+
+    let infos;
+
+    try {
+      const blob = await fsPromises.readFile(infosPathname);
+      infos = JSON.parse(blob.toString());
+    } catch (err) {
+      throw new Error(`Cannot execute "setProject" on ComoServer: ${err.message}`);
+    }
+
+    await this.project.set({
+      name: infos.name,
+      dirname: projectDirname,
+    });
   }
 }
