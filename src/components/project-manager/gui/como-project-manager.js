@@ -26,12 +26,12 @@ class ComoProjectManager extends LitElement {
     }
 
     .header {
-      padding: 4px;
+      /* padding: 2px; */
       background-color: var(--sc-color-primary-2);
     }
 
     .extended {
-      padding: 4px;
+      /* padding: 4px; */
       position: absolute;
       z-index: 10;
       background-color: var(--sc-color-primary-1);

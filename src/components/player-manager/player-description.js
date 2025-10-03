@@ -7,12 +7,16 @@ export default {
     type: 'integer',
     required: true,
   },
-
   sourceId: {
     type: 'string',
     required: true,
   },
-  script: {
+  sessionId: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
+  scriptName: {
     type: 'string',
     nullable: true,
     default: null,
@@ -26,5 +30,17 @@ export default {
     type: 'integer',
     nullable: true,
     default: null,
+  },
+
+  // audio
+  mute: {
+    type: 'boolean',
+    default: false,
+  },
+  volume: {
+    type: 'float',
+    min: -80,
+    max: 12,
+    default: 0,
   },
 }

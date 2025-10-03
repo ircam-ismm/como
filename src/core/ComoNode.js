@@ -11,6 +11,9 @@ import {
   serializeError,
   deserializeError,
 } from 'serialize-error';
+import {
+  AudioContext,
+} from 'isomorphic-web-audio-api';
 
 import * as constants from './constants.js';
 import { getId } from '#isomorphic-utils.js';
@@ -37,7 +40,8 @@ export default class ComoNode {
   #rfcHandlers = new Map();
   #rfcResolverHooks = new Map();
 
-  // schedulers
+  // audio / schedulers
+  #audioContext;
   #scheduler;
   #audioScheduler;
   #syncedScheduler;
@@ -49,6 +53,7 @@ export default class ComoNode {
   constructor(host, options) {
     this.#host = host;
     this.#config = options;
+    this.#audioContext = new AudioContext();
   }
 
   get host() {
@@ -109,6 +114,10 @@ export default class ComoNode {
 
   get pluginManager() {
     return this.#host.pluginManager;
+  }
+
+  get audioContext() {
+    return this.#audioContext;
   }
 
   get scheduler() {
@@ -184,7 +193,7 @@ export default class ComoNode {
   }
 
   async setProject(projectDirname) {
-    this.requestRfc(this.constants.SERVER_ID, 'como:setProject', { projectDirname });
+    return await this.requestRfc(this.constants.SERVER_ID, 'como:setProject', { projectDirname });
   }
 
   /**

@@ -57,6 +57,10 @@ export default class SourceManager extends ComoComponent {
     return !!this.sources.find(s => s.get('id') === sourceId);
   }
 
+  getSourceFiltered(sourceId) {
+    return this.sources.find(source => source.get('id') === sourceId);
+  }
+
   async getSource(sourceId) {
     // if the source has been created on this node, return the underlying owned source state
     const owned = Array.from(this.#ownedSources).find(source => source.id === sourceId);

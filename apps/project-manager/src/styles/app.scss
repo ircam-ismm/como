@@ -78,6 +78,12 @@ body.loading {
   }
 
   & > section {
-    // padding: 20px;
+    position: relative;
+
+    & > como-script-manager {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
   }
 }

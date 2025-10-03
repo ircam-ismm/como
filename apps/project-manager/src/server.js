@@ -32,3 +32,11 @@ await como.start();
 const projectDirname = como.projectManager.projects.getValues()[0].dirname;
 await como.setProject(projectDirname);
 
+const sourceId = await como.sourceManager.createSource({
+  type: 'comote',
+  id: 'comote-test',
+  port: 8001,
+  verbose: false,
+});
+
+const player = await como.playerManager.createPlayer(sourceId);

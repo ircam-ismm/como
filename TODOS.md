@@ -10,7 +10,7 @@
   + [ ] loop start / loop end
 - [x] Implement project manager
 - [ ] Move `RecordingManager` within `SourceManager`
-- [ ] sketch scripts : `enter` / `exit` / `defineParams` / `process`
+- [x] sketch scripts : `enter` / `exit` / `defineParams` / `process`
 - [ ] Errors issues - are swallowed somehow...
   + [ ] `como.setProject`
   + [ ] `Player.setScript`

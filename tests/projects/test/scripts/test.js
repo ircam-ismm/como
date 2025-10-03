@@ -1,12 +1,3 @@
-const presets = {
-  preset1: {
-    myBoolean: false,
-  },
-  preset2: {
-    myBoolean: true,
-  },
-}
-
 const G = 9.81;
 
 export async function defineSharedState(como) {

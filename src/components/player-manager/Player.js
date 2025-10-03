@@ -2,7 +2,11 @@ import {
   counter,
   isPlainObject,
   isFunction,
+  decibelToLinear,
 } from '@ircam/sc-utils';
+import {
+  GainNode
+} from 'isomorphic-web-audio-api';
 /**
  * Basically wrap 3 different states
  * - source
@@ -21,19 +25,33 @@ export default class Player {
   #session = null;
   #script = null;
   #scriptState = null;
+  #scriptLastState = null;
   // refs to clean up on script change
   #scriptModule = null;
   #scriptContext = null;
   #unsubscribeSource = null;
+  #unsubscribeSession = null;
+  // audio
+  #muteNode;
+  #volumeNode;
 
   static duplicate(playerState) {
     // not sure...
   }
 
-  constructor(como, sourceId, scriptName = null) {
+  constructor(como, sourceId) {
+    // @todo
+    // - check arguments
+
     this.#como = como;
     this.#sourceId = sourceId;
-    this.#scriptName = scriptName;
+
+    // @todo - pipe to session
+    this.#muteNode = new GainNode(this.#como.audioContext);
+    this.#volumeNode = new GainNode(this.#como.audioContext);
+    this.#muteNode
+      .connect(this.#volumeNode)
+      .connect(this.#como.audioContext.destination);
   }
 
   get id() {
@@ -44,53 +62,109 @@ export default class Player {
     return this.state.get('nodeId');
   }
 
-  get state() {
-    return this.#state;
-  }
-
   get source() {
     return this.#source;
   }
 
-  get script() {
-    return this.#script;
+  get state() {
+    return this.#state;
   }
 
-  get scriptState() {
-    return this.#scriptState;
-  }
+  // get script() {
+  //   return this.#script;
+  // }
 
-  async init() {
+  // expose so that we can create remote interfaces
+  // get scriptState() {
+  //   return this.#scriptState;
+  // }
+
+  async init(withState = null) {
     if (!this.#como.sourceManager.sourceExists(this.#sourceId)) {
       throw new Error(`Cannot execute "createPlayer" on PlayerManager: source with id ${this.#sourceId} does not exists`);
     }
 
     this.#source = await this.#como.sourceManager.getSource(this.#sourceId);
-    this.#state = await this.#como.stateManager.create(`${this.#como.playerManager.name}:player`, {
-      id: `${this.#como.id}-${idGenerator()}`,
-      nodeId: this.#como.nodeId,
-      sourceId: this.source.get('id'),
-    });
 
-    await this.setScript(this.#scriptName);
+    // this is the difference between "real" and "duplicated" clients
+    if (withState) {
+      this.#state = withState;
+      this.#state.onDetach(async () => await this.delete());
+    } else {
+      this.#state = await this.#como.stateManager.create(`${this.#como.playerManager.name}:player`, {
+        id: `${this.#como.id}-${idGenerator()}`,
+        nodeId: this.#como.nodeId,
+        sourceId: this.source.get('id'),
+      });
+    }
+
+    this.state.onUpdate(async updates => {
+      for (let [key, value] of Object.entries(updates)) {
+        switch (key) {
+          case 'sessionId': {
+            const sessionId = value;
+
+            if (this.#unsubscribeSession) {
+              this.#unsubscribeSession();
+            }
+
+            if (sessionId !== null) {
+              const session = this.#como.sessionManager.getSession(sessionId);
+
+              if (!session) {
+                console.log(`Cannot attach player ${this.state.get('id')} to session ${sessionId}: session does not exists`);
+                this.setScript(null);
+                this.state.set({ sessionId: null });
+                break;
+              }
+
+              // if session default script changes, update the player as well
+              this.#unsubscribeSession = session.onUpdate(async updates => {
+                if ('defaultScript' in updates) {
+                  await this.setScript(updates.defaultScript);
+                }
+              }, true);
+            } else {
+              await this.setScript(null);
+            }
+            break;
+          }
+          case 'mute': {
+            const gain = value ? 0 : 1;
+            this.#muteNode.gain.setTargetAtTime(gain, this.#como.audioContext.currentTime, 0.003);
+            break;
+          }
+          case 'volume': {
+            const gain = decibelToLinear(value);
+            this.#volumeNode.gain.setTargetAtTime(gain, this.#como.audioContext.currentTime, 0.003);
+            break;
+          }
+        }
+      }
+    });
   }
 
   async delete() {
-    // delete the attached state, but not the "real" source
+    // if the source is not owned we can delete it safely
     if (!this.#source.isOwned) {
       await this.#source.detach();
     }
+
+    // only delete "real" state, not attached ones
+    if (this.#state.isOwned) {
+      await this.#state.delete();
+    }
   }
 
-  // ...
+  // async setSession(sessionId) {
+  //   await this.state.set({ sessionId });
+  // }
 
   async setScript(scriptName = null) {
     if (this.#script) {
       // delete shared state class
       if (this.#scriptState !== null) {
-        // delete the state
-        await this.#scriptState.detach();
-        // delete the whole class
+        // delete the whole shared state script
         const scriptSharedStateClassName = this.state.get('scriptSharedStateClassName');
         this.#como.requestRfc(
           this.#como.constants.SERVER_ID,
@@ -100,18 +174,25 @@ export default class Player {
           }
         )
 
-        this.#scriptState = null;
         await this.state.set({
+          scriptName: null,
           scriptSharedStateClassName: null,
           scriptSharedStateId: null,
-        })
+        });
       }
 
-      // delete script
+      this.#unsubscribeSource();
+      // if no build was found, we may not have any script module
+      if (this.#scriptModule && isFunction(this.#scriptModule.exit)) {
+        await this.#scriptModule.exit(this.#scriptContext);
+      }
+
       await this.#script.detach();
+
       this.#script = null;
-      this.#scriptName = null;
       this.#scriptModule = null;
+      this.#scriptState = null;
+      this.#scriptLastState = null;
     }
 
     if (scriptName == null) {
@@ -119,10 +200,10 @@ export default class Player {
     }
 
     const { promise, resolve, reject } = Promise.withResolvers();
-    const script = await this.#como.scriptManager.attach(scriptName);
     let init = true;
+    this.#script = await this.#como.scriptManager.attach(scriptName);
 
-    script.onUpdate(async updates => {
+    this.#script.onUpdate(async updates => {
       if (this.#como.runtime === 'node' && !updates.nodeBuild) {
         reject(new Error(`Invalid script ${scriptName} for 'node' runtime: no node build found in script`));
       }
@@ -131,45 +212,53 @@ export default class Player {
         reject(new Error(`Invalid script ${scriptName} for 'browser' runtime: no browser build found in script`));
       }
 
-      if (this.#scriptModule && this.#scriptModule.exit) {
+      if (this.#scriptModule && isFunction(this.#scriptModule.exit)) {
         try {
-          this.#scriptModule.exit();
+          // retrieve current values of the state to propagate the to next update if possible
+          if (this.#scriptState) {
+            this.#scriptLastState = {
+              values: this.#scriptState.getValues(),
+              description: this.#scriptState.getDescription(),
+            }
+          }
+
+          this.#scriptModule.exit(this.#scriptContext);
         } catch (err) {
-          script.reportRuntimeError(err);
+          this.#script.reportRuntimeError(err);
         }
       }
 
-      this.#scriptModule = await script.import();
+      this.#scriptModule = await this.#script.import();
       // check script API contract
       if (this.#scriptModule.defineSharedState && !isFunction(this.#scriptModule.defineSharedState)) {
         const err = new Error(`Invalid script ${scriptName}: 'defineSharedState' export should be a function`);
-        script.reportRuntimeError(err);
+        this.#script.reportRuntimeError(err);
         reject(err);
       }
 
       if (this.#scriptModule.enter && !isFunction(this.#scriptModule.enter)) {
         const err = new Error(`Invalid script ${scriptName}: 'enter' export should be a function`);
-        script.reportRuntimeError(err);
+        this.#script.reportRuntimeError(err);
         reject(err);
       }
 
       if (this.#scriptModule.exit && !isFunction(this.#scriptModule.exit)) {
         const err = new Error(`Invalid script ${scriptName}: 'exit' export should be a function`);
-        script.reportRuntimeError(err);
+        this.#script.reportRuntimeError(err);
         reject(err);
       }
 
       if (this.#scriptModule.process && !isFunction(this.#scriptModule.process)) {
         const err = new Error(`Invalid script ${scriptName}: 'process' export should be a function`);
-        script.reportRuntimeError(err);
+        this.#script.reportRuntimeError(err);
         reject(err);
       }
 
       // create shared state for this script if any
       if (this.#scriptModule.defineSharedState) {
-        const {
+        let {
           classDescription,
-          initValues = {},
+          initValues = null,
         } = await this.#scriptModule.defineSharedState();
 
         if (!isPlainObject(classDescription)) {
@@ -185,6 +274,22 @@ export default class Player {
           }
         );
 
+        // if no init values have been explicitly defined in the script
+        // try to propagate the values from last state instance to the new one
+        if (initValues === null && this.#scriptLastState !== null) {
+          initValues = {};
+          for (let key in classDescription) {
+            if (key in this.#scriptLastState.values) {
+              // use value from last state only if default is the same
+              if (classDescription[key].default === this.#scriptLastState.description[key].default) {
+                initValues[key] = this.#scriptLastState.values[key];
+              }
+            }
+          }
+        } else {
+          initValues = {};
+        }
+
         this.#scriptState = await this.#como.stateManager.create(className, initValues);
       }
 
@@ -192,39 +297,34 @@ export default class Player {
       await this.state.set({
         scriptSharedStateClassName: this.#scriptState.className,
         scriptSharedStateId: this.#scriptState.id,
+        scriptName,
       });
 
       this.#scriptContext = {
         como: this.#como,
         audioContext: this.#como.audioContext,
+        outputNode: this.#muteNode,
         sessionSoundFiles: '@todo - load session soundfiles',
         sharedState: this.#scriptState,
       };
 
-      if (this.#scriptModule.enter) {
+      if (isFunction(this.#scriptModule.enter)) {
         this.#scriptModule.enter(this.#scriptContext);
       }
 
       this.#unsubscribeSource = this.#source.onUpdate(async updates => {
         if ('frame' in updates) {
-          await this.#scriptModule.process(this.#scriptContext, updates.frame);
+          if (isFunction(this.#scriptModule.process)) {
+            await this.#scriptModule.process(this.#scriptContext, updates.frame);
+          }
         }
       });
 
       if (init) {
         init = false;
-        console.log('resolve setScript');
         resolve();
       }
     }, true);
-
-    script.onDetach(async () => {
-      this.#unsubscribeSource();
-
-      if (this.#scriptModule.exit) {
-        await this.#scriptModule.exit(this.#scriptContext);
-      }
-    });
 
     return promise;
   }

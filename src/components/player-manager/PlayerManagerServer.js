@@ -8,6 +8,18 @@ export default class PlayerManagerServer extends PlayerManager {
     super(como, name);
 
     this.como.stateManager.defineClass(`${this.name}:player`, playerDescription);
+    this.como.stateManager.registerUpdateHook(`${this.name}:player`, updates => {
+      // reset all script information so that we don't try to attach to
+      // an nonexisting state based on information from previous session
+      if ('sessionId' in updates) {
+        return {
+          scriptName: null,
+          scriptSharedStateClassName: null,
+          scriptSharedStateId: null,
+          ...updates,
+        }
+      }
+    });
 
     this.como.setRfcHandler(`${this.name}:defineSharedStateClass`, this.#defineSharedStateClass);
     this.como.setRfcHandler(`${this.name}:deleteSharedStateClass`, this.#deleteSharedStateClass);
@@ -20,6 +32,6 @@ export default class PlayerManagerServer extends PlayerManager {
   }
 
   #deleteSharedStateClass = ({ className }) => {
-    return this.como.deleteClass(className);
+    return this.como.stateManager.deleteClass(className);
   }
 }

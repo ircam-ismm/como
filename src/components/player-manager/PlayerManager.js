@@ -52,7 +52,9 @@ export default class PlayerManager extends ComoComponent {
     const notOwned = this.players.find(player => player.get('id') === playerId);
 
     if (notOwned) {
-      throw new Error('@todo - Cannot execute "getPlayer" on PlayerManager: player exists on network but player duplication is not implemented yet')
+      const player = new Player(this.como, notOwned.get('sourceId'), notOwned.get('script'));
+      await player.init(notOwned); // init with attached state from the collection
+      return player;
     }
 
     return null;
@@ -67,7 +69,6 @@ export default class PlayerManager extends ComoComponent {
 
     const scriptSharedStateClassName = player.get('scriptSharedStateClassName');
     const scriptSharedStateId = player.get('scriptSharedStateId');
-    console.log(scriptSharedStateClassName);
 
     if (scriptSharedStateClassName !== null) {
       const scriptState = await this.como.stateManager.attach(

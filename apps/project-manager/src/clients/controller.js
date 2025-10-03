@@ -1,7 +1,7 @@
 import '@soundworks/helpers/polyfills.js';
 import { Client } from '@soundworks/core/client.js';
 import { loadConfig, launcher } from '@soundworks/helpers/browser.js';
-import { html, render } from 'lit';
+import { html, render, nothing } from 'lit';
 
 import ComoClient from '@ircam/como/core/ComoClient.js';
 
@@ -23,16 +23,31 @@ async function main($container) {
 
   await como.start();
 
+  let showEditor = false;
+
   function renderApp() {
     render(html`
       <div class="controller-layout">
         <header>
           <h1>${client.config.app.name} | ${client.role}</h1>
+          <sc-icon
+            type="prompt"
+            @input=${e => {
+              showEditor = !showEditor;
+              renderApp();
+            }}
+          ></sc-icon>
           <como-project-manager .como=${como}></como-project-manager>
           <sw-audit .client="${client}"></sw-audit>
         </header>
         <section>
-          <como-script-manager .como=${como}></como-script-manager>
+          <como-session-manager .como=${como}></como-session-manager>
+          <como-player-manager .como=${como}></como-player-manager>
+          ${showEditor
+            ? html`<como-script-manager .como=${como}></como-script-manager>`
+            : nothing
+          }
+
         </section>
       </div>
     `, $container);
