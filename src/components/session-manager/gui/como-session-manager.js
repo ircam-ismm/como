@@ -19,6 +19,10 @@ class ComoScriptManager extends LitElement {
       display: block;
     }
 
+    div {
+      margin-bottom: 4px;
+    }
+
     .session {
       padding: 10px 0;
       border-bottom: 1px solid #efefef;
@@ -64,23 +68,9 @@ class ComoScriptManager extends LitElement {
                   }
                 }}
               >${session.get('name')}</sc-text>
-              <sc-text>${session.get('uuid')}</sc-text>
-              <sc-select
-                .options=${this.como.scriptManager.getList()}
-                placeholder="select default script"
-                value=${session.get('defaultScript')}
-                @change=${e => session.set('defaultScript', e.detail.value || null)}
-              ></sc-select>
-              <sc-slider
-                min=${session.getDescription('volume').min}
-                max=${session.getDescription('volume').max}
-                value=${session.get('volume')}
-                @input=${e => session.set('volume', e.detail.value)}
-              ></sc-slider>
-              <sc-toggle
-                ?active=${session.get('mute')}
-                @change=${e => session.set('mute', e.detail.value)}
-              ></sc-toggle>
+              <sc-status
+                ?active=${!session.get('dirty')}
+              ></sc-status>
               <sc-icon
                 type="save"
                 @input=${async e => {
@@ -102,7 +92,27 @@ class ComoScriptManager extends LitElement {
                 }}
               ></sc-icon>
             </div>
+            <div>
+              <sc-select
+                .options=${this.como.scriptManager.getList()}
+                placeholder="select default script"
+                value=${session.get('defaultScript')}
+                @change=${e => session.set('defaultScript', e.detail.value || null)}
+              ></sc-select>
+              <sc-slider
+                number-box
+                min=${session.getDescription('volume').min}
+                max=${session.getDescription('volume').max}
+                value=${session.get('volume')}
+                @input=${e => session.set('volume', e.detail.value)}
+              ></sc-slider>
+              <sc-toggle
+                ?active=${session.get('mute')}
+                @change=${e => session.set('mute', e.detail.value)}
+              ></sc-toggle>
+            </div>
             <como-player-manager .como=${this.como} sessionId=${session.get('uuid')}></como-player-manager>
+            <como-soundbank-manager .como=${this.como} sessionId=${session.get('uuid')}></como-soundbank-manager>
           </div>
         `;
       })}

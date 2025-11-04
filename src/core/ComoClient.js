@@ -7,6 +7,7 @@ import ClientPluginPlatformInit from '@soundworks/plugin-platform-init/client.js
 import SourceManagerClient from '../components/source-manager/SourceManagerClient.js';
 import ProjectManagerClient from '../components/project-manager/ProjectManagerClient.js';
 import ScriptManagerClient from '../components/script-manager/ScriptManagerClient.js';
+import SoundbankManagerClient from '../components/soundbank-manager/SoundbankManagerClient.js';
 import SessionManagerClient from '../components/session-manager/SessionManagerClient.js';
 import PlayerManagerClient from '../components/player-manager/PlayerManagerClient.js';
 
@@ -31,6 +32,7 @@ export default class ComoClient extends CoMoNode {
     new SourceManagerClient(this, 'sourceManager');
     new ProjectManagerClient(this, 'projectManager');
     new ScriptManagerClient(this, 'scriptManager');
+    new SoundbankManagerClient(this, 'soundbankManager');
     new SessionManagerClient(this, 'sessionManager');
     new PlayerManagerClient(this, 'playerManager'); // register last
 

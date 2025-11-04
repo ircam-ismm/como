@@ -9,13 +9,26 @@ import { Client } from '@soundworks/core/client.js';
 
 import ComoClient from '../../src/core/ComoClient.js';
 import ComoServer from '../../src/core/ComoServer.js';
+import sessionDescription from '../../src/components/session-manager/session-description.js';
 
 import config from '../config.js';
 
 const testDirectory = path.join('tests');
 const projectsDirname = path.join(testDirectory, 'projects');
 const testProject = 'test';
-const sessionsDirname = path.join(projectsDirname, testProject, 'sessions')
+const sessionsDirname = path.join(projectsDirname, testProject, 'sessions');
+
+function filterPersistedParams(values, description = sessionDescription) {
+  values = structuredClone(values);
+
+  for (let name in description) {
+    if (!description[name].metas?.persist) {
+      delete values[name];
+    }
+  }
+
+  return values;
+}
 
 describe('# SessionManager', () => {
   let client, server;
@@ -138,8 +151,10 @@ describe('# SessionManager', () => {
       assert.isTrue(fs.existsSync(newFile));
 
       originalValues.name = 'Test';
+
+      const persisted = filterPersistedParams(originalValues);
       const json = JSON.parse(fs.readFileSync(newFile).toString());
-      assert.deepEqual(originalValues, json);
+      assert.deepEqual(persisted, json);
       assert.deepEqual(originalValues, session.getValues());
     });
   });
@@ -152,9 +167,10 @@ describe('# SessionManager', () => {
 
       await client.sessionManager.persistSession(sessionId);
 
+      const persisted = filterPersistedParams(session.getValues());
       const pathname = path.join(projectsDirname, 'test', 'sessions', 'coucou.json');
       const json = JSON.parse(fs.readFileSync(pathname).toString());
-      assert.deepEqual(session.getValues(), json);
+      assert.deepEqual(persisted, json);
     });
   });
 
@@ -166,10 +182,11 @@ describe('# SessionManager', () => {
 
       await client.sessionManager.persistSession(sessionId);
 
+      const persisted = filterPersistedParams(session.getValues());
       const pathname = path.join(projectsDirname, 'test', 'sessions', 'coucou.json');
       const json = JSON.parse(fs.readFileSync(pathname).toString());
       assert.isTrue(json.mute);
-      assert.deepEqual(session.getValues(), json);
+      assert.deepEqual(persisted, json);
     });
   });
 

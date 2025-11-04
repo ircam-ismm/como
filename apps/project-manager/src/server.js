@@ -34,9 +34,13 @@ await como.setProject(projectDirname);
 
 const sourceId = await como.sourceManager.createSource({
   type: 'comote',
-  id: 'comote-test',
+  id: 'comote',
   port: 8001,
   verbose: false,
 });
 
-const player = await como.playerManager.createPlayer(sourceId);
+// const source = await como.sourceManager.getSource(sourceId);
+const playerId = await como.playerManager.createPlayer(sourceId);
+const player = await como.playerManager.getPlayer(playerId);
+const sessionId = como.sessionManager.sessions.find(s => s.get('name') === 'session-0').get('uuid');
+player.state.set({ sessionId });

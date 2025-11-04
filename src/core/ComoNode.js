@@ -28,7 +28,7 @@ export default class ComoNode {
   #node;
   #nodes; // collection of node-infos
 
-  #plugins = [];
+  // #plugins = [];
   #components = new Map();
 
   // global shared states
@@ -92,9 +92,9 @@ export default class ComoNode {
 
   }
 
-  get plugins() {
-    return this.#plugins;
-  }
+  // get plugins() {
+  //   return this.#plugins;
+  // }
 
   get global() {
     return this.#global;

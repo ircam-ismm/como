@@ -2,7 +2,7 @@
 import AbstractSource from './AbstractSource.js';
 import os from 'node:os';
 
-const DEFAULT_INTERVAL_MS = 10;
+const DEFAULT_INTERVAL_MS = 100;
 
 export default class ComoteSource extends AbstractSource {
   static type = 'comote';
@@ -10,7 +10,7 @@ export default class ComoteSource extends AbstractSource {
   #server;
   #config;
 
-  #activeTimeout;
+  #activeTimeoutPeriod;
   #activeTimeoutId;
   #onDataBinded;
 
@@ -25,8 +25,7 @@ export default class ComoteSource extends AbstractSource {
 
   async init() {
     const interval = this.#config.interval || DEFAULT_INTERVAL_MS;
-    // @todo - confirm this is a sensible default
-    this.#activeTimeout = interval * 10;
+    this.#activeTimeoutPeriod = interval;
 
     const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
@@ -77,7 +76,7 @@ export default class ComoteSource extends AbstractSource {
 
       this.#activeTimeoutId = setTimeout(() => {
         this.state.set({ active: false });
-      }, this.#activeTimeout);
+      }, this.#activeTimeoutPeriod);
 
       // source frames are multichannel, so we wrap in an array
       this.state.set({ frame: [data] });

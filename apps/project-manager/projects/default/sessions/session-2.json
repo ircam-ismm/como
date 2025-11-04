@@ -3,5 +3,6 @@
   "name": "session-2",
   "defaultScript": null,
   "mute": false,
-  "volume": 0
+  "volume": 0,
+  "soundbank": []
 }

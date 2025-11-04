@@ -52,8 +52,9 @@ class ComoPlayerManager extends LitElement {
 
       return html`
         <sc-text>${player.get('id')}</sc-text>
-        <sc-text>source: ${source.get('id')}</sc-text>
-        <sc-status ?active=${source.get('active')}></sc-status>
+        <div>
+          <como-source .source=${source}></como-source>
+        </div>
         <sc-select
           .options=${sessionList}
           value=${session ? session.get('uuid') : null}
@@ -75,7 +76,7 @@ class ComoPlayerManager extends LitElement {
             @change=${e => player.set('mute', e.detail.value)}
           ></sc-toggle>
         </div>
-        ${session.get('defaultScript') !== null
+        ${session && session.get('defaultScript') !== null
           ? html`
             <como-player-script-shared-state
               .como=${this.como}

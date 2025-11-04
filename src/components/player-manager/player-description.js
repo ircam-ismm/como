@@ -16,6 +16,10 @@ export default {
     default: null,
     nullable: true,
   },
+  sessionLoading: {
+    type: 'boolean',
+    default: false,
+  },
   scriptName: {
     type: 'string',
     nullable: true,

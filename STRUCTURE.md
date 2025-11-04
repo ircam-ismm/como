@@ -29,6 +29,7 @@
   + link a Source with a Script
 - `Source`:
   + a source of motion sensors
+  + https://github.com/ircam-ismm/sc-motion/blob/main/FORMAT.md
 - `Script`:
   + dynamic script to process Sources and make noises
 - `Topology`

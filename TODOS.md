@@ -9,8 +9,10 @@
   + [ ] seek
   + [ ] loop start / loop end
 - [x] Implement project manager
-- [ ] Move `RecordingManager` within `SourceManager`
+- [x] Move `RecordingManager` within `SourceManager`
 - [x] sketch scripts : `enter` / `exit` / `defineParams` / `process`
+- [ ] Implement SoundBankManager
+- [ ] add test for source recording
 - [ ] Errors issues - are swallowed somehow...
   + [ ] `como.setProject`
   + [ ] `Player.setScript`

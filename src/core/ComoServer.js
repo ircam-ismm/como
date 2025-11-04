@@ -20,6 +20,7 @@ import rfcDescription from './entities/rfc-description.js';
 import SourceManagerServer from '../components/source-manager/SourceManagerServer.js';
 import ProjectManagerServer from '../components/project-manager/ProjectManagerServer.js';
 import ScriptManagerServer from '../components/script-manager/ScriptManagerServer.js';
+import SoundbankManagerServer from '../components/soundbank-manager/SoundbankManagerServer.js';
 import SessionManagerServer from '../components/session-manager/SessionManagerServer.js';
 import PlayerManagerServer from '../components/player-manager/PlayerManagerServer.js';
 
@@ -54,6 +55,7 @@ export default class ComoServer extends CoMoNode {
     new SourceManagerServer(this, 'sourceManager');
     new ProjectManagerServer(this, 'projectManager');
     new ScriptManagerServer(this, 'scriptManager');
+    new SoundbankManagerServer(this, 'soundbankManager');
     new SessionManagerServer(this, 'sessionManager');
     new PlayerManagerServer(this, 'playerManager');
 

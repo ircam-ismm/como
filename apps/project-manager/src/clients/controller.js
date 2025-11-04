@@ -43,6 +43,7 @@ async function main($container) {
         <section>
           <como-session-manager .como=${como}></como-session-manager>
           <como-player-manager .como=${como}></como-player-manager>
+          <como-soundbank-manager .como=${como}></como-soundbank-manager>
           ${showEditor
             ? html`<como-script-manager .como=${como}></como-script-manager>`
             : nothing

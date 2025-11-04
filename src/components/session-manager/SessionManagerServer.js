@@ -8,26 +8,73 @@ import filenamify from 'filenamify';
 import SessionManager from './SessionManager.js';
 import sessionDescription from './session-description.js';
 
+function serializeSession(session) {
+  const description = session.getDescription();
+  const values = session.getValues();
+
+  for (let name in description) {
+    const persist = description[name].metas?.persist;
+    if (!persist) {
+      delete values[name];
+    }
+  }
+
+  return JSON.stringify(values, null, 2);
+}
+
 export default class SessionManagerServer extends SessionManager {
   #currentSessions = new Set();
 
   constructor(como, name) {
     super(como, name);
 
-    this.como.setRfcHandler(`${this.name}:createSession`, this.#createSession)
-    this.como.setRfcHandler(`${this.name}:persistSession`, this.#persistSession)
-    this.como.setRfcHandler(`${this.name}:renameSession`, this.#renameSession)
-    this.como.setRfcHandler(`${this.name}:deleteSession`, this.#deleteSession)
+    this.como.setRfcHandler(`${this.name}:createSession`, this.#createSession);
+    this.como.setRfcHandler(`${this.name}:persistSession`, this.#persistSession);
+    this.como.setRfcHandler(`${this.name}:renameSession`, this.#renameSession);
+    this.como.setRfcHandler(`${this.name}:deleteSession`, this.#deleteSession);
   }
 
   async init() {
     await super.init();
 
     await this.como.stateManager.defineClass(`${this.name}:session`, sessionDescription);
+    this.como.stateManager.registerUpdateHook(`${this.name}:session`, updates => {
+      let dirty = false;
+      for (let name in updates) {
+        const persist = sessionDescription[name].metas?.persist;
+        if (persist) {
+          dirty = true;
+        }
+      }
+
+      return {
+        ...updates,
+        dirty,
+      }
+    });
   }
 
   async start() {
     await super.start();
+
+    // if a soundfile is deleted, remove it from the soundbank of all sessions
+    this.como.soundbankManager.onUpdate(async ({ tree, events }) => {
+      if (!events) {
+        return;
+      }
+
+      for (let event of events) {
+        if (event.type === 'delete') {
+          for (let session of this.sessions) {
+            const soundbank = new Set(session.get('soundbank'));
+            soundbank.delete(event.node.relPath);
+            await session.set({ soundbank: Array.from(soundbank) });
+            await this.persistSession(session.get('uuid'));
+          }
+        }
+      }
+    });
+
   }
 
   async setProject(dirname) {
@@ -87,8 +134,10 @@ export default class SessionManagerServer extends SessionManager {
       name: sessionName,
     });
 
-    const json = JSON.stringify(session.getValues(), null, 2);
-    await fsPromises.writeFile(this.#getPathname(sessionName), json);
+    const pathname = this.#getPathname(sessionName);
+    const json = serializeSession(session);
+
+    await fsPromises.writeFile(pathname, json);
 
     this.#currentSessions.add(session);
 
@@ -102,10 +151,11 @@ export default class SessionManagerServer extends SessionManager {
       throw new Error(`Cannot execute "deleteSession" on SessionManager: session with uuid: ${sessionId} does not exists`);
     }
 
-    const filename = this.#getPathname(session.get('name'));
-    const data = JSON.stringify(session.getValues());
+    const pathname = this.#getPathname(session.get('name'));
+    const json = serializeSession(session);
 
-    await fsPromises.writeFile(filename, data);
+    await fsPromises.writeFile(pathname, json);
+    await session.set({ dirty: false });
   }
 
   #renameSession = async ({ sessionId, newName }) => {

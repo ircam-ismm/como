@@ -20,6 +20,10 @@ export default class PlayerManager extends ComoComponent {
       throw new Error(`Cannot construct PlayerManager: relies on 'como.scriptManager'`);
     }
 
+    if (!this.como.sessionManager) {
+      throw new Error(`Cannot construct PlayerManager: relies on 'como.sessionManager'`);
+    }
+
     this.como.setRfcHandler(`${this.name}:createPlayer`, this.#createPlayer);
   }
 
@@ -52,7 +56,7 @@ export default class PlayerManager extends ComoComponent {
     const notOwned = this.players.find(player => player.get('id') === playerId);
 
     if (notOwned) {
-      const player = new Player(this.como, notOwned.get('sourceId'), notOwned.get('script'));
+      const player = new Player(this.como, notOwned.get('sourceId'));
       await player.init(notOwned); // init with attached state from the collection
       return player;
     }

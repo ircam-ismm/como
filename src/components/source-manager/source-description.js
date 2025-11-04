@@ -1,4 +1,7 @@
 export default {
+  // @todo - make this more robust:
+  // - use proper `uuid` & rename `id` to `label`?
+  // - or just make sure `id` is unique and throw if not
   id: {
     type: 'string',
     required: true,
@@ -30,13 +33,14 @@ export default {
     type: 'boolean',
     default: false,
   },
-  // for recordingManager
+  // if true record the source into file
   record: {
     type: 'boolean',
     default: false,
   },
-  // pause the update of the shared state from the underlying source
-  // @todo - define if we want for stream-player only or not...
+  // Pause the propagation of the underlying source, currently only implemented
+  // in stream sources.
+  // @todo -  Generalize to other sources
   control: {
     type: 'enum',
     list: ['play', 'pause'],
@@ -49,29 +53,32 @@ export default {
     type: 'boolean',
     default: false,
   },
-  // index of the frame where the playback should start, included
-  // if loop == true, start point of the loop
-  frameStart: {
-    type: 'integer',
-    default: 0,
-    min: 0,
-  },
-  // index of the frame where the playback should stop, excluded
-  // if loop == true, end point of the loop
-  frameEnd: {
-    type: 'float',
-    default: 0,
-    min: 0,
-  },
-  // use as feedback (get) and seek (set)
-  framePosition: {
-    type: 'float',
-    event: true,
-  },
   duration: {
     type: 'float',
     default: null,
     nullable: true,
-  }
+  },
+  // the frame of the recording that is currently played
+  // @todo - could be used to seek in the recording as well
+  framePosition: {
+    type: 'float',
+    event: true,
+  },
+  // // index of the frame where the playback should start, included
+  // // if loop == true, start point of the loop
+  // frameStart: {
+  //   type: 'integer',
+  //   default: 0,
+  //   min: 0,
+  // },
+  // // index of the frame where the playback should stop, excluded
+  // // if loop == true, end point of the loop
+  // frameEnd: {
+  //   type: 'float',
+  //   default: 0,
+  //   min: 0,
+  // },
+
+
   // ---------------------------------------------------
 }

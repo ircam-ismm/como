@@ -7,6 +7,7 @@ import {
 import SourceFactory from '#sources/factory.js';
 
 export default class SourceManager extends ComoComponent {
+  #recordingFilesystem;
   #ownedSources = new Set(); // owned sources created on this node
   #sources;
   #factory;
@@ -25,10 +26,16 @@ export default class SourceManager extends ComoComponent {
     return this.#sources.get('id');
   }
 
+  // SourceManagerServer requires access to the plugin
+  get recordingFilesystem() {
+    return this.#recordingFilesystem;
+  }
+
   async start() {
     await super.start();
 
-    // collections
+    this.#recordingFilesystem = await this.como.pluginManager.get(`${this.name}:filesystem`);
+
     this.#sources = await this.como.stateManager.getCollection(`${this.name}:source`,
       // parameter whitelist - we really don't want the streams here
       // @todo - move to blacklist once implemented in soundworks
@@ -144,5 +151,21 @@ export default class SourceManager extends ComoComponent {
 
   #deleteSourceHandler = async (config) => {
     return this.#factory.deleteSource(config);
+  }
+
+  // ----------------------------------------------------------------------
+  // RECORDINGS MANAGEMENT
+  // ----------------------------------------------------------------------
+
+  listRecordings() {
+    return this.#recordingFilesystem.getTree();
+  }
+
+  async readRecording(filename) {
+    return await this.#recordingFilesystem.readFile(filename);
+  }
+
+  async deleteRecording(filename) {
+    return await this.#recordingFilesystem.rm(filename);
   }
 }
