@@ -133,13 +133,11 @@ export default class SourceFactory {
   }
 
   async #createAggregatedSource(config) {
-    if (this.como.nodeId !== this.como.constants.SERVER_ID) {
-      throw new Error('Cannot create aggregated source, only the server (id: -1) has this ability');
-    }
-
     if (!Array.isArray(config.sources)) {
       throw new Error('Cannot create aggregated source: sources must be an array of source id');
     }
+
+    // @todo - check that source ids exists
 
     const source = new AggregatedSource(this.como, config);
     await source.init();

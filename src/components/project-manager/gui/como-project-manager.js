@@ -16,7 +16,7 @@ class ComoProjectManager extends LitElement {
 
   static styles = css`
     :host {
-      display: inline-block;
+      display: flex;
       box-sizing: border-box;
     }
 
@@ -27,13 +27,15 @@ class ComoProjectManager extends LitElement {
 
     .header {
       /* padding: 2px; */
+      display: flex;
       background-color: var(--sc-color-primary-2);
     }
 
     .extended {
-      /* padding: 4px; */
+      padding: 4px;
       position: absolute;
-      z-index: 10;
+      top: 30px;
+      z-index: 100;
       background-color: var(--sc-color-primary-1);
       outline: 1px solid var(--sc-color-primary-3);
     }
@@ -48,8 +50,7 @@ class ComoProjectManager extends LitElement {
   render() {
     return html`
       <div class="header">
-        <sc-text>current project</sc-text>
-        <sc-text>${this.como.project.get('name')}</sc-text>
+        <sc-text>current project: ${this.como.project.get('name')}</sc-text>
         <sc-icon
           type="gear"
           @input=${e => this.extended = !this.extended}
@@ -110,7 +111,6 @@ class ComoProjectManager extends LitElement {
                       }
                     }}
                   ></sc-icon>
-                  <p>${project.get('dirname')}</p>
                 </div>
               `
             })}

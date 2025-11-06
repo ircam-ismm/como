@@ -153,7 +153,12 @@ export default class Player {
                   case 'soundbank': {
                     const sessionId = session.get('uuid');
                     this.#sessionSoundbank = await this.#como.sessionManager.getSessionSoundbank(sessionId);
-                    await this.#reloadScript();
+
+                    try {
+                      await this.#reloadScript();
+                    } catch (err) {
+                      this.#script.reportRuntimeError(err);
+                    }
                   }
                 }
               }
@@ -215,7 +220,15 @@ export default class Player {
       this.#unsubscribeSource();
       // if no build was found, we may not have any script module
       if (this.#scriptModule && isFunction(this.#scriptModule.exit)) {
-        await this.#scriptModule.exit(this.#scriptContext);
+        // if we don't have any script context, this means that something
+        // failed before enter so no need to exit
+        if (this.#scriptContext) {
+          try {
+            await this.#scriptModule.exit(this.#scriptContext);
+          } catch (err) {
+            this.#script.reportRuntimeError(err);
+          }
+        }
       }
 
       await this.#script.detach();
@@ -235,6 +248,7 @@ export default class Player {
     this.#script = await this.#como.scriptManager.attach(scriptName);
 
     this.#script.onUpdate(async updates => {
+      console.log('!!!!! script updates');
       if (this.#como.runtime === 'node' && !updates.nodeBuild) {
         reject(new Error(`Invalid script ${scriptName} for 'node' runtime: no node build found in script`));
       }
@@ -243,7 +257,11 @@ export default class Player {
         reject(new Error(`Invalid script ${scriptName} for 'browser' runtime: no browser build found in script`));
       }
 
-      await this.#reloadScript();
+      try {
+        await this.#reloadScript();
+      } catch (err) {
+        this.#script.reportRuntimeError(err);
+      }
 
       if (init) {
         init = false;
@@ -255,6 +273,10 @@ export default class Player {
   }
 
   async #reloadScript() {
+    if (!this.#script) {
+      return;
+    }
+
     if (this.#unsubscribeSource) {
       this.#unsubscribeSource();
     }
@@ -269,10 +291,11 @@ export default class Player {
           }
         }
 
+        // if we don't have any script context, this means that something
+        // failed before enter so no need to exit
         await this.#scriptModule.exit(this.#scriptContext);
       } catch (err) {
         this.#script.reportRuntimeError(err);
-        return;
       }
     }
 
@@ -287,25 +310,25 @@ export default class Player {
     if (this.#scriptModule.defineSharedState && !isFunction(this.#scriptModule.defineSharedState)) {
       const err = new Error(`Invalid script ${scriptName}: 'defineSharedState' export should be a function`);
       this.#script.reportRuntimeError(err);
-      reject(err);
+      throw err;
     }
 
     if (this.#scriptModule.enter && !isFunction(this.#scriptModule.enter)) {
       const err = new Error(`Invalid script ${scriptName}: 'enter' export should be a function`);
       this.#script.reportRuntimeError(err);
-      reject(err);
+      throw err;
     }
 
     if (this.#scriptModule.exit && !isFunction(this.#scriptModule.exit)) {
       const err = new Error(`Invalid script ${scriptName}: 'exit' export should be a function`);
       this.#script.reportRuntimeError(err);
-      reject(err);
+      throw err;
     }
 
     if (this.#scriptModule.process && !isFunction(this.#scriptModule.process)) {
       const err = new Error(`Invalid script ${scriptName}: 'process' export should be a function`);
       this.#script.reportRuntimeError(err);
-      reject(err);
+      throw err;
     }
 
     // create shared state for this script if any
@@ -316,17 +339,24 @@ export default class Player {
       } = await this.#scriptModule.defineSharedState();
 
       if (!isPlainObject(classDescription)) {
-        reject(new Error('Cannot execute "setScript" on Player: script "defineSharedState" return value should contains a valid "classDescription" field'));
+        throw new Error('Cannot execute "setScript" on Player: script "defineSharedState" return value should contains a valid "classDescription" field');
       }
 
-      const className = await this.#como.requestRfc(
-        this.#como.constants.SERVER_ID,
-        `${this.#como.playerManager.name}:defineSharedStateClass`,
-        {
-          scriptName,
-          classDescription,
-        }
-      );
+      let className;
+      try {
+        className = await this.#como.requestRfc(
+          this.#como.constants.SERVER_ID,
+          `${this.#como.playerManager.name}:defineSharedStateClass`,
+          {
+            scriptName,
+            classDescription,
+          }
+        );
+      } catch (err) {
+        console.log(err);
+        this.#script.reportRuntimeError(err);
+        throw err;
+      }
 
       // if no init values have been explicitly defined in the script
       // try to propagate the values from last state instance to the new one

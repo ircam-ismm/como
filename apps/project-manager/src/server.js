@@ -30,6 +30,7 @@ await como.start();
 // 2: use `config.application.project`
 // 3: take first project in list
 const projectDirname = como.projectManager.projects.getValues()[0].dirname;
+console.log(projectDirname);
 await como.setProject(projectDirname);
 
 const sourceId = await como.sourceManager.createSource({

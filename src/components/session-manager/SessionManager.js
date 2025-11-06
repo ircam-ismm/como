@@ -68,12 +68,20 @@ export default class SessionManager extends ComoComponent {
     });
   }
 
+  /**
+   * Return the session.
+   *
+   * @param {string} sessionId - Id of the session
+   * @returns GainNode|null - return null if session does not exists
+   */
   getSession(sessionId) {
-    if (!isString(sessionId)) {
-      throw new Error('Cannot execute "getSession" on "SessionManager": argument 0 (sessionId) is not a string');
+    const session = this.#sessions.find(session => session.get('uuid') === sessionId);
+
+    if (!session) {
+      return null;
     }
 
-    return this.#sessions.find(session => session.get('uuid') === sessionId);
+    return session;
   }
 
   /**
@@ -81,14 +89,10 @@ export default class SessionManager extends ComoComponent {
    *
    * The audio bus is lazily created on first call of this function.
    *
-   * @param {string} sessionId
+   * @param {string} sessionId - Id of the session
    * @returns GainNode|null - return null if session does not exists
    */
   getSessionBus(sessionId) {
-    if (!isString(sessionId)) {
-      throw new Error('Cannot execute "getSessionBus" on "SessionManager": argument 0 (sessionId) is not a string');
-    }
-
     if (this.#sessionAudioRouting.has(sessionId)) {
       const { mute } = this.#sessionAudioRouting.get(sessionId);
       return mute;
@@ -114,10 +118,6 @@ export default class SessionManager extends ComoComponent {
   }
 
   async getSessionSoundbank(sessionId) {
-    if (!isString(sessionId)) {
-      throw new Error('Cannot execute "getSessionSoundbank" on "SessionManager": argument 0 (sessionId) is not a string');
-    }
-
     const session = this.getSession(sessionId);
 
     if (!session) {

@@ -18,7 +18,6 @@ export default class MemoryBuffer {
 
   constructor(size, _initData) {
     this.#length = size;
-    console.log(this.#length);
     this.#stack = new Array(this.#length);
 
     // @todo - fill with last values of init data
@@ -54,25 +53,6 @@ export default class MemoryBuffer {
   }
 }
 
-// const buffer = new MemoryBuffer(4);
-// buffer.push(1); // this should be d
-// buffer.push(2);
-// buffer.push(3);
-// buffer.push(4);
-// buffer.push(5);
-
-// let valueExpected = 2;
-// let indexExpected = 0;
-
-// buffer.forEach((value, index) => {
-//   console.log(value, index);
-//   assert.equal(value, valueExpected);
-//   assert.equal(index, indexExpected);
-
-//   valueExpected += 1;
-//   indexExpected += 1;
-// });
-
 class ComoSensor extends LitElement {
   #canvas = null;
   #ctx = null;
@@ -87,6 +67,10 @@ class ComoSensor extends LitElement {
     pause: { type: Boolean }, // pause rendering but not buffering
     duration: { type: Number },
     numChannel: { type: Number },
+    sourceId: {
+      type: String,
+      attribute: 'source-id',
+    }
   };
 
   static styles = css`
@@ -117,11 +101,13 @@ class ComoSensor extends LitElement {
       <canvas></canvas>
       <div class="controls">
         <div>
-          <sc-text>pause</sc-text>
+          <sc-text style="width: 85px;">pause</sc-text>
           <sc-toggle @change=${e => this.pause = e.detail.value}></sc-toggle>
           ${this.numChannel > 1
             ? html`
+              <sc-text style="width: 85px;">channel</sc-text>
               <sc-number
+                style="width: 81px;"
                 value=0
                 min=${0}
                 max=${this.numChannel - 1}
@@ -129,6 +115,7 @@ class ComoSensor extends LitElement {
               ></sc-number>`
             : ''
           }
+          <sc-text style="width: 100%">x: 'steelblue', y: 'orange', z: 'green'</sc-text>
         </div>
       </div>
     `;
@@ -168,7 +155,7 @@ class ComoSensor extends LitElement {
     this.#resizeObserver.observe(this);
 
     this.source = await this.como.sourceManager.getSource(this.sourceId);
-    this.source.onUpdate(updates => this.onUpdate(updates));
+    this.source.onUpdate(updates => this.#onUpdate(updates));
 
     if (this.source.get('type') === 'aggregated') {
       const infos = this.source.get('infos');
@@ -185,7 +172,7 @@ class ComoSensor extends LitElement {
     super.disconnectedCallback();
   }
 
-  onUpdate(updates) {
+  #onUpdate = (updates) => {
     let { frame } = updates;
 
     if (!frame) {

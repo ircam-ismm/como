@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 
 import '@ircam/sc-components/sc-text.js';
 import '@ircam/sc-components/sc-status.js';
@@ -8,7 +8,11 @@ class ComoSource extends LitElement {
   #unsubscribeSource;
 
   static properties = {
-
+    plotSensor: {
+      type: Boolean,
+      reflect: true,
+      attribute: 'plot-sensor',
+    },
   };
 
   static styles = css`
@@ -18,8 +22,10 @@ class ComoSource extends LitElement {
   constructor() {
     super();
 
-    // this.como = null;
+    this.como = null;
     this.source = null;
+
+    this.plotSensor = false;
   }
 
   render() {
@@ -30,22 +36,26 @@ class ComoSource extends LitElement {
         ?value=${this.source.get('record')}
         @change=${e => this.source.set('record', e.detail.value)}
       ></sc-record>
-
-      <p>todo "create player from source"</p>
+      <sc-icon
+        type="waveform"
+        ?active=${this.plotSensor}
+        @input=${e => this.plotSensor = !this.plotSensor}
+      ></sc-icon>
+      ${this.plotSensor
+        ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
+        : nothing
+      }
     `;
   }
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.#unsubscribeSource = this.source.onUpdate(updates => {
-      this.requestUpdate();
-    });
+    this.#unsubscribeSource = this.source.onUpdate(() => this.requestUpdate());
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
     this.#unsubscribeSource();
+    super.disconnectedCallback();
   }
 }
 

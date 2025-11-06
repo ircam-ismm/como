@@ -21,6 +21,7 @@ export default class SourceManagerClient extends SourceManager {
       // await import ('./gui/como-sensor-plot.js');
       await import ('./gui/como-sensor.js');
       await import ('./gui/como-source.js');
+      await import ('./gui/como-source-manager.js');
     }
   }
 }

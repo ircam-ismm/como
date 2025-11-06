@@ -215,7 +215,7 @@ describe('# SourceManager', () => {
     });
 
     describe('### aggregated', () => {
-      it(`should create a source locally`, async () => {
+      it(`should create a source locally (server)`, async () => {
         await client.sourceManager.createSource(configs.riot);
         await client.sourceManager.createSource(configs.comote);
 
@@ -240,6 +240,32 @@ describe('# SourceManager', () => {
         }
       });
 
+      // @todo - make sure everything is synchronous here
+      it.only(`should create a source locally (client)`, async () => {
+        await client.sourceManager.createSource(configs.riot);
+        await client.sourceManager.createSource(configs.comote);
+
+        const sourceId = await client.sourceManager.createSource(configs.aggregated);
+        assert.equal(sourceId, configs.aggregated.id);
+
+        {
+          const source = await server.sourceManager.getSource(configs.aggregated.id);
+          assert.isNotNull(source);
+          assert.equal(source.get('id'), configs.aggregated.id);
+          assert.equal(source.get('nodeId'), client.nodeId);
+        }
+
+        // make sure the collection update has been propagated
+        await delay(10);
+
+        {
+          const source = await client.sourceManager.getSource(configs.aggregated.id);
+          assert.isNotNull(source);
+          assert.equal(source.get('id'), configs.aggregated.id);
+          assert.equal(source.get('nodeId'), client.nodeId);
+        }
+      });
+
       it(`should create a source through rfc`, async () => {
         await client.sourceManager.createSource(configs.riot);
         await client.sourceManager.createSource(configs.comote);
@@ -260,6 +286,10 @@ describe('# SourceManager', () => {
           assert.equal(source.get('id'), configs.aggregated.id);
           assert.equal(source.get('nodeId'), server.nodeId);
         }
+      });
+
+      it.skip('should be synchronous if all sources (input and aggregated) are created on the same node', () => {
+
       });
 
       it.skip('should throw if target node is not server', () => {

@@ -14,15 +14,25 @@ class ComoSoundbankManager extends LitElement {
     sessionId: {
       type: String,
     },
-    open: {
+    expanded: {
       type: Boolean,
       reflect: true,
     },
   };
 
   static styles = css`
+    :host {
+      display: block;
+      padding: 4px;
+      border-bottom: 1px solid #454545;
+    }
+
     .header {
-      margin-bottom: 8px;
+      display: block;
+    }
+
+    .header + div {
+      margin-top: 4px;
     }
 
     audio {
@@ -36,7 +46,7 @@ class ComoSoundbankManager extends LitElement {
     this.como = null;
     this.session = null;
 
-    this.open = true;
+    this.expanded = false;
   }
 
   connectedCallback() {
@@ -69,16 +79,16 @@ class ComoSoundbankManager extends LitElement {
       <div class="header">
         <sc-text>soundbank</sc-text>
         <sc-icon
-          @click=${e => this.open = !this.open}
-          ?active=${this.open}
+          @click=${e => this.expanded = !this.expanded}
+          ?active=${this.expanded}
           type="plus"
         ></sc-icon>
       </div>
 
-      ${this.open
+      ${this.expanded
         ? repeat(Object.entries(urlMap), ([url]) => url, ([name, url]) => {
             return html`
-              <div>
+              <div class="soundfile">
                 <sc-text>${name}</sc-text>
                 <sc-transport
                   .buttons=${['play', 'stop']}

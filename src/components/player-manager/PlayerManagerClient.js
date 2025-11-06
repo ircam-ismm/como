@@ -10,6 +10,7 @@ export default class PlayerManagerClient extends PlayerManager {
 
     if (isBrowser()) {
       await import('./gui/como-player-manager.js');
+      await import('./gui/como-player-script-shared-state.js');
     }
   }
 }
