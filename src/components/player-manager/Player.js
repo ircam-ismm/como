@@ -148,7 +148,7 @@ export default class Player {
             // connect to session bus
             this.#outputNode.connect(sessionBus);
             this.#outputNode.gain.setValueAtTime(0, fadeInTime);
-            this.#outputNode.gain.linearRampToValueAtTime(1, now + 0.01);
+            this.#outputNode.gain.linearRampToValueAtTime(1, fadeInTime + 0.01);
 
             await this.state.set({ sessionLoading: false });
 
