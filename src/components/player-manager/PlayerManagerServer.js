@@ -31,7 +31,7 @@ export default class PlayerManagerServer extends PlayerManager {
     return className;
   }
 
-  #deleteSharedStateClass = ({ className }) => {
-    return this.como.stateManager.deleteClass(className);
+  #deleteSharedStateClass = ({ scriptSharedStateClassName }) => {
+    return this.como.stateManager.deleteClass(scriptSharedStateClassName);
   }
 }

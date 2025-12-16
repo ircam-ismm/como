@@ -104,10 +104,12 @@ class ComoProjectManager extends LitElement {
                   <sc-icon
                     type="delete"
                     @input=${async e => {
-                      try {
-                        await this.como.projectManager.deleteProject(project.get('name'));
-                      } catch (err) {
-                        console.log(err);
+                      if (confirm(`Are you sure you want to delete the "${project.get('name')}" project?`)) {
+                        try {
+                          await this.como.projectManager.deleteProject(project.get('name'));
+                        } catch (err) {
+                          console.log(err);
+                        }
                       }
                     }}
                   ></sc-icon>

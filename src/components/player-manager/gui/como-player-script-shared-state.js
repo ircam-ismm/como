@@ -22,6 +22,10 @@ class ComoPlayerScriptSharedState extends LitElement {
       margin: 4px;
       outline: 1px solid #565656;
     }
+
+    :host > div {
+      padding-bottom: 2px;
+    }
   `;
 
   constructor() {
@@ -37,13 +41,21 @@ class ComoPlayerScriptSharedState extends LitElement {
     }
     const description = this.scriptState.getDescription();
 
-    const title = html`<sc-text>script state</sc-text>`
+    const title = html`<div><sc-text>script state</sc-text></div>`
     const parts = Object.keys(description).map(key => {
       const desc = description[key];
 
-      // if (desc.metas.interface) {
-      //   return
-      // }
+      if (desc.event === true) {
+        return html`
+          <div>
+            <sc-text>${key}</sc-text>
+            <sc-bang
+              ?active=${this.scriptState.get(key)}
+              @input=${e => this.scriptState.set(key, true)}
+            ></sc-bang>
+          </div>
+        `;
+      }
 
       switch (desc.type) {
         case 'boolean': {

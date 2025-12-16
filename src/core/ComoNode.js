@@ -3,20 +3,27 @@ import {
   isFunction,
   isString,
   getTime,
+  isBrowser,
 } from '@ircam/sc-utils';
 import {
   Scheduler,
 } from '@ircam/sc-scheduling';
 import {
+  AudioBufferLoader,
+} from '@ircam/sc-loader';
+import {
   serializeError,
   deserializeError,
 } from 'serialize-error';
-import {
-  AudioContext,
-} from 'isomorphic-web-audio-api';
+import * as webaudio from 'isomorphic-web-audio-api';
 
 import * as constants from './constants.js';
 import { getId } from '#isomorphic-utils.js';
+
+// register webaudio globally on node clients
+if (!isBrowser()) {
+  Object.assign(globalThis, webaudio);
+}
 
 export default class ComoNode {
   #host; // soundworks node
@@ -42,6 +49,7 @@ export default class ComoNode {
 
   // audio / schedulers
   #audioContext;
+  #audioBufferLoader;
   #scheduler;
   #audioScheduler;
   #syncedScheduler;
@@ -54,6 +62,7 @@ export default class ComoNode {
     this.#host = host;
     this.#config = options;
     this.#audioContext = new AudioContext();
+    this.#audioBufferLoader = new AudioBufferLoader(this.#audioContext);
   }
 
   get host() {
@@ -118,6 +127,10 @@ export default class ComoNode {
 
   get audioContext() {
     return this.#audioContext;
+  }
+
+  get audioBufferLoader() {
+    return this.#audioBufferLoader;
   }
 
   get scheduler() {

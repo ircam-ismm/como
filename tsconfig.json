@@ -16,16 +16,8 @@
     "outDir": "types",
     // go to js file when using IDE functions like
     // "Go to Definition" in VSCode
-    "declarationMap": false,
+    "declarationMap": true,
     // do not check dependencies
     "skipLibCheck": true
-  },
-
-  // https://github.com/TypeStrong/typedoc/issues/643
-  "typedocOptions": {
-    // "ignoreCompilerErrors": true,
-    // "mode": "modules",
-    "entryPoints": ["src/**/*.js"],
-    "out": "./docs-test"
   },
 }

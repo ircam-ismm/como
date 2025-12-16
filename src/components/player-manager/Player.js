@@ -1,7 +1,7 @@
 import {
   counter,
   decibelToLinear,
-  delay,
+  sleep,
   isFunction,
   isPlainObject,
 } from '@ircam/sc-utils';
@@ -22,13 +22,14 @@ export default class Player {
   #state;
   #source;
 
-  #script = null;
-  #scriptState = null;
+  #script = null; // the script instance from the plugin
+  #scriptModule = null; // the JS module as imported from the script
+  #scriptSharedState = null; // the shared state defined by the script
+  #scriptContext = null; // Context object passed to all script public interface
+  #scriptErrored = false; // Wether the script thrown an error during its lifetime
+  #unsubscribeSource = null; // The subscription to the motion source
   #scriptLastState = null;
-  // refs to clean up on script change
-  #scriptModule = null;
-  #scriptContext = null;
-  #unsubscribeSource = null;
+
   #unsubscribeSession = null;
   // audio
   #muteNode;
@@ -48,7 +49,8 @@ export default class Player {
     this.#outputNode = new GainNode(this.#como.audioContext);
     this.#muteNode
       .connect(this.#volumeNode)
-      .connect(this.#outputNode);
+      .connect(this.#outputNode)
+      .connect(this.#como.audioContext.destination);
   }
 
   get id() {
@@ -67,14 +69,17 @@ export default class Player {
     return this.#state;
   }
 
-  // get script() {
-  //   return this.#script;
-  // }
-
-  // expose so that we can create remote interfaces
-  // get scriptState() {
-  //   return this.#scriptState;
-  // }
+  /**
+   * Reconnect output node to destination, this allows to have a script running
+   * outside a session.
+   */
+  #reconnectDestination() {
+    // re-connect
+    const fadeInTime = this.#como.audioContext.currentTime;
+    this.#outputNode.connect(this.#como.audioContext.destination);
+    this.#outputNode.gain.setValueAtTime(0, fadeInTime);
+    this.#outputNode.gain.linearRampToValueAtTime(1, fadeInTime + 0.01);
+  }
 
   async init(withState = null) {
     if (!this.#como.sourceManager.sourceExists(this.#sourceId)) {
@@ -98,23 +103,28 @@ export default class Player {
     this.state.onUpdate(async updates => {
       for (let [key, value] of Object.entries(updates)) {
         switch (key) {
+          case 'scriptName': {
+            await this.setScript(value);
+            break;
+          }
           case 'sessionId': {
             await this.state.set({ sessionLoading: true });
             const sessionId = value;
 
+            // disconnect from current output, be it a session bus or the destination
+            const fadeOutTime = this.#como.audioContext.currentTime;
+            this.#outputNode.gain.setValueAtTime(1, fadeOutTime);
+            this.#outputNode.gain.linearRampToValueAtTime(0, fadeOutTime + 0.01);
+            await sleep(0.01);
+            this.#outputNode.disconnect();
+
             if (this.#unsubscribeSession) {
               this.#unsubscribeSession();
-              // handle audio routing
-              const now = this.#como.audioContext.currentTime;
-              this.#outputNode.gain.setValueAtTime(1, now);
-              this.#outputNode.gain.linearRampToValueAtTime(0, now + 0.01);
-              await delay(10);
-              this.#outputNode.disconnect();
             }
 
             if (sessionId === null) {
-              await this.setScript(null);
-              await this.state.set({ sessionLoading: false });
+              this.#reconnectDestination();
+              await this.state.set({ scriptName: null, sessionLoading: false });
               break; // nothing left to do
             }
 
@@ -122,8 +132,8 @@ export default class Player {
 
             if (!session) {
               console.log(`Cannot attach player ${this.state.get('id')} to session ${sessionId}: session does not exists`);
-              this.setScript(null);
-              this.state.set({ sessionId: null, sessionLoading: false });
+              this.#reconnectDestination();
+              this.state.set({ scriptName: null, sessionId: null, sessionLoading: false });
               break;
             }
 
@@ -133,11 +143,11 @@ export default class Player {
             const defaultScript = session.get('defaultScript');
             await this.setScript(defaultScript);
 
-            const now = this.#como.audioContext.currentTime;
             const sessionBus = this.#como.sessionManager.getSessionBus(sessionId);
-            // connect to session
+            const fadeInTime = this.#como.audioContext.currentTime;
+            // connect to session bus
             this.#outputNode.connect(sessionBus);
-            this.#outputNode.gain.setValueAtTime(0, now);
+            this.#outputNode.gain.setValueAtTime(0, fadeInTime);
             this.#outputNode.gain.linearRampToValueAtTime(1, now + 0.01);
 
             await this.state.set({ sessionLoading: false });
@@ -153,12 +163,7 @@ export default class Player {
                   case 'soundbank': {
                     const sessionId = session.get('uuid');
                     this.#sessionSoundbank = await this.#como.sessionManager.getSessionSoundbank(sessionId);
-
-                    try {
-                      await this.#reloadScript();
-                    } catch (err) {
-                      this.#script.reportRuntimeError(err);
-                    }
+                    await this.#reloadScript();
                   }
                 }
               }
@@ -192,222 +197,269 @@ export default class Player {
     }
   }
 
-  // async setSession(sessionId) {
-  //   await this.state.set({ sessionId });
-  // }
-
   async setScript(scriptName = null) {
-    if (this.#script) {
-      // delete shared state class
-      if (this.#scriptState !== null) {
-        // delete the whole shared state script
-        const scriptSharedStateClassName = this.state.get('scriptSharedStateClassName');
-        this.#como.requestRfc(
-          this.#como.constants.SERVER_ID,
-          `${this.#como.playerManager.name}:deleteSharedStateClass`,
-          {
-            className: scriptSharedStateClassName,
-          }
-        )
-
-        await this.state.set({
-          scriptName: null,
-          scriptSharedStateClassName: null,
-          scriptSharedStateId: null,
-        });
-      }
-
-      this.#unsubscribeSource();
-      // if no build was found, we may not have any script module
-      if (this.#scriptModule && isFunction(this.#scriptModule.exit)) {
-        // if we don't have any script context, this means that something
-        // failed before enter so no need to exit
-        if (this.#scriptContext) {
-          try {
-            await this.#scriptModule.exit(this.#scriptContext);
-          } catch (err) {
-            this.#script.reportRuntimeError(err);
-          }
-        }
-      }
-
-      await this.#script.detach();
-
-      this.#script = null;
-      this.#scriptModule = null;
-      this.#scriptState = null;
-      this.#scriptLastState = null;
+    if (this.#state.get('scriptName') !== scriptName) {
+      // Keep state in sync if method is called directly
+      // Note that this will resolve after the onUpdate execution
+      await this.#state.set('scriptName', scriptName);
+      return;
     }
+
+    if (this.#script) {
+      await this.#releaseScript();
+      await this.#script.detach();
+    }
+
+    this.#script = null;
 
     if (scriptName == null) {
       return;
     }
 
-    const { promise, resolve, reject } = Promise.withResolvers();
-    let init = true;
     this.#script = await this.#como.scriptManager.attach(scriptName);
-
     this.#script.onUpdate(async updates => {
-      console.log('!!!!! script updates');
-      if (this.#como.runtime === 'node' && !updates.nodeBuild) {
-        reject(new Error(`Invalid script ${scriptName} for 'node' runtime: no node build found in script`));
+      if ('runtimeError' in updates && updates.runtimeError !== null) {
+        console.log(updates.runtimeError);
+        return;
+        // silently release the script, we don't want to pack up runtime errors
+        this.#releaseScript({ silent: true });
+        return;
       }
 
-      if (this.#como.runtime === 'browser' && !updates.browserBuild) {
-        reject(new Error(`Invalid script ${scriptName} for 'browser' runtime: no browser build found in script`));
-      }
-
-      try {
+      // make sure the script actually changed to prevent infinite loops on error
+      if (this.#como.runtime === 'node' && 'nodeBuild' in updates) {
         await this.#reloadScript();
-      } catch (err) {
-        this.#script.reportRuntimeError(err);
       }
 
-      if (init) {
-        init = false;
-        resolve();
+      if (this.#como.runtime === 'browser' && 'browserBuild' in updates) {
+        await this.#reloadScript();
       }
-    }, true);
+    });
 
-    return promise;
+    return this.#reloadScript();
   }
 
-  async #reloadScript() {
-    if (!this.#script) {
-      return;
-    }
-
+  async #releaseScript({ silent = false } = {}) {
+    // stop listening from the source
     if (this.#unsubscribeSource) {
       this.#unsubscribeSource();
     }
 
+    // exit current script
+    // if no build was found, we may not have any script module
     if (this.#scriptModule && isFunction(this.#scriptModule.exit)) {
+      // if we don't have any script context, this means that something
+      // failed before enter so no need to exit
       try {
-        // retrieve current values of the state to propagate the to next update if possible
-        if (this.#scriptState) {
-          this.#scriptLastState = {
-            values: this.#scriptState.getValues(),
-            description: this.#scriptState.getDescription(),
-          }
-        }
-
-        // if we don't have any script context, this means that something
-        // failed before enter so no need to exit
         await this.#scriptModule.exit(this.#scriptContext);
       } catch (err) {
-        this.#script.reportRuntimeError(err);
+        // if the script errored at its initialization, this is likely that
+        // disconnect will crash too, so we almost ignore this error which may be
+        // confusing for the user.
+        if (!silent) {
+          this.#script.reportRuntimeError(err);
+
+          if (this.#scriptErrored) {
+            console.log('> note that the script errored at its initialized, it is likely that you can ignore this error');
+          }
+        }
+        // Note that we don't want to return at this point
       }
     }
 
+    // fade out and disconnect audio output
     if (this.#scriptContext?.outputNode) {
+      const now = this.#como.audioContext.currentTime;
+      this.#scriptContext.outputNode.gain.setValueAtTime(1, now);
+      this.#scriptContext.outputNode.gain.linearRampToValueAtTime(0, now + 0.01);
+
+      await sleep(0.01 + 128 / this.#como.audioContext.sampleRate);
+
       this.#scriptContext.outputNode.disconnect();
     }
 
-    this.#scriptModule = await this.#script.import();
-    const scriptName = this.#script.name;
+    // clean script shared state if any
+    if (this.#scriptSharedState !== null) {
+      await this.#scriptSharedState.delete();
+      const scriptSharedStateClassName = this.state.get('scriptSharedStateClassName');
+
+      // clean state
+      await this.state.set({
+        scriptSharedStateClassName: null,
+        scriptSharedStateId: null,
+      });
+
+      // clean class
+      this.#como.requestRfc(
+        this.#como.constants.SERVER_ID,
+        `${this.#como.playerManager.name}:deleteSharedStateClass`,
+        { scriptSharedStateClassName }
+      )
+    }
+
+    this.#scriptModule = null;
+    this.#scriptSharedState = null;
+    this.#scriptLastState = null;
+    this.#scriptContext = null;
+  }
+
+  async #reloadScript() {
+    // release old version of the script
+    await this.#releaseScript();
+
+    // do nothing if there is no valid build for this platform
+    // console.log(this.#script.getValues());
+    // if (this.#como.runtime === 'node' && this.#script.nodeBuild === null) {
+    //   return;
+    // }
+
+    // if (this.#como.runtime === 'browser' && this.#script.browserBuild === null) {
+    //   return;
+    // }
+
+    // import script and check API
+    try {
+      this.#scriptModule = await this.#script.import();
+    } catch (err) {
+      this.#script.reportRuntimeError(err);
+      this.#scriptErrored = true;
+    }
+
+    // return if no import was found
+    if (this.#scriptModule === null) {
+      return;
+    }
 
     // check script API contract
     if (this.#scriptModule.defineSharedState && !isFunction(this.#scriptModule.defineSharedState)) {
-      const err = new Error(`Invalid script ${scriptName}: 'defineSharedState' export should be a function`);
-      this.#script.reportRuntimeError(err);
-      throw err;
+      this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid API: 'defineSharedState' is not a function`));
+      this.#scriptErrored = true;
+      return;
     }
 
     if (this.#scriptModule.enter && !isFunction(this.#scriptModule.enter)) {
-      const err = new Error(`Invalid script ${scriptName}: 'enter' export should be a function`);
-      this.#script.reportRuntimeError(err);
-      throw err;
+      this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid API: 'enter' is not a function`));
+      this.#scriptErrored = true;
+      return;
     }
 
     if (this.#scriptModule.exit && !isFunction(this.#scriptModule.exit)) {
-      const err = new Error(`Invalid script ${scriptName}: 'exit' export should be a function`);
-      this.#script.reportRuntimeError(err);
-      throw err;
+      this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid API: 'exit' is not a function`));
+      this.#scriptErrored = true;
+      return;
     }
 
     if (this.#scriptModule.process && !isFunction(this.#scriptModule.process)) {
-      const err = new Error(`Invalid script ${scriptName}: 'process' export should be a function`);
-      this.#script.reportRuntimeError(err);
-      throw err;
+      this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid API: 'process' is not a function`));
+      this.#scriptErrored = true;
+      return;
     }
 
+    // Handle script shared state
     // create shared state for this script if any
     if (this.#scriptModule.defineSharedState) {
-      let {
+      // 1. validate class description
+      const {
         classDescription,
-        initValues = null,
+        initValues,
       } = await this.#scriptModule.defineSharedState();
 
-      if (!isPlainObject(classDescription)) {
-        throw new Error('Cannot execute "setScript" on Player: script "defineSharedState" return value should contains a valid "classDescription" field');
+      try {
+        this.#como.stateManager.validateClassDescription(classDescription);
+      } catch (err) {
+        this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid shared state definition: ${err.message}`));
+        this.#scriptErrored = true;
+        return;
       }
 
+      // 2. define shared state class
       let className;
       try {
         className = await this.#como.requestRfc(
           this.#como.constants.SERVER_ID,
           `${this.#como.playerManager.name}:defineSharedStateClass`,
           {
-            scriptName,
+            scriptName: this.#script.name,
             classDescription,
           }
         );
       } catch (err) {
-        console.log(err);
         this.#script.reportRuntimeError(err);
-        throw err;
+        this.#scriptErrored = true;
+        return;
       }
 
+      // 3. merge init values from last script instance
       // if no init values have been explicitly defined in the script
       // try to propagate the values from last state instance to the new one
-      if (initValues === null && this.#scriptLastState !== null) {
-        initValues = {};
-        for (let key in classDescription) {
-          if (key in this.#scriptLastState.values) {
-            // use value from last state only if default is the same
-            if (classDescription[key].default === this.#scriptLastState.description[key].default) {
-              initValues[key] = this.#scriptLastState.values[key];
-            }
-          }
-        }
-      } else {
-        initValues = {};
-      }
+      // if (initValues === null && this.#scriptLastState !== null) {
+      //   initValues = {};
+      //   for (let key in classDescription) {
+      //     if (key in this.#scriptLastState.values) {
+      //       // use value from last state only if default is the same
+      //       if (classDescription[key].default === this.#scriptLastState.description[key].default) {
+      //         initValues[key] = this.#scriptLastState.values[key];
+      //       }
+      //     }
+      //   }
+      // } else {
+      //   initValues = {};
+      // }
 
-      this.#scriptState = await this.#como.stateManager.create(className, initValues);
+      // 4. create script shared state
+      // @todo - Proxy this.#scriptSharedState to report runtime errors
+      this.#scriptSharedState = await this.#como.stateManager.create(className, initValues);
+
+      // 5. propagate shared state infos
+      this.#state.set({
+        scriptSharedStateClassName: this.#scriptSharedState.className,
+        scriptSharedStateId: this.#scriptSharedState.id,
+      });
     }
 
-    // update player state
-    await this.state.set({
-      scriptSharedStateClassName: this.#scriptState.className,
-      scriptSharedStateId: this.#scriptState.id,
-      scriptName,
-    });
-
-    // create an output per script execution
-    const outputNode = new GainNode(this.#como.audioContext);
+    // Build audio graph for this script instance
+    const outputNode = new GainNode(this.#como.audioContext, { gain: 0 });
     outputNode.connect(this.#muteNode);
 
+    // create context object for this script instance
     this.#scriptContext = {
-      como: this.#como,
-      scriptName,
-      audioContext: this.#como.audioContext,
-      outputNode,
+      output: outputNode,
+      state: this.#scriptSharedState,
       soundbank: this.#sessionSoundbank,
-      sharedState: this.#scriptState,
+      scriptName: this.#script.name,
     };
 
+    // enter the script
     if (isFunction(this.#scriptModule.enter)) {
-      await this.#scriptModule.enter(this.#scriptContext);
+      try {
+        await this.#scriptModule.enter(this.#scriptContext);
+      } catch (err) {
+        console.log(err.message.slice(0, 200));
+        process.exit(0);
+        // this.#script.reportRuntimeError(err);
+        // this.#scriptErrored = true;
+        // return;
+      }
     }
 
-    // everything is ready, pipe source into script
+    // subscribe to the player's motion source
     this.#unsubscribeSource = this.#source.onUpdate(async updates => {
       if ('frame' in updates) {
         if (isFunction(this.#scriptModule.process)) {
-          await this.#scriptModule.process(this.#scriptContext, updates.frame);
+          try {
+            this.#scriptModule.process(this.#scriptContext, updates.frame);
+          } catch (err) {
+            this.#script.reportRuntimeError(err);
+            this.#scriptErrored = true;
+            return;
+          }
         }
       }
     });
+
+    // fade in output
+    const now = this.#como.audioContext.currentTime;
+    outputNode.gain.setValueAtTime(0, now);
+    outputNode.gain.linearRampToValueAtTime(1, now + 0.01);
   }
 }

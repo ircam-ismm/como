@@ -109,10 +109,12 @@ class ComoScriptManager extends LitElement {
                 <sc-icon
                   type="delete"
                   @input=${async e => {
-                    try {
-                      await this.como.sessionManager.deleteSession(session.get('uuid'));
-                    } catch (err) {
-                      console.log(err.message);
+                    if (confirm(`Are you sure you want to delete the "${session.get('name')}" session`)) {
+                      try {
+                        await this.como.sessionManager.deleteSession(session.get('uuid'));
+                      } catch (err) {
+                        console.log(err.message);
+                      }
                     }
                   }}
                 ></sc-icon>

@@ -91,6 +91,13 @@ class ComoPlayerManager extends LitElement {
                   value=${session ? session.get('uuid') : null}
                   @change=${async e => await player.set('sessionId', e.detail.value)}
                 >/</sc-select>
+                <sc-text class="small">script</sc-text>
+                <sc-select
+                  .options=${this.como.scriptManager.getList()}
+                  placeholder="select default script"
+                  value=${player.get('scriptName')}
+                  @change=${e => player.set('scriptName', e.detail.value || null)}
+                ></sc-select>
               </div>
               <div>
                 <sc-text class="small">volume</sc-text>
@@ -107,7 +114,7 @@ class ComoPlayerManager extends LitElement {
                   @change=${e => player.set('mute', e.detail.value)}
                 ></sc-toggle>
               </div>
-              ${session && session.get('defaultScript') !== null
+              ${player.get('scriptName') !== null
                 ? html`
                   <como-player-script-shared-state
                     .como=${this.como}

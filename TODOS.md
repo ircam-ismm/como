@@ -1,3 +1,17 @@
+- [x] review scripting
+- [x] confirm on delete project & session
+- [x] expose node-web-audio-api on `globalThis`
+- [ ] prototype synth layer (in como-health)
+
+- [ ] R-IoT 2 source (JIP)
+- [ ] Algo - sc-motion
+  - [ ] review API
+  - [ ] Orientation / Gravity
+  - [ ] Intensity
+  - [ ]
+
+
+
 - [x] rename 'source.stream' to 'frame'
 - [x] add soundworks as peer dependency
 - [x] record streams - tag with synchronized time
@@ -25,5 +39,7 @@
 
 - [ ] fix `instanceof` issue with peer dependency check in local (npm link)
 - [ ] check https://github.com/dbrekalo/validate-types for commands validation
+
+
 
 

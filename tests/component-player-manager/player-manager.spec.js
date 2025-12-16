@@ -87,6 +87,18 @@ describe('# PlayerManager', () => {
   });
 
   describe('## Player.setScript', () => {
+    it.only(`should reflect on player state`, async () => {
+      const sourceId = await client.sourceManager.createSource({
+        forcePeriod: 1, // force stream period for playback
+        ...sourceConfig
+      });
+      const playerId = await client.playerManager.createPlayer(sourceId);
+      const player = await client.playerManager.getPlayer(playerId);
+      await player.setScript('test.js');
+
+      console.log(player.state.get('scriptName'));
+    });
+
     it(`should properly initialize the script`, async function() {
       this.timeout(10000);
 

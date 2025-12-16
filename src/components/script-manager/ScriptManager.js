@@ -16,6 +16,11 @@ export default class ScriptManager extends ComoComponent {
     await super.start();
 
     this.#scripting = await this.como.pluginManager.get(`${this.name}:scripting`);
+    this.#scripting.setGlobalScriptingContext({
+      audioContext: this.como.audioContext,
+      audioBufferLoader: this.como.audioBufferLoader,
+      como: this.como,
+    });
   }
 
   // just expose plugin API
