@@ -1,5 +1,5 @@
 import AbstractSource from './AbstractSource.js';
-import { jsonToOsc } from '../utils/comote-format.js';
+import { jsonToOscBundle } from '../utils/comote-format.js';
 
 export default class OscBridgeSource extends AbstractSource {
   static type = 'osc-bridge';
@@ -49,7 +49,7 @@ export default class OscBridgeSource extends AbstractSource {
           this.state.set('frame', value);
           // handle multi-channel
           value.forEach(channel => {
-            const bundle = jsonToOsc(channel, { asNodeOscBundle: true });
+            const bundle = jsonToOscBundle(channel, { asNodeOscBundle: true });
             this.#oscClient.send(bundle);
           });
 

@@ -275,7 +275,7 @@ export const oscBundleFull = {
 
 export const jsonFrame = {
   source: 'riot',
-  format: 'v3',
+  api: 'v3',
   id: '0',
   timestamp: 367060,
   accelerometer: {
@@ -350,7 +350,7 @@ export const jsonFrame = {
 
 export const jsonFrameBno055 = {
   source: 'riot',
-  format: 'v3',
+  api: 'v3',
   id: '0',
   timestamp: 367060,
   accelerometer: {

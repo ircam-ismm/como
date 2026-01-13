@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import {
   jsonToOsc,
   oscToJson,
-  getSourceAndIdFromBundle,
+  getMetaFromBundle,
 } from '../../src/components/source-manager/utils/comote-format.js';
 import {
   Bundle,
@@ -19,9 +19,9 @@ import {
   jsonFrameBno055,
 } from '../fixtures.js';
 
-describe('# getSourceAndIdFromBundle', () => {
+describe('# getMetaFromBundle', () => {
   it('should work', () => {
-    const { source, id } = getSourceAndIdFromBundle(oscBundleFull);
+    const { source, id } = getMetaFromBundle(oscBundleFull);
     assert.equal(source, 'riot');
     assert.equal(id, '0');
   });
