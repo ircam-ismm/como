@@ -3,6 +3,7 @@ import AbstractSource from './AbstractSource.js';
 import os from 'node:os';
 
 const DEFAULT_INTERVAL_MS = 100;
+const DEFAULT_ACTIVE_TIMEOUT_MS = 500;
 
 export default class ComoteSource extends AbstractSource {
   static type = 'comote';
@@ -25,7 +26,7 @@ export default class ComoteSource extends AbstractSource {
 
   async init() {
     const interval = this.#config.interval || DEFAULT_INTERVAL_MS;
-    this.#activeTimeoutPeriod = interval;
+    this.#activeTimeoutPeriod = this.#config.activeTimeout || DEFAULT_ACTIVE_TIMEOUT_MS;
 
     const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,

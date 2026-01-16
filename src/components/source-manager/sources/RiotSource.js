@@ -9,6 +9,13 @@ import {
 import { getTime } from '@ircam/sc-gettime';
 import { Lowpass } from '@ircam/sc-signal';
 
+const DEFAULT_ACTIVE_TIMEOUT_MS = 500;
+
+// used for initialisation of interval and frequency estimation
+// (when timestamp is estimated from incoming OSC messages)
+const FREQUENCY_MAX = 1000; // Hz
+const INTERVAL_MIN = 1e3 / FREQUENCY_MAX; // ms
+
 export default class RiotSource extends AbstractSource {
   static type = 'riot';
 
@@ -16,12 +23,11 @@ export default class RiotSource extends AbstractSource {
   #config;
 
   // @todo - make this more robust
-  #activeTimeout = 200; // ms
+  #activeTimeout;
   #activeTimeoutId;
 
   #timestampCurrent = null;
   #timestampLast = null;
-  #interval = null;
   #intervalSmoother = new Lowpass({ lowpassFrequency: 0.02 });
 
 
@@ -44,7 +50,7 @@ export default class RiotSource extends AbstractSource {
 
     super.init(state);
 
-    this.#resetTimestamp();
+    this.#timestampReset();
 
     this.#server.on('bundle', this.#onOscBundle);
     this.#server.on('message', this.#onOscMessage);
@@ -60,24 +66,29 @@ export default class RiotSource extends AbstractSource {
     await this.state.delete();
   }
 
-  #resetTimestamp = () => {
+  #timestampReset = () => {
     this.#timestampCurrent = null;
     this.#timestampLast = null;
-    this.#interval = null;
-
     this.#intervalSmoother.reset();
   };
 
   #timestampUpdate = ({
     timestamp = getTime() * 1e3, // milliseconds
   } = {}) => {
+    const initPhase = this.#timestampLast === null;
     this.#timestampLast = this.#timestampCurrent;
     this.#timestampCurrent = timestamp;
     if (this.#timestampLast !== null) {
-      const rawInterval = this.#timestampCurrent - this.#timestampLast;
-      this.#interval = this.#intervalSmoother.process(rawInterval);
-      const frequency = 1e3 / this.#interval;
-      const interval = this.#interval;
+      const intervalRaw = this.#timestampCurrent - this.#timestampLast;
+      if (initPhase && intervalRaw < INTERVAL_MIN) {
+        // first interval might be erratic, as it is not smoothed yet
+        // discard and restart
+        this.#timestampLast = null;
+        return {};
+      }
+
+      const interval = this.#intervalSmoother.process(intervalRaw);
+      const frequency = 1e3 / interval;
       return { timestamp, interval, frequency };
     }
     return {};
@@ -90,7 +101,7 @@ export default class RiotSource extends AbstractSource {
       clearTimeout(this.#activeTimeoutId);
 
       this.#activeTimeoutId = setTimeout(() => {
-        this.#resetTimestamp();
+        this.#timestampReset();
         this.state.set({ active: false });
       }, this.#activeTimeout);
 
@@ -118,7 +129,7 @@ export default class RiotSource extends AbstractSource {
       clearTimeout(this.#activeTimeoutId);
 
       this.#activeTimeoutId = setTimeout(() => {
-        this.#resetTimestamp();
+        this.#timestampReset();
         this.state.set({ active: false });
       }, this.#activeTimeout);
 

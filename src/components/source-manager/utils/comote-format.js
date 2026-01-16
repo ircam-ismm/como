@@ -1,9 +1,11 @@
 import { Bundle } from 'node-osc';
 import { isPlainObject } from '@ircam/sc-utils';
 import {
+  unsignedInt12BitToNormalised,
+  unsignedInt14BitToNormalised,
   temperatureRawToCelsius as riotTemperatureToCelsius,
   batteryRawToVolts as riotBatteryRawToVolts,
-  analogInputRawToNormalised as riotAnalogInputRawToNormalised,
+  magnetometerV1ToGauss as riotMagnetometerV1ToGauss,
 } from './riot.js';
 import { apiConvert } from '@ircam/sc-motion/format.js';
 
@@ -424,10 +426,6 @@ export function oscBundleToJson(bundle, {
       return json;
     } // api: 'v3'
 
-    case 'comote-v2': {
-      break;
-    } // api: 'comote-v2'
-
     default: {
       throw new Error(`oscBundleToJson: unsupported api type "${api}"`);
     }
@@ -491,8 +489,8 @@ export function oscMessageToJson(message, {
       json.control = {
         button1: message[11],
         button2: message[12],
-        analog1: riotAnalogInputRawToNormalised(message[13]),
-        analog2: riotAnalogInputRawToNormalised(message[14]),
+        analog1: unsignedInt12BitToNormalised(message[13]),
+        analog2: unsignedInt12BitToNormalised(message[14]),
         timestamp,
       };
 
@@ -581,6 +579,53 @@ export function oscMessageToJson(message, {
 
       json.heading = {
         magnetic: message[20],
+        timestamp,
+        frequency,
+      };
+
+      break;
+    }
+
+    case 'riot-v1': {
+      json = {
+        source: 'riot',
+        api,
+        id,
+        timestamp,
+        frequency,
+      };
+
+      json.battery = {
+        level: riotBatteryRawToVolts(message[1]),
+        timestamp,
+        frequency,
+      };
+
+      json.control = {
+        button1: message[2],
+        timestamp,
+      };
+
+      json.accelerometer = {
+        x: unsignedInt12BitToNormalised(message[3]),
+        y: unsignedInt12BitToNormalised(message[4]),
+        z: unsignedInt12BitToNormalised(message[5]),
+        timestamp,
+        frequency,
+      };
+
+      json.gyroscope = {
+        alpha: unsignedInt14BitToNormalised(message[6]),
+        beta: unsignedInt14BitToNormalised(message[7]),
+        gamma: unsignedInt14BitToNormalised(message[8]),
+        timestamp,
+        frequency,
+      };
+
+      json.magnetometer = {
+        x: riotMagnetometerV1ToGauss(message[9]),
+        y: riotMagnetometerV1ToGauss(message[10]),
+        z: riotMagnetometerV1ToGauss(message[11]),
         timestamp,
         frequency,
       };

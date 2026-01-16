@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
 import {
-  jsonToOsc,
-  oscToJson,
+  jsonToOscBundle,
+  oscBundleToJson,
   getMetaFromBundle,
 } from '../../src/components/source-manager/utils/comote-format.js';
 import {
@@ -27,13 +27,13 @@ describe('# getMetaFromBundle', () => {
   });
 });
 
-describe('# oscToJson / jsonToOsc', () => {
+describe('# oscBundleToJson / jsonToOscBundle', () => {
   it('should work - default', () => {
-    const json = oscToJson(oscBundleFull);
+    const json = oscBundleToJson(oscBundleFull);
     // frequency estimation
     assert.deepEqual(json, jsonFrame);
     // convert back to osc
-    const osc = jsonToOsc(json);
+    const osc = jsonToOscBundle(json);
 
     osc.forEach(msg => {
       const expected = oscBundleFull.elements.find(el => el[0] === msg[0]);
@@ -48,14 +48,14 @@ describe('# oscToJson / jsonToOsc', () => {
   });
 
   it('should estimate frequency if not found in OSC bundle', () => {
-    const nullFrame = oscToJson(oscBundleNoFreq0);
+    const nullFrame = oscBundleToJson(oscBundleNoFreq0);
     assert.isNull(nullFrame); // required to estimate missing frequency with current Riot frame
-    const json = oscToJson(oscBundleNoFreq1);
+    const json = oscBundleToJson(oscBundleNoFreq1);
     // frequency estimation
     assert.equal(json.accelerometer.frequency, 100);
     assert.deepEqual(json, jsonFrame);
     // convert back to osc
-    const osc = jsonToOsc(json);
+    const osc = jsonToOscBundle(json);
 
     osc.forEach(msg => {
       const expected = oscBundleNoFreq1.elements.find(el => el[0] === msg[0]);
@@ -74,15 +74,15 @@ describe('# oscToJson / jsonToOsc', () => {
     });
   });
 
-  it('oscToJson - useBno055 = true', () => {
-    const json = oscToJson(oscBundleFull, { useBno055: true });
+  it('oscBundleToJson - useBno055 = true', () => {
+    const json = oscBundleToJson(oscBundleFull, { useBno055: true });
     // frequency estimation
     assert.equal(json.accelerometer.frequency, 100);
     assert.deepEqual(json, jsonFrameBno055);
   });
 
-  it('jsonToOsc - asNodeOscBundle = true', async () => {
-    const bundle = jsonToOsc(jsonFrame, { asNodeOscBundle: true });
+  it('jsonToOscBundle - asNodeOscBundle = true', async () => {
+    const bundle = jsonToOscBundle(jsonFrame, { asNodeOscBundle: true });
     assert.isTrue(bundle instanceof Bundle);
 
     return new Promise(resolve => {
