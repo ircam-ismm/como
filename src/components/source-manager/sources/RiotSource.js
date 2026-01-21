@@ -23,7 +23,7 @@ export default class RiotSource extends AbstractSource {
   #config;
 
   // @todo - make this more robust
-  #activeTimeout;
+  #activeTimeoutDuration;
   #activeTimeoutId;
 
   #timestampCurrent = null;
@@ -39,6 +39,8 @@ export default class RiotSource extends AbstractSource {
   }
 
   async init() {
+    this.#activeTimeoutDuration = this.#config.activeTimeout || DEFAULT_ACTIVE_TIMEOUT_MS;
+
     const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: RiotSource.type,
@@ -103,7 +105,7 @@ export default class RiotSource extends AbstractSource {
       this.#activeTimeoutId = setTimeout(() => {
         this.#timestampReset();
         this.state.set({ active: false });
-      }, this.#activeTimeout);
+      }, this.#activeTimeoutDuration);
 
       // @todo - allow to disable use of bno055
       const json = oscBundleToJson(bundle, {
@@ -131,7 +133,7 @@ export default class RiotSource extends AbstractSource {
       this.#activeTimeoutId = setTimeout(() => {
         this.#timestampReset();
         this.state.set({ active: false });
-      }, this.#activeTimeout);
+      }, this.#activeTimeoutDuration);
 
       const json = oscMessageToJson(message, {
         timestampUpdate: this.#timestampUpdate,
