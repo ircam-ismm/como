@@ -13,15 +13,12 @@ export default class ComoteSource extends AbstractSource {
 
   #activeTimeoutPeriod;
   #activeTimeoutId;
-  #onDataBinded;
 
   constructor(como, server, config) {
     super(como);
 
     this.#server = server;
     this.#config = config;
-
-    this.#onDataBinded = this.#onData.bind(this);
   }
 
   async init() {
@@ -55,19 +52,19 @@ export default class ComoteSource extends AbstractSource {
 
     super.init(state);
 
-    this.#server.addWsListener(this.#onDataBinded);
+    this.#server.addWsListener(this.#onData);
 
     return true;
   }
 
   async delete() {
     clearTimeout(this.#activeTimeoutId);
-    this.#server.removeWsListener(this.#onDataBinded);
+    this.#server.removeWsListener(this.#onData);
 
     await this.state.delete();
   }
 
-  #onData(data) {
+  #onData = (data) => {
     if (data.source === ComoteSource.type && data.id === this.#config.id) {
       clearTimeout(this.#activeTimeoutId);
 
@@ -82,5 +79,5 @@ export default class ComoteSource extends AbstractSource {
       // source frames are multichannel, so we wrap in an array
       this.state.set({ frame: [data] });
     }
-  }
+  };
 }
