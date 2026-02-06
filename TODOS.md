@@ -1,16 +1,13 @@
+
+- [ ] make sure projects directory can live alongside (not within) the application
+- [ ] documentation
+- [ ] template generator
+  + [x] merge @soundworks/create cf. https://github.com/collective-soundworks/soundworks-create/pull/10
+
 - [x] review scripting
 - [x] confirm on delete project & session
 - [x] expose node-web-audio-api on `globalThis`
-- [ ] prototype synth layer (in como-health)
-
-- [ ] R-IoT 2 source (JIP)
-- [ ] Algo - sc-motion
-  - [ ] review API
-  - [ ] Orientation / Gravity
-  - [ ] Intensity
-  - [ ]
-
-
+- [x] prototype synth layer (in como-health)
 
 - [x] rename 'source.stream' to 'frame'
 - [x] add soundworks as peer dependency
@@ -30,7 +27,7 @@
 - [ ] Errors issues - are swallowed somehow...
   + [ ] `como.setProject`
   + [ ] `Player.setScript`
-- [ ] review `como.setProject` api
+- [x] review `como.setProject` api
 - [ ] release comote-helpers
 - [ ] check options for all sources
 - [ ] name components at registration
@@ -41,5 +38,11 @@
 - [ ] check https://github.com/dbrekalo/validate-types for commands validation
 
 
+
+- [x] R-IoT 2 source (JIP)
+- [x] Algo - sc-motion
+  + [x] review API
+  + [x] Orientation / Gravity
+  + [x] Intensity
 
 

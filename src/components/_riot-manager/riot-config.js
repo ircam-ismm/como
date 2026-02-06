@@ -23,7 +23,7 @@ export default {
     metas: {
       description: `Enables debug mode, makes the module more verbose over the USB serial console, especially at boot time.`
     }
-  }
+  },
   // WiFi config
   mode: {
     type: 'enum',
@@ -32,7 +32,7 @@ export default {
     metas: {
       description: `0 for station mode (the R-IoT connects to a Wi-Fi access point), 1 for Access Point mode (the R-IoT becomes a Wi-Fi access point to which the computer connects)`,
     },
-  }
+  },
   ssid: {
     type: 'string',
     default: '',

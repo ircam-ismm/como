@@ -24,14 +24,21 @@
     "lint": "npx eslint src",
     "test": "npx mocha tests/**/*.spec.js",
     "test:only": "npx mocha",
-    "types": "rm -rf types && tsc"
+    "types": "rm -rf types && tsc",
+    "docs:api": "npm run types && rm -rf docs/public/api && jsdoc -c .jsdoc --verbose",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@ircam/eslint-config": "^2.0.1",
+    "docdash": "^2.0.2",
     "eslint": "^9.39.1",
     "jsdoc": "^4.0.5",
     "osc-min": "^2.1.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.27"
   },
   "dependencies": {
     "@ircam/comote-helpers": "^1.5.6",

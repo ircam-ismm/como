@@ -8,7 +8,7 @@ const parseString = str => str;
 const riotifyString = str => str;
 
 // return index of the list, as string
-const parseEnum =
+// const parseEnum =
 
 
 export function parseRiotConfig(input) {

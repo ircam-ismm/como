@@ -1,6 +1,7 @@
 import CoMoNode from './ComoNode.js';
 import { isString } from '@ircam/sc-utils';
 
+/** @private */
 export default class ComoComponent {
   #como;
   #name;

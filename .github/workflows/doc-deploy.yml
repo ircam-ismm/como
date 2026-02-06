@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts
+          cache: 'npm'
+      - run: npm ci
+
+      - name: Build API
+        run: npm run docs:api
+
+      - name: Build
+        run: npm run docs:build
+
+      # requires read / write permissions cf. Settings > Action > workflow permissions
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/.vitepress/dist
+          # cname: soundworks.dev # if wanna deploy to custom domain
+

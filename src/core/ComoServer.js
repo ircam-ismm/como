@@ -4,14 +4,10 @@ import fsPromises from 'node:fs/promises';
 
 import ServerPluginPlatformInit from '@soundworks/plugin-platform-init/server.js';
 import ServerPluginSync from '@soundworks/plugin-sync/server.js';
-import {
-  isString,
-  isFunction,
-} from '@ircam/sc-utils';
+import { isString } from '@ircam/sc-utils';
 
-import CoMoNode from './ComoNode.js';
+import ComoNode from './ComoNode.js';
 
-// @todo - rename to config
 import globalDescription from './entities/global-description.js';
 import projectDescription from './entities/project-description.js';
 import nodeDescription from './entities/node-description.js';
@@ -25,9 +21,9 @@ import SessionManagerServer from '../components/session-manager/SessionManagerSe
 import PlayerManagerServer from '../components/player-manager/PlayerManagerServer.js';
 
 import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServer.js';
-// import RecordingManagerServer from '../components/recording-manager/RecordingManagerServer.js';
 
-export default class ComoServer extends CoMoNode {
+/** @private */
+export default class ComoServer extends ComoNode {
   #projectsDirname;
   /**
    *
@@ -58,9 +54,7 @@ export default class ComoServer extends CoMoNode {
     new SoundbankManagerServer(this, 'soundbankManager');
     new SessionManagerServer(this, 'sessionManager');
     new PlayerManagerServer(this, 'playerManager');
-
     new KeyValueStoreServer(this, 'store');
-    // new RecordingManagerServer(this);
 
     this.setRfcHandler('como:setProject', this.#setProject);
   }

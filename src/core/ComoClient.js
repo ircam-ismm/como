@@ -1,6 +1,5 @@
-import CoMoNode from './ComoNode.js';
+import ComoNode from './ComoNode.js';
 
-// import ClientPluginSync from '@soundworks/plugin-sync/client.js';
 import ClientPluginPlatformInit from '@soundworks/plugin-platform-init/client.js';
 
 // components
@@ -12,18 +11,19 @@ import SessionManagerClient from '../components/session-manager/SessionManagerCl
 import PlayerManagerClient from '../components/player-manager/PlayerManagerClient.js';
 
 import KeyValueStoreClient from '../components/key-value-store/KeyValueStoreClient.js';
-// import RecordingManagerClient from '../components/recording-manager/RecordingManagerClient.js';
 
-export default class ComoClient extends CoMoNode {
+/**
+ * Client-side entry for a node within a como application
+ * @extends ComoNode
+ * @private
+ */
+export default class ComoClient extends ComoNode {
   /**
    *
    * @param {Client} node - Instance of soundworks client
    */
   constructor(node) {
     super(node);
-
-    // do not register for now, more fluid in DEV
-    // this.pluginManager.register('sync', ServerPluginSync);
 
     this.pluginManager.register('platform-init', ClientPluginPlatformInit, {
       audioContext: this.audioContext,

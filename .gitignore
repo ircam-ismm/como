@@ -4,15 +4,15 @@
 # junk files
 .DS_Store
 Thumbs.db
-.data
-docs
 
-# personnal files
+# personal files
 __*
 NOTES.md
 
-# testing
-.env
+# documentation
+docs/.vitepress/dist
+docs/.vitepress/cache
+# where jsdoc is built
+docs/public/api
 
-# changelog
-# CHANGELOG.md
+# types

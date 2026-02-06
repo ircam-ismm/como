@@ -1,3 +1,4 @@
+/** @private */
 export default {
   name: {
     type: 'string',

@@ -1,17 +1,19 @@
 
+/** @private */
 const timestamp = {
   unit: 'ms',
 }
 
+/** @private */
 const frequency = {
   unit: 'Hz',
 }
 
-
+/** @private */
 const accelerometer = {
-  x: { unit: 'm/s^2', normalize: val => val / 9.81 };
-  y: { unit: 'm/s^2', normalize: val => val / 9.81 };
-  z: { unit: 'm/s^2', normalize: val => val / 9.81 };
+  x: { unit: 'm/s^2', normalize: val => val / 9.81 },
+  y: { unit: 'm/s^2', normalize: val => val / 9.81 },
+  z: { unit: 'm/s^2', normalize: val => val / 9.81 },
 };
 
 // const gyroscope = {

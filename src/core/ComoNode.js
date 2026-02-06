@@ -25,7 +25,10 @@ if (!isBrowser()) {
   Object.assign(globalThis, webaudio);
 }
 
-export default class ComoNode {
+/**
+ * A Node in a como application
+ */
+class ComoNode {
   #host; // soundworks node
   #config;
   #constants = Object.freeze({
@@ -216,10 +219,10 @@ export default class ComoNode {
    * - We could just lazily attach to a per node owned state to minimize network load
    * - This could be integrated into soundworks
    *
-   * @param {*} executorNodeId
-   * @param {*} name
-   * @param {*} [payload={}]
-   * @returns
+   * @param {*} executorNodeId - Id of the node that should execute the procedure
+   * @param {*} name - Name of the procedure
+   * @param {*} [payload={}] - Arguments of the procedure
+   * @returns {Promise<any>} The return value of the remote procedure call
    */
   async requestRfc(executorNodeId, name, payload = {}) {
     if (!Number.isInteger(executorNodeId)) {
@@ -261,7 +264,6 @@ export default class ComoNode {
    * @param {*} executorNodeId
    * @param {*} name
    * @param {*} payload
-   * @returns
    */
   setRfcHandler(name, callback) {
     if (!isString(name)) {
@@ -354,3 +356,5 @@ export default class ComoNode {
     }
   }
 }
+
+export default ComoNode;

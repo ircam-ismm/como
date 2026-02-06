@@ -1,18 +1,15 @@
 {
   "source": {
     "include": [
-      "misc/assets/DOC.md",
-      "src/client",
-      "src/server",
-      "src/common"
+      "src/core/"
     ]
   },
   "plugins": [
     "plugins/markdown"
   ],
   "opts": {
-    "projectTitle": "Soundworks",
-    "destination": "./docs",
+    "projectTitle": "como",
+    "destination": "./docs/public/api",
     "encoding": "utf8",
     "template": "./node_modules/docdash"
   },
@@ -37,20 +34,19 @@
       "Interfaces"
     ],
     "scripts": [
-      "assets/custom.css"
+      "../api-styles.css"
     ],
     "meta": {
-        "title": "soundworks",
-        "description": "Documentation of soundworks, a full-stack JavaScript framework for distributed WebAudio and multimedia applications"
+        "title": "como",
+        "description": "Documentation of the como framework"
     },
     "menu": {
       "Website": {
-        "href":"http://soundworks.dev/",
-        "target":"_blank",
+        "href":"../",
         "class":"menu-item"
       },
       "Github": {
-        "href": "https://github.com/collective-soundworks/soundworks",
+        "href": "https://github.com/ircam-ismm/como",
         "target":"_blank",
         "class":"menu-item"
       }
