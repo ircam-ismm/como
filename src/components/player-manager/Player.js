@@ -3,7 +3,6 @@ import {
   decibelToLinear,
   sleep,
   isFunction,
-  isPlainObject,
 } from '@ircam/sc-utils';
 import {
   GainNode
