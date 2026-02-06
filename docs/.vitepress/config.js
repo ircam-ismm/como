@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "como",
   description: "Documentation website of the como framework",
+  base: '/como/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
