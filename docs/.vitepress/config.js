@@ -5,10 +5,10 @@ export default defineConfig({
   title: "como",
   description: "Documentation website of the como framework",
   base: '/como/',
-  head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
+  head: [['link', { rel: 'icon', href: '/como/favicon.ico' }]],
 
   themeConfig: {
-    logo: '/como/logo-200x200.png',
+    logo: '/logo-200x200.png',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
