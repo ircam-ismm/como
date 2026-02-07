@@ -9,10 +9,12 @@ export default defineConfig({
 
   themeConfig: {
     logo: '/logo-200x200.png',
+    search: {
+      provider: 'local'
+    },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
       { text: 'API', link: '/api/index.html', target: '_blank' },
     ],
 
