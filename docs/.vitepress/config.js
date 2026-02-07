@@ -23,7 +23,20 @@ export default defineConfig({
           { text: 'Ontology', link: '/generalities/ontology' },
           { text: 'Scripts API', link: '/generalities/script-api' },
         ]
-      }
+      },
+
+      {
+        text: 'Ecosystem',
+        items: [
+          { text: 'soundworks', link: 'https://soundworks.dev/' },
+          { text: '@ircam/sc-components', link: 'https://github.com/ircam-ismm/sc-components/' },
+          { text: '@ircam/sc-utils', link: 'https://github.com/ircam-ismm/sc-utils' },
+          { text: '@ircam/sc-motion', link: 'https://github.com/ircam-ismm/sc-motion/' },
+          { text: '@ircam/sc-scheduling', link: 'https://github.com/ircam-ismm/sc-scheduling/' },
+          { text: 'node-web-audio-api', link: 'https://github.com/ircam-ismm/node-web-audio-api/' },
+          { text: 'dotpi tools', link: 'https://ircam-ismm.github.io/dotpi/' },
+        ],
+      },
     ],
 
     socialLinks: [
