@@ -29,6 +29,7 @@ export default defineConfig({
         text: 'Ecosystem',
         items: [
           { text: 'soundworks', link: 'https://soundworks.dev/' },
+          { text: 'comote application', link: 'https://apps.ismm.ircam.fr/comote' },
           { text: '@ircam/sc-components', link: 'https://github.com/ircam-ismm/sc-components/' },
           { text: '@ircam/sc-utils', link: 'https://github.com/ircam-ismm/sc-utils' },
           { text: '@ircam/sc-motion', link: 'https://github.com/ircam-ismm/sc-motion/' },
