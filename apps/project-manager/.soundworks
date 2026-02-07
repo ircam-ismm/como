@@ -1,7 +1,0 @@
-{
-  "name": "project-manager",
-  "createVersion": "5.0.8",
-  "language": "js",
-  "template": "js",
-  "configFormat": "yaml"
-}

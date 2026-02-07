@@ -1,6 +1,0 @@
-name: project-manager
-author: ""
-clients:
-  controller:
-    runtime: browser
-    default: true

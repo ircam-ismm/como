@@ -1,8 +1,0 @@
-name: web-to-comote
-author: ""
-clients:
-  player:
-    runtime: browser
-    default: true
-  controller:
-    runtime: browser
