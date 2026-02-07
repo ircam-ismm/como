@@ -7,7 +7,7 @@ layout: page
 <h1>como</h1>
 
   <div>
-    <img src="./assets/home/logo-400x400.png" rel="logo" style="float: left; padding-right: 20px;  width: 300px; height: 300px;" />
+    <img src="./assets/home/logo-400x400.png" rel="logo" style="float: left; margin-right: 20px;  width: 300px; height: 300px;" />
     <p style="font-style: italic; margin-bottom: 10px;">
       Como (for <i>collective movement</i>) is a framework to develop web applications for gesture/movement interaction with sounds.
     </p>
