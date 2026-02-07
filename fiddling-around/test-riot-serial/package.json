@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "serialport": "^13.0.0",
+    "usb": "^2.16.0"
+  }
+}
