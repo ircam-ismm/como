@@ -6,6 +6,7 @@ export default defineConfig({
   description: "Documentation website of the como framework",
   base: '/como/',
   themeConfig: {
+    logo: '/logo-200x200.png',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
@@ -15,16 +16,16 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Generalities',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Ontology', link: '/generalities/ontology' },
+          { text: 'Scripts API', link: '/generalities/script-api' },
         ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/ircam-ismm/como/' }
     ]
   }
 })
