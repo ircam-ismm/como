@@ -7,6 +7,11 @@ export default defineConfig({
   base: '/como/',
   head: [['link', { rel: 'icon', href: '/como/favicon.ico' }]],
 
+  markdown: {
+    theme: 'monokai',
+    lineNumbers: false,
+  },
+
   themeConfig: {
     logo: '/logo-200x200.png',
     search: {
