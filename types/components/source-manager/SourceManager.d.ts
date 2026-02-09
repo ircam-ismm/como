@@ -5,8 +5,8 @@ export default class SourceManager extends ComoComponent {
     sourceExists(sourceId: any): boolean;
     getSourceFiltered(sourceId: any): any;
     getSource(sourceId: any): Promise<any>;
-    createSource(config: any, nodeId?: any): Promise<any>;
-    deleteSource(config: any, nodeId?: any): Promise<any>;
+    createSource(config: any, nodeId?: number): Promise<any>;
+    deleteSource(config: any, nodeId?: number): Promise<any>;
     listRecordings(): any;
     readRecording(filename: any): Promise<any>;
     deleteRecording(filename: any): Promise<any>;

@@ -3,7 +3,7 @@ export default class PlayerManager extends ComoComponent {
     playerExists(playerId: any): boolean;
     getPlayer(playerId: any): Promise<any>;
     getScriptSharedState(playerId: any): Promise<any>;
-    createPlayer(sourceId: any, scriptName?: any, nodeId?: any): Promise<any>;
+    createPlayer(sourceId: any, scriptName?: any, nodeId?: number): Promise<any>;
     deletePlayer(playerId: any): Promise<void>;
     #private;
 }

@@ -26,7 +26,13 @@ if (!isBrowser()) {
 }
 
 /**
- * A Node in a como application
+ * A Node in a como application.
+ *
+ * A ComoNode is a wrapper around a soundworks node (Client or Server) with dedicated functionality.
+ *
+ * @see {@link https://soundworks.dev/}
+ * @see {@link https://soundworks.dev/soundworks/Client.html}
+ * @see {@link https://soundworks.dev/soundworks/Server.html}
  */
 class ComoNode {
   #host; // soundworks node
@@ -58,7 +64,6 @@ class ComoNode {
   #syncedScheduler;
 
   /**
-   *
    * @param {Client|Server} host - Instance of soundworks client or server
    */
   constructor(host, options) {
@@ -68,86 +73,172 @@ class ComoNode {
     this.#audioBufferLoader = new AudioBufferLoader(this.#audioContext);
   }
 
+  /**
+   * The underlying soundworks client or server instance.
+   * @readonly
+   * @see {@link https://soundworks.dev/soundworks/Client.html}
+   * @see {@link https://soundworks.dev/soundworks/Server.html}
+   */
   get host() {
     return this.#host;
   }
 
+  /** @private */
   get options() {
     return this.options;
   }
 
+  /** @private */
   get constants() {
     return this.#constants;
   }
 
-  /** soundworks id, uniquely generated at runtime */
+  /**
+   * Soundworks id, uniquely generated at runtime
+   * @type {Number}
+   * @readonly
+   */
   get nodeId() {
     return this.#node.get('nodeId');
   }
 
-  /** topological id - can be fixed between different restart */
+  /**
+   * Topological id (can be fixed between different restarts):
+   * - For browser clients: generated from soundworks node id, or user defined
+   * through query parameter, i.e. http://host.local?id=my-client-id
+   * - For node clients: hostname
+   * - For server: 'server' constant
+   *
+   * @type {String}
+   * @readonly
+   */
   get id() {
     return this.#node.get('id');
   }
 
-  /** node | browser */
+  /**
+   * Runtime in which the node is running
+   * @type {'node'|'browser'}
+   * @readonly
+   */
   get runtime() {
     return this.#node.get('runtime');
   }
 
-  /** as defined in soundworks */
+  /**
+   * Role of the node, as defined in soundworks config
+   * @type {String}
+   * @readonly
+   */
   get role() {
     return this.#node.get('role');
   }
 
+  /** @private */
   get nodes() {
 
   }
 
-  // get plugins() {
-  //   return this.#plugins;
-  // }
-
+  /** @private */
   get global() {
     return this.#global;
   }
 
+  /** @private */
   get project() {
     return this.#project;
   }
 
+  /**
+   * List of registered components
+   * @type {Map<String, ComoComponent}
+   * @readonly
+   */
   get components() {
     return this.#components;
   }
 
+  /**
+   * Accessor to the soundworks `StateManager`
+   * @readonly
+   * @see {@link https://soundworks.dev/soundworks/ClientStateManager.html}
+   * @see {@link https://soundworks.dev/soundworks/ServerStateManager.html}
+   */
   get stateManager() {
     return this.#host.stateManager;
   }
 
+  /**
+   * Accessor to the soundworks `PluginManager`
+   * @readonly
+   * @see {@link https://soundworks.dev/soundworks/ClientPluginManager.html}
+   * @see {@link https://soundworks.dev/soundworks/ServerPluginManager.html}
+   */
   get pluginManager() {
     return this.#host.pluginManager;
   }
 
+  /**
+   * Instance of `AudioContext`
+   * @readonly
+   * @see {@link https://developer.mozilla.org/fr/docs/Web/API/AudioContext}
+   */
   get audioContext() {
     return this.#audioContext;
   }
 
+  /**
+   * Instance of `AudioBufferLoader`
+   * @readonly
+   * @see {@link https://github.com/ircam-ismm/sc-loader?tab=readme-ov-file#audiobufferloader}
+   */
   get audioBufferLoader() {
     return this.#audioBufferLoader;
   }
 
+  /**
+   * Instance of Scheduler, running in arbitrary timeline
+   * @readonly
+   * @see {@link https://github.com/ircam-ismm/sc-scheduling/?tab=readme-ov-file#scheduler}
+   * @see {@link https://github.com/ircam-ismm/sc-utils?tab=readme-ov-file#gettime}
+   */
   get scheduler() {
     return this.#scheduler;
   }
 
+  /**
+   * Instance of Scheduler, running in AudioContext timeline
+   * @readonly
+   * @see {@link https://github.com/ircam-ismm/sc-scheduling/?tab=readme-ov-file#scheduler}
+   */
   get audioScheduler() {
-    throw new Error(`Cannot get "${audioScheduler}" on ComoNode: not implemented yet`);
+    return this.#audioScheduler;
   }
 
+  /** @private */
   get syncedScheduler() {
     throw new Error(`Cannot get "${syncedScheduler}" on ComoNode: not implemented yet`);
   }
 
+  /**
+   * The init method is part of the initialization lifecycle of the como node.
+   * Most of the time, this method will be implicitly executed by the `{@link ComoNode#start}` method.
+   *
+   * Note that will automatically call the `init` method of the soundworks host as well.
+   *
+   * In some situations you might want to call this method manually, in such cases the method
+   * should be called before the `{@link ComoNode#start}` method.`.
+   *
+   * @example
+   * import { Client } from '@soundworks/core/client.js';
+   * import { ComoClient } from '@ircam/como';
+   *
+   * const client = new Client(config);
+   * const como = new ComoClient(client);
+   * // optional explicit call of `init` before `start`
+   * await como.init();
+   * await como.start();
+   */
   async init() {
     if (this.#host.status === 'idle') {
       await this.host.init();
@@ -158,6 +249,21 @@ class ComoNode {
     }
   }
 
+  /**
+   * The start method is part of the initialization lifecycle of the como node.
+   * This method will implicitly execute {@link ComoNode#init} method if it has not been called manually.
+   *
+   * Note that will automatically call the `start` method of the soundworks host as well.
+   *
+   * @example
+   * import { Client } from '@soundworks/core/client.js';
+   * import { ComoClient } from '@ircam/como';
+   *
+   * const client = new Client(config);
+   * const como = new ComoClient(client);
+   * // implicit execution of `init` method
+   * await como.start();
+   */
   async start() {
     await this.init();
     await this.#host.start();
@@ -195,11 +301,28 @@ class ComoNode {
     }
 
     this.#scheduler = new Scheduler(getTime);
+    this.#audioScheduler = new Scheduler(() => this.#audioContext.currentTime);
     // @todo
-    // this.#audioScheduler;
     // this.#syncedScheduler;
   }
 
+  /**
+   * The stop method is part of the lifecycle of the como node.
+   * Notes:
+   * - will automatically call the `stop` method of the soundworks host as well.
+   * - most of the time, you should not have to call this method manually, mainly
+   * meant for testing purposes.
+   *
+   * @example
+   * import { Client } from '@soundworks/core/client.js';
+   * import { ComoClient } from '@ircam/como';
+   *
+   * const client = new Client(config);
+   * const como = new ComoClient(client);
+   * await como.start();
+   * // ...
+   * await como.stop();
+   */
   async stop() {
     for (let component of this.#components.values()) {
       await component.stop();
@@ -208,20 +331,34 @@ class ComoNode {
     await this.#host.stop();
   }
 
+  /**
+   * Change the current project of the whole Como application.
+   *
+   * - **Important** Calling this method method on any node will change the project for all connected nodes.
+   * - **Unstable** The signature of this method is subject to change
+   *
+   * @unstable
+   *
+   * @param {String} projectDirname - Dirname of the project
+   */
   async setProject(projectDirname) {
     return await this.requestRfc(this.constants.SERVER_ID, 'como:setProject', { projectDirname });
   }
 
   /**
-   * Request a remote function call
+   * Request a remote function call on a given node.
    *
+   * **Warning** - This method should be considered protected and may be subject to change,
+   * use at your own risk.
+   *
+   * @unstable
    * @todo
-   * - We could just lazily attach to a per node owned state to minimize network load
+   * - Lazily attach to a peer node owned state to minimize network load
    * - This could be integrated into soundworks
    *
-   * @param {*} executorNodeId - Id of the node that should execute the procedure
-   * @param {*} name - Name of the procedure
-   * @param {*} [payload={}] - Arguments of the procedure
+   * @param {Number} executorNodeId - Id of the node that should execute the procedure
+   * @param {String} name - Name of the procedure
+   * @param {Object} [payload={}] - Arguments of the procedure
    * @returns {Promise<any>} The return value of the remote procedure call
    */
   async requestRfc(executorNodeId, name, payload = {}) {
@@ -257,13 +394,12 @@ class ComoNode {
   /**
    * Function to execute when a remote function call is requested on this node
    *
-   * @todo
-   * - We could just lazily attach to a per node owned state to minimize network load
-   * - This could be integrated into soundworks
+   * **Warning** - This method should be considered protected and may be subject to change,
+   * use at your own risk.
    *
-   * @param {*} executorNodeId
-   * @param {*} name
-   * @param {*} payload
+   * @unstable
+   * @param {String} name - Name of the procedure
+   * @param {Function} callback - Function to be executed
    */
   setRfcHandler(name, callback) {
     if (!isString(name)) {
@@ -279,8 +415,12 @@ class ComoNode {
 
   /**
    * Function executed by the requesting node when the rfc is settled to perform
-   * additional logic before fulfilling the promise
+   * additional logic on rfc result before fulfilling the promise.
    *
+   * **Warning** - This method should be considered protected and may be subject to change,
+   * use at your own risk.
+   *
+   * @unstable
    * @param {*} name
    * @param {*} callback
    */
@@ -297,6 +437,7 @@ class ComoNode {
 
   }
 
+  /** @private */
   async #handleRfc(infos) {
     if (infos.settled === true) {
       // check if node is initiator of command
