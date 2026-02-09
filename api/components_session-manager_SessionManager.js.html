@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>components/source-manager/SourceManager.js - como</title>
+    <title>components/session-manager/SessionManager.js - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -51,7 +51,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/source-manager/SourceManager.js</h1>
+    <h1 class="page-title">components/session-manager/SessionManager.js</h1>
     
 
     
@@ -61,296 +61,248 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import ComoComponent from '../../core/ComoComponent.js';
-
+            <pre class="prettyprint source linenums"><code>import {
+  GainNode,
+} from 'isomorphic-web-audio-api';
 import {
-  isPlainObject,
+  isString,
+  decibelToLinear,
 } from '@ircam/sc-utils';
 
-import SourceFactory from '#sources/factory.js';
+import ComoComponent from '../../core/ComoComponent.js';
 
 /**
- * The SourceManager component is responsible for creating and dispatching
- * sources of motion sensors.
+ * The SourceManager component is responsible for creating and managing
+ * sessions within a project. At its core, a session the association of
+ * a script and of a subset of the project soundfiles.
  *
- * Como sources are represented as soundworks SharedState and act as
- * middlewares between the actual sources of data (e.g. hardware) and the application, e.g.:
- * ```
- * motion sensor -- [OSC] -> como source -- [websocket / SharedState] -> como application
- * ```
- * Hence, the como source can exists but be inactive due to its underlying motion
- * sensor being shutdown.
+ * Como players can be associated to session.
  *
- * Como source stream must output a stream that follows the specification defined
- * here: &lt;https://github.com/ircam-ismm/sc-motion/blob/main/FORMAT.md>
- *
- * The shared state is defined by the following parameters:
- * - `id` - id of the source
- * - `type` - type of the "real" source of motion data
- * - `nodeId` - node who owns the source
- * - `infos` - information (e.g. OSC config) used to configure the source
- * - `frame` - motion data stream
- * - `active` - whether the underlying sensor is active or not
- * - `record` - if true record the source on the filesystem
- *
- * @example
- * import { Client } from '@soundworks/core/client.js';
- * import ComoClient from '@ircam/como/ComoClient.js';
- *
- * const client = new Client(config);
- * const como = new ComoClient(client);
- * await como.start();
- *
- * const sourceId = await como.sourceManager.createSource({
- *   type: 'riot',
- *   id: '0',
- *   port: 8081,
- *   verbose: false,
- * });
+ * Como sessions are represented as soundworks SharedState defined by the
+ * following parameters:
+ * - uuid - Unique id, stable across restarts
+ * - name - User defined name
+ * - defaultScript - The script associated with the session
+ * - soundbank - The list of files associated to the session
+ * - mute - Whether the audio output is muted
+ * - volume - Volume of the audio output of the session
  */
-class SourceManager extends ComoComponent {
-  #recordingFilesystem;
-  #ownedSources = new Set(); // owned sources created on this node
-  #sources;
-  #factory;
+class SessionManager extends ComoComponent {
+  #sessions;
+  #sessionAudioRouting = new Map(); // &lt;uuid, { mute: GainNode, volume: GainNode }>
 
   /**
-   * The SourceManager component is automatically created by the {@link ComoNode} instance.
-   *
-   * _This constructor should never be called manually_
+   * @hideconstructor
    * @param {ComoNode} como
    * @param {String} name
    */
   constructor(como, name) {
     super(como, name);
 
-    this.#factory = new SourceFactory(como);
+    if (!this.como.soundbankManager) {
+      throw new Error(`Cannot construct PlayerManager: relies on 'como.soundbankManager'`);
+    }
   }
 
   /**
-   * Lightweight collection of all the sources on the network. The collection
-   * only contains information that allows to monitor or control the sources,
-   * but does not contain the actual stream of data.
-   *
-   * If a node is interested in a particular motion stream source, it should
-   * explicity retrieve to the "full" source using {@link SourceManager#getSource}.
-   *
-   * @readonly
-   * @type {SharedStateCollection}
+   * SharedStateCollection of all existing sessions
    */
-  get sources() {
-    return this.#sources;
+  get sessions() {
+    return this.#sessions;
   }
 
-  /**
-   * List of current source ids.
-   *
-   * @readonly
-   * @type {Array&lt;String>}
-   */
-  get list() {
-    return this.#sources.get('id');
-  }
-
-  /**
-   * SourceManagerServer requires access to the plugin
-   * @private
-   */
-  get recordingFilesystem() {
-    return this.#recordingFilesystem;
-  }
-
-  /** @private */
   async start() {
     await super.start();
 
-    this.#recordingFilesystem = await this.como.pluginManager.get(`${this.name}:filesystem`);
+    this.#sessions = await this.como.stateManager.getCollection(`${this.name}:session`);
+    this.#sessions.onUpdate((session, updates) => {
+      const sessionId = session.get('uuid');
 
-    this.#sources = await this.como.stateManager.getCollection(`${this.name}:source`,
-      // parameter whitelist - we really don't want the streams here
-      // @todo - move to blacklist once implemented in soundworks
-      ['id', 'type', 'infos', 'active', 'record', 'control']
-    );
+      if (this.#sessionAudioRouting.has(sessionId)) {
+        const { mute, volume } = this.#sessionAudioRouting.get(sessionId);
 
-    this.como.setRfcHandler(`${this.name}:createSource`, this.#createSourceHandler);
-    this.como.setRfcHandler(`${this.name}:deleteSource`, this.#deleteSourceHandler);
-
-    this.como.setRfcResolverHook(`${this.name}:createSource`, this.#createSourceResolverHook);
-  }
-
-  /** @private */
-  async stop() {
-    await super.stop();
-
-    await this.#sources.detach();
-
-    for (let source of this.#ownedSources.values()) {
-      await source.delete();
-    }
-
-    this.#factory.stop();
-  }
-
-  /**
-   * Check whether the given source id correspond to an existing source
-   *
-   * @param {String} sourceId
-   * @returns {Boolean}
-   */
-  sourceExists(sourceId) {
-    return !!this.sources.find(s => s.get('id') === sourceId);
-  }
-
-  /**
-   * Return the lightweight version of a source (i.e. without its stream) from its id.
-   *
-   * @param {String} sourceId
-   * @returns {SharedState|undefined}
-   */
-  getSourceFiltered(sourceId) {
-    return this.sources.find(source => source.get('id') === sourceId);
-  }
-
-  /**
-   * Retrieve the full version of a source (i.e. with its stream) from its id.
-   *
-   * If the node is the owner of the source, the retrieved source will be the owned
-   * original instance of the shared state.
-   *
-   * @param {String} sourceId
-   * @returns {SharedState|null}
-   */
-  async getSource(sourceId) {
-    // if the source has been created on this node, return the underlying owned source state
-    const owned = Array.from(this.#ownedSources).find(source => source.id === sourceId);
-    if (owned) {
-      return owned.state;
-    }
-
-    // if the source has been created on another node, attach to the "real" source
-    const notOwned = this.sources.find(s => s.get('id') === sourceId);
-    if (notOwned) {
-      return await this.como.stateManager.attach(`${this.name}:source`, notOwned.id);
-    }
-
-    // source does not exits
-    return null;
-  }
-
-  /**
-   * Create a new como source.
-   *
-   * @param {Object} config - The configuration object for the source.
-   * @param {String} [nodeId=this.como.nodeId] - If given, creates the source on
-   *  given como node.
-   * @returns {String} The id of the created source
-   */
-  async createSource(config, nodeId = this.como.nodeId) {
-    if (!isPlainObject(config)) {
-      throw new Error(`Cannot execute "createSource" on SourceManager: argument 1 is not an object`);
-    }
-
-    if (!('id' in config)) {
-      throw new Error(`Cannot execute "createSource" on SourceManager: config.id is not defined`);
-    }
-
-    const exists = this.#sources.find(source => source.get('id') === config.id);
-
-    if (exists) {
-      throw new Error(`Cannot execute "createSource" on SourceManager: a source with id "${config.id}" already exists`);
-    }
-
-    // always go though the rfc roundtrip, even if `nodeId = this.como.nodeId`,
-    // to benefit from the hook logic
-    // @note - this could be optimized within the Rfc logic
-    return await this.como.requestRfc(nodeId, `${this.name}:createSource`, config);
-  }
-
-  /**
-   * _NOT IMPLEMENTED YET_
-   *
-   * Delete an existing source.
-   */
-  async deleteSource(config, nodeId = this.como.nodeId) {
-    // always go though the rfc roundtrip, even if `nodeId = this.como.nodeId`,
-    // to benefit from the hook logic
-    // @note - this could be optimized within the Rfc logic
-    return await this.como.requestRfc(nodeId, `${this.name}:deleteSource`, config);
-  }
-
-
-  #createSourceHandler = async (config) => {
-    const source = await this.#factory.createSource(config);
-    this.#ownedSources.add(source);
-
-    return source.id;
-  }
-
-  #createSourceResolverHook = async (err, sourceId) => {
-    if (err) {
-      return;
-    }
-
-    // make sure the new source is in the list before we resolve `createSource`
-    // cf. https://github.com/collective-soundworks/soundworks/issues/118
-    //
-    // 1. check that the source is not already in list, this may happen server-side
-    const source = this.como.sourceManager.sources.find(s => s.get('id') === sourceId);
-
-    if (source !== undefined) {
-      return Promise.resolve();
-    }
-
-    // 2. else, wait for the source to attach to the collection before resolving
-    return new Promise(resolve => {
-      // detach listener will be defined as we will be asynchronous
-      //
-      const detachListener = this.como.sourceManager.sources.onAttach(source => {
-        // console.log(source.get('id'), sourceId);
-        if (source.get('id') === sourceId) {
-          detachListener();
-          resolve();
+        for (let [key, value] of Object.entries(updates)) {
+          switch (key) {
+            case 'mute': {
+              const gain = value ? 0 : 1;
+              mute.gain.setTargetAtTime(gain, this.como.audioContext.currentTime, 0.01);
+              break;
+            }
+            case 'volume': {
+              const gain = decibelToLinear(value);
+              volume.gain.setTargetAtTime(gain, this.como.audioContext.currentTime, 0.01);
+              break;
+            }
+            case 'soundbank': {
+              // @todo - refresh cache
+              break;
+            }
+          }
         }
-      });
+      }
+    });
+
+    this.#sessions.onDetach(session => {
+      const sessionId = session.get('uuid');
+
+      if (this.#sessionAudioRouting.has(sessionId)) {
+        const { mute, volume } = this.#sessionAudioRouting.get(sessionId);
+        volume.disconnect();
+        mute.disconnect();
+
+        this.#sessionAudioRouting.delete(sessionId);
+      }
     });
   }
 
-  #deleteSourceHandler = async (config) => {
-    return this.#factory.deleteSource(config);
-  }
-
-  // ----------------------------------------------------------------------
-  // RECORDINGS MANAGEMENT
-  // ----------------------------------------------------------------------
-
   /**
-   * Returns the list of the existing recordings.
+   * Get a session SharedState from its unique id.
    *
-   * @returns {Object} The file tree of the projects's recordings directory
+   * @param {string} sessionId - Unique id of the session
+   * @returns GainNode|null - returns null if session does not exists
    */
-  listRecordings() {
-    return this.#recordingFilesystem.getTree();
+  getSession(sessionId) {
+    const session = this.#sessions.find(session => session.get('uuid') === sessionId);
+
+    if (!session) {
+      return null;
+    }
+
+    return session;
   }
 
   /**
-   * Retrieve the content of a given recording.
-   * @param {Filename} Filename - Filename of the recording
-   * @returns {Blob}
+   * Get the audio destination of a session from its unique id.
+   *
+   * The audio bus is lazily created on first call of this function on a given node.
+   *
+   * @param {String} sessionId - Unique id of the session
+   * @returns GainNode|null - returns null if session does not exists
    */
-  async readRecording(filename) {
-    return await this.#recordingFilesystem.readFile(filename);
+  getSessionBus(sessionId) {
+    if (this.#sessionAudioRouting.has(sessionId)) {
+      const { mute } = this.#sessionAudioRouting.get(sessionId);
+      return mute;
+    }
+
+    const session = this.getSession(sessionId);
+
+    if (!session) {
+      return null;
+    }
+
+    const mute = new GainNode(this.como.audioContext, {
+      gain: session.get('mute') ? 0 : 1,
+    });
+    const volume = new GainNode(this.como.audioContext, {
+      gain: decibelToLinear(session.get('volume')),
+    });
+
+    mute.connect(volume).connect(this.como.audioContext.destination);
+    this.#sessionAudioRouting.set(sessionId, { mute, volume });
+
+    return mute;
   }
 
   /**
-   * Delete a given recording.
-   * @param {Filename} Filename - Filename of the recording
+   * Get the AudioBuffers associated to the session
+   *
+   * @param {String} sessionId
+   * @returns {Object&lt;String, AudioBuffer>}
    */
-  async deleteRecording(filename) {
-    return await this.#recordingFilesystem.rm(filename);
+  async getSessionSoundbank(sessionId) {
+    const session = this.getSession(sessionId);
+
+    if (!session) {
+      return null;
+    }
+
+    const sessionSoundbank = session.get('soundbank');
+
+    return await this.como.soundbankManager.getBuffers(sessionSoundbank);
+  }
+
+  /**
+   * Create a new session in the current project
+   *
+   * @param {String} sessionName - Name of the session
+   * @returns {String} Unique id of the new session
+   */
+  async createSession(sessionName) {
+    if (!isString(sessionName)) {
+      throw new Error('Cannot execute "createSession" on "SessionManager": argument 0 (sessionName) is not a string');
+    }
+
+    const exists = this.#sessions.find(session => session.get('name') === sessionName);
+
+    if (exists) {
+      throw new Error(`Cannot execute "createSession" on SessionManager: a session with name ${sessionName} already exists`);
+    }
+
+    const sessionId = await this.como.requestRfc(this.como.constants.SERVER_ID, `${this.name}:createSession`, { sessionName });
+    // synchronous on server-side
+    if (this.getSession(sessionId)) {
+      return sessionId;
+    } else {
+      return new Promise((resolve) => {
+        const unsubscribe = this.sessions.onAttach(state => {
+          if (state.get('id') === sessionId) {
+            unsubscribe();
+            resolve(sessionId);
+          }
+        });
+      });
+    }
+  }
+
+  /**
+   * Save the session in the filesystem
+   *
+   * @param {String} sessionId - Unique id of the session
+   */
+  async persistSession(sessionId) {
+    if (!isString(sessionId)) {
+      throw new Error('Cannot execute "persistSession" on "SessionManager": argument 0 (sessionId) is not a string');
+    }
+
+    return this.como.requestRfc(this.como.constants.SERVER_ID, `${this.name}:persistSession`, { sessionId });
+  }
+
+  /**
+   * Change the name of the session
+   *
+   * @param {String} sessionId - Unique id of the session
+   * @param {*} newName - New name of the session
+   */
+  async renameSession(sessionId, newName) {
+    if (!isString(sessionId)) {
+      throw new Error('Cannot execute "renameSession" on "SessionManager": argument 0 (sessionId) is not a string');
+    }
+
+    if (!isString(newName)) {
+      throw new Error('Cannot execute "renameSession" on "SessionManager": argument 1 (newName) is not a string');
+    }
+
+    return this.como.requestRfc(this.como.constants.SERVER_ID, `${this.name}:renameSession`, { sessionId, newName });
+  }
+
+  /**
+   * Delete the session
+   * - All players within this session will be removed from it
+   * - All associated files will be deleted
+   *
+   * @param {String} sessionId - Unique id of the session
+   */
+  async deleteSession(sessionId) {
+    if (!isString(sessionId)) {
+      throw new Error('Cannot execute "deleteSession" on "SessionManager": argument 0 (sessionId) is not a string');
+    }
+
+    return this.como.requestRfc(this.como.constants.SERVER_ID, `${this.name}:deleteSession`, { sessionId });
   }
 }
 
-export default SourceManager;
+export default SessionManager;
 </code></pre>
         </article>
     </section>
