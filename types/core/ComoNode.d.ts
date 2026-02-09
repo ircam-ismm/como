@@ -61,7 +61,7 @@ declare class ComoNode {
     private get project();
     /**
      * List of registered components
-     * @type {Map<String, ComoComponent}
+     * @type {Map<String, ComoComponent>}
      * @readonly
      */
     readonly get components(): Map<string, ComoComponent>;

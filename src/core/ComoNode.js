@@ -151,7 +151,7 @@ class ComoNode {
 
   /**
    * List of registered components
-   * @type {Map<String, ComoComponent}
+   * @type {Map<String, ComoComponent>}
    * @readonly
    */
   get components() {
