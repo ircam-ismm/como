@@ -2,7 +2,8 @@
   "source": {
     "include": [
       "src/core/",
-      "src/components/source-manager"
+      "src/components/source-manager",
+      "src/components/session-manager"
     ]
   },
   "plugins": [

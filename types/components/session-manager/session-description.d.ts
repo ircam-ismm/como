@@ -1,4 +1,5 @@
-declare namespace _default {
+export default Session;
+declare namespace Session {
     namespace uuid {
         let type: string;
         let required: boolean;
@@ -71,5 +72,4 @@ declare namespace _default {
         export { metas_5 as metas };
     }
 }
-export default _default;
 //# sourceMappingURL=session-description.d.ts.map

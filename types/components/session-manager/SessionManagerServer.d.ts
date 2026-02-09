@@ -1,5 +1,12 @@
-export default class SessionManagerServer extends SessionManager {
-    setProject(dirname: any): Promise<any>;
+export default SessionManagerServer;
+/**
+ * Server-side representation of the {@link SessionManager}
+ *
+ * @extends {SessionManager}
+ */
+declare class SessionManagerServer extends SessionManager {
+    /** @private */
+    private setProject;
     #private;
 }
 import SessionManager from './SessionManager.js';

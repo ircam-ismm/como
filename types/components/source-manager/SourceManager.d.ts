@@ -1,11 +1,10 @@
 export default SourceManager;
 /**
- * The SourceManager components is responsible for creating and dispatching
+ * The SourceManager component is responsible for creating and dispatching
  * sources of motion sensors.
  *
- * Como sources created by the source manager are represented as soundworks SharedState.
- * The como sources act therefore as middlewares between the actual sources of data
- * (e.g. hardware) and the application, e.g.:
+ * Como sources are represented as soundworks SharedState and act as
+ * middlewares between the actual sources of data (e.g. hardware) and the application, e.g.:
  * ```
  * motion sensor -- [OSC] -> como source -- [websocket / SharedState] -> como application
  * ```
@@ -61,7 +60,7 @@ declare class SourceManager extends ComoComponent {
      */
     readonly get sources(): SharedStateCollection;
     /**
-     * Return the list of current source ids.
+     * List of current source ids.
      *
      * @readonly
      * @type {Array<String>}

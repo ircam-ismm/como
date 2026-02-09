@@ -22,9 +22,19 @@ function serializeSession(session) {
   return JSON.stringify(values, null, 2);
 }
 
-export default class SessionManagerServer extends SessionManager {
+/**
+ * Server-side representation of the {@link SessionManager}
+ *
+ * @extends {SessionManager}
+ */
+class SessionManagerServer extends SessionManager {
   #currentSessions = new Set();
 
+  /**
+   * @hideconstructor
+   * @param {ComoNode} como
+   * @param {String} name
+   */
   constructor(como, name) {
     super(como, name);
 
@@ -77,6 +87,7 @@ export default class SessionManagerServer extends SessionManager {
 
   }
 
+  /** @private */
   async setProject(dirname) {
     // delete all existing states
     for (let session of this.#currentSessions.entries()) {
@@ -186,3 +197,5 @@ export default class SessionManagerServer extends SessionManager {
     await fsPromises.rm(pathname, { force: true });
   }
 }
+
+export default SessionManagerServer;

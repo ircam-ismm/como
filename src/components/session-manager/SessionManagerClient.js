@@ -4,7 +4,12 @@ import {
 
 import SessionManager from './SessionManager.js';
 
-export default class SessionManagerClient extends SessionManager {
+/**
+ * Client-side representation of the {@link SessionManager}
+ *
+ * @extends {SessionManager}
+ */
+class SessionManagerClient extends SessionManager {
   constructor(como, name) {
     super(como, name);
   }
@@ -17,3 +22,5 @@ export default class SessionManagerClient extends SessionManager {
     }
   }
 }
+
+export default SessionManagerClient;

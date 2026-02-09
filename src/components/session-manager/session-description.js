@@ -1,4 +1,4 @@
-export default {
+const Session = {
   uuid: {
     type: 'string',
     required: true,
@@ -49,12 +49,6 @@ export default {
       persist: true,
     },
   },
-  // @todo
-  // preloadSoundbank: {
-  //   type: 'boolean',
-  //   default: false,
-  //   metas: {
-  //     persist: true,
-  //   },
-  // },
 };
+
+export default Session;
