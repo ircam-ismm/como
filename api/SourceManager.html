@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>SourceManagerServer - como</title>
+    <title>SourceManager - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -51,7 +51,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">SourceManagerServer</h1>
+    <h1 class="page-title">SourceManager</h1>
     
 
     
@@ -67,20 +67,29 @@
         
         </h2>
         
-            <div class="class-description usertext"><p>Server-side representation of the SourceManager.</p></div>
+            <div class="class-description usertext"><p>The SourceManager components is responsible for creating and dispatching
+sources of motion sensors.</p>
+<p>Como sources created by the source manager are represented as soundworks SharedState.
+The como sources act therefore as middlewares between the actual sources of data
+(e.g. hardware) and the application, e.g.:</p>
+<pre class="prettyprint source"><code>motion sensor -- [OSC] -> como source -- [websocket / SharedState] -> como application
+</code></pre>
+<p>Hence, the como source can exists but be inactive due to its underlying motion
+sensor being shutdown.</p>
+<p>Como source stream must output a stream that follows the specification defined
+here: <a href="https:%5C/%5C/github.com/ircam-ismm/sc-motion/blob/main/FORMAT.md">https://github.com/ircam-ismm/sc-motion/blob/main/FORMAT.md</a></p>
+<p>The shared state is defined by the following parameters:</p>
+<ul>
+<li><code>id</code> - id of the source</li>
+<li><code>type</code> - type of the &quot;real&quot; source of motion data</li>
+<li><code>nodeId</code> - node who owns the source</li>
+<li><code>infos</code> - information (e.g. OSC config) used to configure the source</li>
+<li><code>frame</code> - motion data stream</li>
+<li><code>active</code> - whether the underlying sensor is active or not</li>
+<li><code>record</code> - if true record the source on the filesystem</li>
+</ul></div>
         
     
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="SourceManager.html">SourceManager</a></li>
-    </ul>
-
 
     
 </header>
@@ -95,7 +104,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="SourceManagerServer"><span class="type-signature"></span>new SourceManagerServer<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="SourceManager"><span class="type-signature"></span>new SourceManager<span class="signature">(como, name)</span><span class="type-signature"></span></h4>
 
     
 
@@ -104,11 +113,15 @@
 
 <dl class="details">
     
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>The SourceManager component is automatically created by the <a href="ComoNode.html">ComoNode</a> instance.</p>
+<p><em>This constructor should never be called manually</em></p></li></ul></dd>
+    
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManagerServer.js.html">components/source-manager/SourceManagerServer.js</a>, <a href="components_source-manager_SourceManagerServer.js.html#line13">line 13</a>
+        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -153,6 +166,97 @@
 
 
 
+    <h5 class="h5-examples">Example</h5>
+    
+    <pre class="prettyprint"><code>import { Client } from '@soundworks/core/client.js';
+import ComoClient from '@ircam/como/ComoClient.js';
+
+const client = new Client(config);
+const como = new ComoClient(client);
+await como.start();
+
+const sourceId = await como.sourceManager.createSource({
+  type: 'riot',
+  id: '0',
+  port: 8081,
+  verbose: false,
+});</code></pre>
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>como</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ComoNode.html">ComoNode</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -217,11 +321,6 @@
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#list">SourceManager#list</a>
-    </li></ul></dd>
-    
 
     
 
@@ -284,11 +383,6 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#sources">SourceManager#sources</a>
-    </li></ul></dd>
     
 
     
@@ -358,11 +452,6 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#createSource">SourceManager#createSource</a>
-    </li></ul></dd>
     
 
     
@@ -579,11 +668,6 @@ given como node.</p></td>
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#deleteRecording">SourceManager#deleteRecording</a>
-    </li></ul></dd>
-    
 
     
 
@@ -720,11 +804,6 @@ given como node.</p></td>
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#deleteSource">SourceManager#deleteSource</a>
-    </li></ul></dd>
-    
 
     
 
@@ -811,11 +890,6 @@ original instance of the shared state.</p></li></ul></dd>
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#getSource">SourceManager#getSource</a>
-    </li></ul></dd>
     
 
     
@@ -974,11 +1048,6 @@ original instance of the shared state.</p></li></ul></dd>
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#getSourceFiltered">SourceManager#getSourceFiltered</a>
-    </li></ul></dd>
-    
 
     
 
@@ -1136,11 +1205,6 @@ original instance of the shared state.</p></li></ul></dd>
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#listRecordings">SourceManager#listRecordings</a>
-    </li></ul></dd>
-    
 
     
 
@@ -1248,11 +1312,6 @@ original instance of the shared state.</p></li></ul></dd>
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#readRecording">SourceManager#readRecording</a>
-    </li></ul></dd>
     
 
     
@@ -1407,11 +1466,6 @@ original instance of the shared state.</p></li></ul></dd>
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#sourceExists">SourceManager#sourceExists</a>
-    </li></ul></dd>
     
 
     
