@@ -5,7 +5,11 @@ import {
   isBrowser
 } from '@ircam/sc-utils';
 
-export default class SourceManagerClient extends SourceManager {
+/**
+ * Client-side representation of the {@link SourceManager}
+ * @extends SourceManager
+ */
+class SourceManagerClient extends SourceManager {
   constructor(como, name) {
     super(como, name);
 
@@ -25,3 +29,5 @@ export default class SourceManagerClient extends SourceManager {
     }
   }
 }
+
+export default SourceManagerClient;

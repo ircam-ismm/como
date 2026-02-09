@@ -7,7 +7,8 @@ import SourceManager from './SourceManager.js';
 import sourceDescription from './source-description.js';
 
 /**
- * Server-side representation of the SourceManager;
+ * Server-side representation of the SourceManager.
+ * @extends SourceManager
  */
 class SourceManagerServer extends SourceManager {
   #logger;
@@ -21,15 +22,6 @@ class SourceManagerServer extends SourceManager {
     this.como.pluginManager.register(`${this.name}:filesystem`, ServerPluginFilesystem);
 
     this.como.stateManager.defineClass(`${this.name}:source`, sourceDescription);
-    this.como.stateManager.registerUpdateHook(`${this.name}:source`, (updates, currentValues) => {
-      // prevent recording of an inactive source
-      // @note - are we sure this is the desired behavior
-      // @note - this also create an issue on the GUI because the state does not
-      // change, hence the GUI component is never set back to inactive
-      // if (updates.record && !currentValues.active) {
-      //   return { ...updates, record: false };
-      // }
-    });
   }
 
   /** @private */
