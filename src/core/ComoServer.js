@@ -22,14 +22,27 @@ import PlayerManagerServer from '../components/player-manager/PlayerManagerServe
 
 import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServer.js';
 
-/** @private */
-export default class ComoServer extends ComoNode {
+/**
+ * Server-side representation of a ComoNode
+ *
+ * @extends ComoNode
+ * @example
+ * import { Server } from '@soundworks/core/server.js';
+ * import { ComoServer } from '@ircam/como/server.js';
+ *
+ * const server = new Server(config);
+ * const como = new ComoServer(server);
+ * await como.start();
+ */
+class ComoServer extends ComoNode {
   #projectsDirname;
+
   /**
+   * Constructs a new ComoServer instance
    *
    * @param {Server} server - Instance of soundworks server
    * @param {Object} options
-   * @param {String} [options.projectsDirname='projects'] - Directory in which the projects live
+   * @param {String} [options.projectsDirname='projects'] - Directory in which the projects live (unstable)
    */
   constructor(server, {
     // directory
@@ -48,12 +61,54 @@ export default class ComoServer extends ComoNode {
     this.stateManager.defineClass('como:node', nodeDescription);
     this.stateManager.defineClass('como:rfc', rfcDescription);
 
+    /**
+     * @member sourceManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {SourceManagerServer}
+     */
     new SourceManagerServer(this, 'sourceManager');
+    /**
+     * @member projectManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {ProjectManagerServer}
+     */
     new ProjectManagerServer(this, 'projectManager');
+    /**
+     * @member scriptManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {ScriptManagerServer}
+     */
     new ScriptManagerServer(this, 'scriptManager');
+    /**
+     * @member soundbankManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {SoundbankManagerServer}
+     */
     new SoundbankManagerServer(this, 'soundbankManager');
+    /**
+     * @member sessionManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {SessionManagerServer}
+     */
     new SessionManagerServer(this, 'sessionManager');
+    /**
+     * @member playerManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {PlayerManagerServer}
+     */
     new PlayerManagerServer(this, 'playerManager');
+    /**
+     * @member store
+     * @memberof ComoServer#
+     * @readonly
+     * @type {KeyValueStoreServer}
+     */
     new KeyValueStoreServer(this, 'store');
 
     this.setRfcHandler('como:setProject', this.#setProject);
@@ -105,3 +160,5 @@ export default class ComoServer extends ComoNode {
     return true;
   }
 }
+
+export default ComoServer;

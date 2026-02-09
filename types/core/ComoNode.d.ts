@@ -166,6 +166,8 @@ declare class ComoNode {
      * - **Important** Calling this method method on any node will change the project for all connected nodes.
      * - **Unstable** The signature of this method is subject to change
      *
+     * @unstable
+     *
      * @param {String} projectDirname - Dirname of the project
      */
     setProject(projectDirname: string): Promise<any>;

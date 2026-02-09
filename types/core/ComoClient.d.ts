@@ -1,10 +1,19 @@
+export default ComoClient;
 /**
- * Client-side entry for a node within a como application
+ * Server-side representation of a ComoNode
+ *
  * @extends ComoNode
- * @private
+ * @example
+ * import { Client } from '@soundworks/core/client.js';
+ * import { ComoClient } from '@ircam/como/client.js';
+ *
+ * const client = new Client(config);
+ * const como = new ComoClient(client);
+ * await como.start();
  */
-export default class ComoClient extends ComoNode {
+declare class ComoClient extends ComoNode {
     /**
+     * Constructs a new ComoClient instance
      *
      * @param {Client} node - Instance of soundworks client
      */

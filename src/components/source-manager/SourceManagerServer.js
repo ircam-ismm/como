@@ -6,7 +6,10 @@ import ServerPluginFilesystem from '@soundworks/plugin-filesystem/server.js';
 import SourceManager from './SourceManager.js';
 import sourceDescription from './source-description.js';
 
-export default class SourceManagerServer extends SourceManager {
+/**
+ * Server-side representation of the SourceManager;
+ */
+class SourceManagerServer extends SourceManager {
   #logger;
   #sync;
   #recordedSources = new Map();
@@ -29,6 +32,7 @@ export default class SourceManagerServer extends SourceManager {
     });
   }
 
+  /** @private */
   async start() {
     await super.start();
 
@@ -70,6 +74,7 @@ export default class SourceManagerServer extends SourceManager {
     });
   }
 
+  /** @private */
   async setProject(dirname) {
     const recordingsDirname = path.join(dirname, this.como.constants.PROJECT_RECORDINGS_DIRNAME);
 
@@ -80,3 +85,5 @@ export default class SourceManagerServer extends SourceManager {
     });
   }
 }
+
+export default SourceManagerServer;

@@ -1,7 +1,8 @@
 {
   "source": {
     "include": [
-      "src/core/"
+      "src/core/",
+      "src/components/source-manager"
     ]
   },
   "plugins": [
@@ -11,7 +12,7 @@
     "projectTitle": "como",
     "destination": "./docs/public/api",
     "encoding": "utf8",
-    "template": "./node_modules/docdash"
+    "template": "./node_modules/@ircam/jsdoc-template"
   },
   "templates": {
     "default": {
@@ -20,6 +21,9 @@
     "footer": ""
   },
   "docdash": {
+    "logo": "/como/logo-200x200.png",
+    "favicon": "/como/favicon.ico",
+    "collapse": true,
     "search": true,
     "typedefs": true,
     "sectionOrder": [
@@ -33,12 +37,9 @@
       "Tutorials",
       "Interfaces"
     ],
-    "scripts": [
-      "../api-styles.css"
-    ],
     "meta": {
-        "title": "como",
-        "description": "Documentation of the como framework"
+      "title": "como",
+      "description": "Documentation of the como framework"
     },
     "menu": {
       "Website": {

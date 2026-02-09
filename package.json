@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@ircam/eslint-config": "^2.0.1",
-    "docdash": "^2.0.2",
+    "@ircam/jsdoc-template": "^1.0.0",
     "eslint": "^9.39.1",
     "jsdoc": "^4.0.5",
     "osc-min": "^2.1.2",
