@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>ComoNode - como</title>
+    <title>ComoServer - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -51,7 +51,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">ComoNode</h1>
+    <h1 class="page-title">ComoServer</h1>
     
 
     
@@ -67,10 +67,20 @@
         
         </h2>
         
-            <div class="class-description usertext"><p>A Node in a como application.</p>
-<p>A ComoNode is a wrapper around a soundworks node (Client or Server) with dedicated functionality.</p></div>
+            <div class="class-description usertext"><p>Server-side representation of a ComoNode</p></div>
         
     
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="ComoNode.html">ComoNode</a></li>
+    </ul>
+
 
     
 </header>
@@ -85,7 +95,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="ComoNode"><span class="type-signature"></span>new ComoNode<span class="signature">(host)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ComoServer"><span class="type-signature"></span>new ComoServer<span class="signature">(server, options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -94,11 +104,14 @@
 
 <dl class="details">
     
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Constructs a new ComoServer instance</p></li></ul></dd>
+    
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_ComoNode.js.html">core/ComoNode.js</a>, <a href="core_ComoNode.js.html#line37">line 37</a>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -129,17 +142,6 @@
     
 
     
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://soundworks.dev/">https://soundworks.dev/</a></li>
-        
-            <li><a href="https://soundworks.dev/soundworks/Client.html">https://soundworks.dev/soundworks/Client.html</a></li>
-        
-            <li><a href="https://soundworks.dev/soundworks/Server.html">https://soundworks.dev/soundworks/Server.html</a></li>
-        </ul>
-    </dd>
-    
 
     
 </dl>
@@ -152,6 +154,16 @@
 
 
 
+
+
+    <h5 class="h5-examples">Example</h5>
+    
+    <pre class="prettyprint"><code>import { Server } from '@soundworks/core/server.js';
+import { ComoServer } from '@ircam/como/server.js';
+
+const server = new Server(config);
+const como = new ComoServer(server);
+await como.start();</code></pre>
 
 
 
@@ -181,15 +193,12 @@
 
         <tr>
             
-                <td class="name"><code>host</code></td>
+                <td class="name"><code>server</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Client</span>
-|
-
 <span class="param-type">Server</span>
 
 
@@ -201,7 +210,101 @@
 
             
 
-            <td class="description last"><p>Instance of soundworks client or server</p></td>
+            <td class="description last"><p>Instance of soundworks server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>projectsDirname</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>'projects'</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Directory in which the projects live (unstable)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -271,6 +374,11 @@
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#audioBufferLoader">ComoNode#audioBufferLoader</a>
+    </li></ul></dd>
+    
 
     
 
@@ -336,6 +444,11 @@
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#audioContext">ComoNode#audioContext</a>
+    </li></ul></dd>
     
 
     
@@ -403,6 +516,11 @@
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#audioScheduler">ComoNode#audioScheduler</a>
+    </li></ul></dd>
+    
 
     
 
@@ -469,6 +587,11 @@
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#components">ComoNode#components</a>
+    </li></ul></dd>
+    
 
     
 
@@ -527,6 +650,11 @@
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#host">ComoNode#host</a>
+    </li></ul></dd>
     
 
     
@@ -602,6 +730,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#id">ComoNode#id</a>
+    </li></ul></dd>
+    
 
     
 
@@ -651,6 +784,67 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="core_ComoNode.js.html">core/ComoNode.js</a>, <a href="core_ComoNode.js.html#line101">line 101</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#nodeId">ComoNode#nodeId</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="playerManager"><span class="type-signature type-signature-readonly">(readonly) </span>playerManager<span class="type-signature"> :PlayerManagerServer</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -720,6 +914,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#pluginManager">ComoNode#pluginManager</a>
+    </li></ul></dd>
+    
 
     
 
@@ -762,6 +961,62 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
 
         
             
+<h4 class="name" id="projectManager"><span class="type-signature type-signature-readonly">(readonly) </span>projectManager<span class="type-signature"> :ProjectManagerServer</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="role"><span class="type-signature type-signature-readonly">(readonly) </span>role<span class="type-signature"> :String</span></h4>
 
 
@@ -787,6 +1042,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#role">ComoNode#role</a>
+    </li></ul></dd>
     
 
     
@@ -847,6 +1107,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#runtime">ComoNode#runtime</a>
+    </li></ul></dd>
+    
 
     
 
@@ -906,6 +1171,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#scheduler">ComoNode#scheduler</a>
+    </li></ul></dd>
+    
 
     
 
@@ -948,7 +1218,7 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
 
         
             
-<h4 class="name" id="stateManager"><span class="type-signature type-signature-readonly">(readonly) </span>stateManager<span class="type-signature"></span></h4>
+<h4 class="name" id="scriptManager"><span class="type-signature type-signature-readonly">(readonly) </span>scriptManager<span class="type-signature"> :ScriptManagerServer</span></h4>
 
 
 
@@ -956,14 +1226,11 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
 
 <dl class="details">
     
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Accessor to the soundworks <code>StateManager</code></p></li></ul></dd>
-    
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_ComoNode.js.html">core/ComoNode.js</a>, <a href="core_ComoNode.js.html#line167">line 167</a>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -994,6 +1261,238 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
     
 
     
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="sessionManager"><span class="type-signature type-signature-readonly">(readonly) </span>sessionManager<span class="type-signature"> :SessionManagerServer</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="soundbankManager"><span class="type-signature type-signature-readonly">(readonly) </span>soundbankManager<span class="type-signature"> :SoundbankManagerServer</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="sourceManager"><span class="type-signature type-signature-readonly">(readonly) </span>sourceManager<span class="type-signature"> :<a href="SourceManagerServer.html">SourceManagerServer</a></span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="stateManager"><span class="type-signature type-signature-readonly">(readonly) </span>stateManager<span class="type-signature"></span></h4>
+
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Accessor to the soundworks <code>StateManager</code></p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoNode.js.html">core/ComoNode.js</a>, <a href="core_ComoNode.js.html#line167">line 167</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#stateManager">ComoNode#stateManager</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
@@ -1002,6 +1501,62 @@ through query parameter, i.e. http://host.local?id=my-client-id</li>
             <li><a href="https://soundworks.dev/soundworks/ServerStateManager.html">https://soundworks.dev/soundworks/ServerStateManager.html</a></li>
         </ul>
     </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="store"><span class="type-signature type-signature-readonly">(readonly) </span>store<span class="type-signature"> :KeyValueStoreServer</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_ComoServer.js.html">core/ComoServer.js</a>, <a href="core_ComoServer.js.html#line106">line 106</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -1055,6 +1610,11 @@ should be called before the <code><a href="ComoNode.html#start">ComoNode#start</
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#init">ComoNode#init</a>
+    </li></ul></dd>
     
 
     
@@ -1154,6 +1714,11 @@ use at your own risk.</p></li></ul></dd>
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#requestRfc">ComoNode#requestRfc</a>
+    </li></ul></dd>
     
 
     
@@ -1417,6 +1982,11 @@ use at your own risk.</p></li></ul></dd>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#setProject">ComoNode#setProject</a>
+    </li></ul></dd>
+    
 
     
 
@@ -1553,6 +2123,11 @@ use at your own risk.</p></li></ul></dd>
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#setRfcHandler">ComoNode#setRfcHandler</a>
+    </li></ul></dd>
     
 
     
@@ -1716,6 +2291,11 @@ use at your own risk.</p></li></ul></dd>
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#setRfcResolverHook">ComoNode#setRfcResolverHook</a>
+    </li></ul></dd>
+    
 
     
 
@@ -1877,6 +2457,11 @@ This method will implicitly execute <a href="ComoNode.html#init">ComoNode#init</
     
 
     
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#start">ComoNode#start</a>
+    </li></ul></dd>
+    
 
     
 
@@ -1978,6 +2563,11 @@ meant for testing purposes.</li>
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="ComoNode.html#stop">ComoNode#stop</a>
+    </li></ul></dd>
     
 
     

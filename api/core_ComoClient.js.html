@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Home - como</title>
+    <title>core/ComoClient.js - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -51,31 +51,110 @@
 
 <div id="main">
     
+    <h1 class="page-title">core/ComoClient.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import ComoNode from './ComoNode.js';
 
+import ClientPluginPlatformInit from '@soundworks/plugin-platform-init/client.js';
 
-    <section class="package">
-        <h3> </h3>		
+// components
+import SourceManagerClient from '../components/source-manager/SourceManagerClient.js';
+import ProjectManagerClient from '../components/project-manager/ProjectManagerClient.js';
+import ScriptManagerClient from '../components/script-manager/ScriptManagerClient.js';
+import SoundbankManagerClient from '../components/soundbank-manager/SoundbankManagerClient.js';
+import SessionManagerClient from '../components/session-manager/SessionManagerClient.js';
+import PlayerManagerClient from '../components/player-manager/PlayerManagerClient.js';
+import KeyValueStoreClient from '../components/key-value-store/KeyValueStoreClient.js';
+
+/**
+ * Server-side representation of a ComoNode
+ *
+ * @extends ComoNode
+ * @example
+ * import { Client } from '@soundworks/core/client.js';
+ * import { ComoClient } from '@ircam/como/client.js';
+ *
+ * const client = new Client(config);
+ * const como = new ComoClient(client);
+ * await como.start();
+ */
+class ComoClient extends ComoNode {
+  /**
+   * Constructs a new ComoClient instance
+   *
+   * @param {Client} node - Instance of soundworks client
+   */
+  constructor(node) {
+    super(node);
+
+    this.pluginManager.register('platform-init', ClientPluginPlatformInit, {
+      audioContext: this.audioContext,
+    });
+
+    /**
+     * @member sourceManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {SourceManagerClient}
+     */
+    new SourceManagerClient(this, 'sourceManager');
+    /**
+     * @member projectManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {ProjectManagerClient}
+     */
+    new ProjectManagerClient(this, 'projectManager');
+    /**
+     * @member scriptManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {ScriptManagerClient}
+     */
+    new ScriptManagerClient(this, 'scriptManager');
+    /**
+     * @member soundbankManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {SoundbankManagerClient}
+     */
+    new SoundbankManagerClient(this, 'soundbankManager');
+    /**
+     * @member sessionManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {SessionManagerClient}
+     */
+    new SessionManagerClient(this, 'sessionManager');
+    /**
+     * @member playerManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {PlayerManagerClient}
+     */
+    new PlayerManagerClient(this, 'playerManager');
+    /**
+     * @member store
+     * @memberof ComoClient#
+     * @readonly
+     * @type {KeyValueStoreClient}
+     */
+    new KeyValueStoreClient(this, 'store');
+  }
+}
+
+export default ComoClient;
+</code></pre>
+        </article>
     </section>
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
 
 
 
