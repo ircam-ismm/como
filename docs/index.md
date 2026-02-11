@@ -15,9 +15,8 @@ layout: page
         <img style="width: auto; height: 20px; margin-top: 20px;" src="https://badge.fury.io/js/@soundworks%2Fcore.svg" />
       </a>
     </p>
-    <p>[![npm version](https://badge.fury.io/js/@ircam%2Fcomo.svg)](https://badge.fury.io/js/@ircam%2Fcomo)</p>
     <p>
-      Como applies in artistic creation and pedagogy, workshops, as well as to education and rehabition. Specific applications are derived from the generic framework, such as CoMo Education, Como-Rehabiliation or CoMo-Vox (in collaboration with Radio France, supported by the Ministere of Education).
+      Como can apply in artistic creation and pedagogy, workshops, as well as to education and rehabition. Specific applications have been derived from the generic framework, such as CoMo Education, Como-Rehabiliation or CoMo-Vox (in collaboration with Radio France, supported by the Ministere of Education).
     </p>
   </div>
 
