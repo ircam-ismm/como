@@ -9,8 +9,13 @@ layout: page
   <div>
     <img src="./assets/home/logo-400x400.png" rel="logo" style="float: left; margin-right: 20px;  width: 300px; height: 300px;" />
     <p style="font-style: italic; margin-bottom: 10px;">
-      Como (for <i>collective movement</i>) is a framework to develop web applications for gesture/movement interaction with sounds.
+      Como (for <i>Collective Movement</i>) is a fullstack javascript framework for movement / sound interaction applications.
+      <br />
+      <a ref="https://badge.fury.io/js/@soundworks%2Fcore">
+        <img style="width: auto; height: 20px; margin-top: 20px;" src="https://badge.fury.io/js/@soundworks%2Fcore.svg" />
+      </a>
     </p>
+    <p>[![npm version](https://badge.fury.io/js/@ircam%2Fcomo.svg)](https://badge.fury.io/js/@ircam%2Fcomo)</p>
     <p>
       Como applies in artistic creation and pedagogy, workshops, as well as to education and rehabition. Specific applications are derived from the generic framework, such as CoMo Education, Como-Rehabiliation or CoMo-Vox (in collaboration with Radio France, supported by the Ministere of Education).
     </p>

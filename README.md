@@ -4,11 +4,11 @@
 
 ![como logo](./docs/public/logo-200x200.png)
 
-Como (for <i>Collective Movement</i>) is a framework to develop web applications for gesture/movement interaction with sounds.
+Como (for <i>Collective Movement</i>) is a fullstack javascript framework for movement / sound interaction applications
 
 ## Documentation
 
-<ircam-ismm.github.io/como/>
+<https://ircam-ismm.github.io/como/>
 
 ## Credits
 
