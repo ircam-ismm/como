@@ -13,6 +13,7 @@ class ComoSoundbankManager extends LitElement {
   static properties = {
     sessionId: {
       type: String,
+      attribute: 'session-id'
     },
     expanded: {
       type: Boolean,

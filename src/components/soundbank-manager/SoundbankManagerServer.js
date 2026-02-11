@@ -4,7 +4,12 @@ import ServerPluginFilesystem from '@soundworks/plugin-filesystem/server.js';
 
 import SoundbankManager from './SoundbankManager.js';
 
-export default class SoundbankManagerServer extends SoundbankManager {
+/**
+ * Server-side representation of the {@link SoundbankManager}
+ *
+ * @extends {SoundbankManager}
+ */
+class SoundbankManagerServer extends SoundbankManager {
   constructor(como, name) {
     super(como, name);
 
@@ -34,3 +39,5 @@ export default class SoundbankManagerServer extends SoundbankManager {
     }, true);
   }
 }
+
+export default SoundbankManagerServer;

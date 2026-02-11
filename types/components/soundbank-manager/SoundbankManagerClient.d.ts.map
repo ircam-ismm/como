@@ -1,1 +1,1 @@
-{"version":3,"file":"SoundbankManagerClient.d.ts","sourceRoot":"","sources":["../../../src/components/soundbank-manager/SoundbankManagerClient.js"],"names":[],"mappings":"AAQA;IAOE,uBAMC;CACF;6BAhB4B,uBAAuB"}
+{"version":3,"file":"SoundbankManagerClient.d.ts","sourceRoot":"","sources":["../../../src/components/soundbank-manager/SoundbankManagerClient.js"],"names":[],"mappings":";AAQA;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA4BG;AACH;IACE,kCAIC;IAED,uBAMC;CACF;6BA7C4B,uBAAuB"}

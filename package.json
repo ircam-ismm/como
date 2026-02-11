@@ -26,15 +26,19 @@
     "test:only": "npx mocha",
     "types": "rm -rf types && tsc",
     "docs:api": "npm run types && rm -rf docs/public/api && jsdoc -c .jsdoc --verbose",
+    "docs:api:watch": "nodemon --watch src --exec \"npm run docs:api\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "docs:watch": "concurrently \"npm run docs:dev\" \"npm run docs:api:watch\""
   },
   "devDependencies": {
     "@ircam/eslint-config": "^2.0.1",
-    "@ircam/jsdoc-template": "^1.1.0",
+    "@ircam/jsdoc-template": "^1.1.1",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "jsdoc": "^4.0.5",
+    "nodemon": "^3.1.11",
     "osc-min": "^2.1.2",
     "typescript": "^5.9.3",
     "vitepress": "^2.0.0-alpha.16",

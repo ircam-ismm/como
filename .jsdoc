@@ -3,7 +3,8 @@
     "include": [
       "src/core/",
       "src/components/source-manager",
-      "src/components/session-manager"
+      "src/components/session-manager",
+      "src/components/soundbank-manager"
     ]
   },
   "plugins": [
