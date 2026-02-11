@@ -210,6 +210,8 @@ export default class Player {
     }
 
     this.#script = null;
+    // explicitly set last state to null as we change the script
+    this.#scriptLastState = null;
 
     if (scriptName == null) {
       return;
@@ -218,9 +220,9 @@ export default class Player {
     this.#script = await this.#como.scriptManager.attach(scriptName);
     this.#script.onUpdate(async updates => {
       if ('runtimeError' in updates && updates.runtimeError !== null) {
-        console.log(updates.runtimeError);
-        return;
         // silently release the script, we don't want to pack up runtime errors
+        console.log(updates.runtimeError);
+        console.log('releasing script');
         this.#releaseScript({ silent: true });
         return;
       }
@@ -298,23 +300,21 @@ export default class Player {
 
     this.#scriptModule = null;
     this.#scriptSharedState = null;
-    this.#scriptLastState = null;
     this.#scriptContext = null;
   }
 
   async #reloadScript() {
+    // keep current shared state values to maintain state after reload
+    // note that when the script changes, this is explicitly set to null
+    if (this.#scriptSharedState) {
+      this.#scriptLastState = {
+        description: this.#scriptSharedState.getDescription(),
+        values: this.#scriptSharedState.getValues(),
+      }
+    }
+
     // release old version of the script
     await this.#releaseScript();
-
-    // do nothing if there is no valid build for this platform
-    // console.log(this.#script.getValues());
-    // if (this.#como.runtime === 'node' && this.#script.nodeBuild === null) {
-    //   return;
-    // }
-
-    // if (this.#como.runtime === 'browser' && this.#script.browserBuild === null) {
-    //   return;
-    // }
 
     // import script and check API
     try {
@@ -358,7 +358,7 @@ export default class Player {
     // create shared state for this script if any
     if (this.#scriptModule.defineSharedState) {
       // 1. validate class description
-      const {
+      let {
         classDescription,
         initValues,
       } = await this.#scriptModule.defineSharedState();
@@ -389,25 +389,41 @@ export default class Player {
       }
 
       // 3. merge init values from last script instance
-      // if no init values have been explicitly defined in the script
-      // try to propagate the values from last state instance to the new one
-      // if (initValues === null && this.#scriptLastState !== null) {
-      //   initValues = {};
-      //   for (let key in classDescription) {
-      //     if (key in this.#scriptLastState.values) {
-      //       // use value from last state only if default is the same
-      //       if (classDescription[key].default === this.#scriptLastState.description[key].default) {
-      //         initValues[key] = this.#scriptLastState.values[key];
-      //       }
-      //     }
-      //   }
-      // } else {
-      //   initValues = {};
-      // }
+      if (!initValues) {
+        initValues = {};
+
+        // if no init values have been explicitly defined in the script
+        // try to propagate the values from last state instance to the new one
+        if (this.#scriptLastState !== null) {
+          for (let key in classDescription) {
+            if (key in this.#scriptLastState.values) {
+              // use value from last state only if default is the same
+              if (classDescription[key].default === this.#scriptLastState.description[key].default) {
+                initValues[key] = this.#scriptLastState.values[key];
+              }
+            }
+          }
+        }
+      }
 
       // 4. create script shared state
       // @todo - Proxy this.#scriptSharedState to report runtime errors
       this.#scriptSharedState = await this.#como.stateManager.create(className, initValues);
+      // override onUpdate to wrap given callbacks in a try catch block
+      // const originalOnUpdate = this.#scriptSharedState.onUpdate;
+      // this.#scriptSharedState.onUpdate = (callback, executeListener) => {
+      //   const wrappedCallback = (...args) => {
+      //     try {
+      //       callback(...args);
+      //     } catch (err) {
+      //       this.#script.reportRuntimeError(err);
+      //       this.#scriptErrored = true;
+      //     }
+      //   }
+
+      //   return originalOnUpdate.call(this.#scriptSharedState, wrappedCallback, executeListener);
+      // }
+
 
       // 5. propagate shared state infos
       this.#state.set({
