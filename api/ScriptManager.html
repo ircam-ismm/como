@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>SourceManagerServer - como</title>
+    <title>ScriptManager - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -50,7 +50,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">SourceManagerServer</h1>
+    <h1 class="page-title">ScriptManager</h1>
     
 
     
@@ -66,113 +66,16 @@
         
         </h2>
         
-            <div class="class-description usertext"><p>Server-side representation of the SourceManager.</p></div>
+            <div class="class-description usertext"><p>The ScriptManager component is responsible for creating and managing
+dynamic scripts.</p>
+<p>Basically a wrapper around <a href="https:%5C/%5C/github.com/collective-soundworks/soundworks-plugin-scripting/">https://github.com/collective-soundworks/soundworks-plugin-scripting/</a></p></div>
         
     
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="SourceManager.html">SourceManager</a></li>
-    </ul>
-
 
     
 </header>
 
 <article>
-    
-        <div class="container-overview">
-        
-            
-
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="SourceManagerServer"><span class="type-signature"></span>new SourceManagerServer<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManagerServer.js.html">components/source-manager/SourceManagerServer.js</a>, <a href="components_source-manager_SourceManagerServer.js.html#line13">line 13</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        </div>
     
 
     
@@ -186,142 +89,6 @@
     
 
     
-        <h3 class="subsection-title">Attributes</h3>
-
-        
-            
-<h4 class="name" id="list"><span class="type-signature type-signature-readonly">(readonly) </span>list<span class="type-signature"> :Array.&lt;String></span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>List of current source ids.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line88">line 88</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#list">SourceManager#list</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="sources"><span class="type-signature type-signature-readonly">(readonly) </span>sources<span class="type-signature"> :SharedStateCollection</span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Lightweight collection of all the sources on the network. The collection
-only contains information that allows to monitor or control the sources,
-but does not contain the actual stream of data.</p>
-<p>If a node is interested in a particular motion stream source, it should
-explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.html#getSource">SourceManager#getSource</a>.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line78">line 78</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#sources">SourceManager#sources</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -331,7 +98,7 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
 
     
 
-    <h4 class="name" id="createSource"><span class="type-signature type-signature-async">(async) </span>createSource<span class="signature">(config, nodeId<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="attach"><span class="type-signature type-signature-async">(async) </span>attach<span class="signature">(name)</span><span class="type-signature"> &rarr; {Promise.&lt;SharedScript>}</span></h4>
 
     
 
@@ -341,13 +108,13 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Create a new como source.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Attach to a script.</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line185">line 185</a>
+        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -358,10 +125,370 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#createSource">SourceManager#createSource</a>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the script</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;SharedScript></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getCollection"><span class="type-signature type-signature-async">(async) </span>getCollection<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;SharedStateCollection>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Return the SharedStateCollection of all the scripts underlying share states.
+Provided for build and error monitoring purposes. Can also be used to maintain
+a list of existing script, e.g. in a drop-down menu</p>
+<p>If you want a full featured / executable Script instance, use the attach instead.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line54">line 54</a>
     </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;SharedStateCollection></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getList"><span class="type-signature"></span>getList<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;String>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Returns the list of all available scripts.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;String></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onUpdate"><span class="type-signature"></span>onUpdate<span class="signature">(callback, executeListener<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Register callback to execute when a script is created or deleted.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -428,13 +555,13 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
 
         <tr>
             
-                <td class="name"><code>config</code></td>
+                <td class="name"><code>callback</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">function</span>
 
 
 
@@ -457,20 +584,20 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
                 </td>
             
 
-            <td class="description last"><p>The configuration object for the source.</p></td>
+            <td class="description last"><p>Function to execute</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>nodeId</code></td>
+                <td class="name"><code>executeListener</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -492,13 +619,12 @@ explicity retrieve to the &quot;full&quot; source using <a href="SourceManager.h
             
                 <td class="default">
                 
-                    <code>this.como.nodeId</code>
+                    <code>false</code>
                 
                 </td>
             
 
-            <td class="description last"><p>If given, creates the source on
-given como node.</p></td>
+            <td class="description last"><p>If true, execute the given callback immediately.</p></td>
         </tr>
 
     
@@ -520,1017 +646,6 @@ given como node.</p></td>
 
 
 
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The id of the created source</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="deleteRecording"><span class="type-signature type-signature-async">(async) </span>deleteRecording<span class="signature">(Filename)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Delete a given recording.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line285">line 285</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#deleteRecording">SourceManager#deleteRecording</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>Filename</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Filename</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Filename of the recording</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="deleteSource"><span class="type-signature type-signature-async">(async) </span>deleteSource<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p><em>NOT IMPLEMENTED YET</em></p>
-<p>Delete an existing source.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line211">line 211</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#deleteSource">SourceManager#deleteSource</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="getSource"><span class="type-signature type-signature-async">(async) </span>getSource<span class="signature">(sourceId)</span><span class="type-signature"> &rarr; {SharedState|null}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Retrieve the full version of a source (i.e. with its stream) from its id.</p>
-<p>If the node is the owner of the source, the retrieved source will be the owned
-original instance of the shared state.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line160">line 160</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#getSource">SourceManager#getSource</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>sourceId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">SharedState</span>
-|
-
-<span class="param-type">null</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="getSourceFiltered"><span class="type-signature"></span>getSourceFiltered<span class="signature">(sourceId)</span><span class="type-signature"> &rarr; {SharedState|undefined}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Return the lightweight version of a source (i.e. without its stream) from its id.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line147">line 147</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#getSourceFiltered">SourceManager#getSourceFiltered</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>sourceId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">SharedState</span>
-|
-
-<span class="param-type">undefined</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="listRecordings"><span class="type-signature"></span>listRecordings<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Returns the list of the existing recordings.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line268">line 268</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#listRecordings">SourceManager#listRecordings</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The file tree of the projects's recordings directory</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="readRecording"><span class="type-signature type-signature-async">(async) </span>readRecording<span class="signature">(Filename)</span><span class="type-signature"> &rarr; {Blob}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Retrieve the content of a given recording.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line277">line 277</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#readRecording">SourceManager#readRecording</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>Filename</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Filename</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Filename of the recording</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Blob</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="sourceExists"><span class="type-signature"></span>sourceExists<span class="signature">(sourceId)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Check whether the given source id correspond to an existing source</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_source-manager_SourceManager.js.html">components/source-manager/SourceManager.js</a>, <a href="components_source-manager_SourceManager.js.html#line137">line 137</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="SourceManager.html#sourceExists">SourceManager#sourceExists</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>sourceId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-    
 
 
 
