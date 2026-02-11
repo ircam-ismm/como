@@ -1,1 +1,1 @@
-{"version":3,"file":"Player.d.ts","sourceRoot":"","sources":["../../../src/components/player-manager/Player.js"],"names":[],"mappings":"AAiBA;IAsBE,sCAaC;IAED,cAEC;IAED,kBAEC;IAED,kBAEC;IAED,iBAEC;IAcD,qCAsGC;IAED,wBAUC;IAED,2CAwCC;;CAiOF"}
+{"version":3,"file":"Player.d.ts","sourceRoot":"","sources":["../../../src/components/player-manager/Player.js"],"names":[],"mappings":"AAiBA;IAsBE,sCAaC;IAED,cAEC;IAED,kBAEC;IAED,kBAEC;IAED,iBAEC;IAcD,qCAsGC;IAED,wBAUC;IAED,2CA0CC;;CA+OF"}

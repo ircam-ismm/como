@@ -4,7 +4,8 @@
       "src/core/",
       "src/components/source-manager",
       "src/components/session-manager",
-      "src/components/soundbank-manager"
+      "src/components/soundbank-manager",
+      "src/components/script-manager"
     ]
   },
   "plugins": [
@@ -16,6 +17,9 @@
     "encoding": "utf8",
     "template": "./node_modules/@ircam/jsdoc-template"
   },
+  "tags": {
+		"allowUnknownTags": true
+	},
   "templates": {
     "default": {
       "useLongnameInNav": true

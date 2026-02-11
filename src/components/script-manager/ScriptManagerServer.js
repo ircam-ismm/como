@@ -4,7 +4,12 @@ import ServerPluginScripting from '@soundworks/plugin-scripting/server.js';
 
 import ScriptManager from './ScriptManager.js';
 
-export default class ScriptManagerServer extends ScriptManager {
+/**
+ * Server-side representation of the {@link ScriptManager}
+ *
+ * @extends {ScriptManager}
+ */
+class ScriptManagerServer extends ScriptManager {
   constructor(como, name) {
     super(como, name);
 
@@ -24,3 +29,5 @@ export default class ScriptManagerServer extends ScriptManager {
     }, true);
   }
 }
+
+export default ScriptManagerServer;

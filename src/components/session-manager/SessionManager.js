@@ -48,6 +48,7 @@ class SessionManager extends ComoComponent {
     return this.#sessions;
   }
 
+  /** @private */
   async start() {
     await super.start();
 

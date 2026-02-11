@@ -5,7 +5,12 @@ import {
 
 import ScriptManager from './ScriptManager.js';
 
-export default class ScriptManagerClient extends ScriptManager {
+/**
+ * Client-side representation of the {@link ScriptManager}
+ *
+ * @extends {ScriptManager}
+ */
+class ScriptManagerClient extends ScriptManager {
   constructor(como, name) {
     super(como, name);
 
@@ -21,4 +26,4 @@ export default class ScriptManagerClient extends ScriptManager {
   }
 }
 
-
+export default ScriptManagerClient

@@ -116,6 +116,7 @@ class SoundbankManager extends ComoComponent {
   /**
    * Get an AudioBuffer from its filename
    *
+   * @stability unstable
    * @param {String} filename - Filename of the related audio buffer
    * @returns {AudioBuffer}
    */
