@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>ScriptManagerClient - como</title>
+    <title>KeyValueStore - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -50,7 +50,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">ScriptManagerClient</h1>
+    <h1 class="page-title">KeyValueStore</h1>
     
 
     
@@ -66,35 +66,47 @@
         
         </h2>
         
-            <div class="class-description usertext"><p>Client-side representation of the <a href="ScriptManager.html">ScriptManager</a></p></div>
+            <div class="class-description usertext"><p>The KeyValueStore component allows to store and and retrieve key value pairs
+on the filesystem.</p>
+<p>For example, the KeyValueStore can be helpful to:</p>
+<ul>
+<li>store and retrieve information between application restarts.</li>
+<li>share values between different script instances</li>
+<li>etc.</li>
+</ul>
+<pre class="prettyprint source lang-js"><code>como.store.set('hello', 'world');
+const world = como.store.get('hello');
+</code></pre></div>
         
     
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="ScriptManager.html">ScriptManager</a></li>
-    </ul>
-
 
     
 </header>
 
 <article>
     
-        <div class="container-overview">
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
         
             
 
     
-    <h2>Constructor</h2>
-    
 
-    <h4 class="name" id="ScriptManagerClient"><span class="type-signature"></span>new ScriptManagerClient<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="clear"><span class="type-signature type-signature-async">(async) </span>clear<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
@@ -103,11 +115,14 @@
 
 <dl class="details">
     
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Clear all values from the store</p></li></ul></dd>
+    
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_script-manager_ScriptManagerClient.js.html">components/script-manager/ScriptManagerClient.js</a>, <a href="components_script-manager_ScriptManagerClient.js.html#line13">line 13</a>
+        <a href="components_key-value-store_KeyValueStore.js.html">components/key-value-store/KeyValueStore.js</a>, <a href="components_key-value-store_KeyValueStore.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -172,30 +187,11 @@
 
 
         
-        </div>
-    
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
             
 
     
 
-    <h4 class="name" id="attach"><span class="type-signature type-signature-async">(async) </span>attach<span class="signature">(name)</span><span class="type-signature"> &rarr; {Promise.&lt;SharedScript>}</span></h4>
+    <h4 class="name" id="delete"><span class="type-signature type-signature-async">(async) </span>delete<span class="signature">(key)</span><span class="type-signature"></span></h4>
 
     
 
@@ -205,13 +201,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Attach to a script.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Delete a key / value pair</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line74">line 74</a>
+        <a href="components_key-value-store_KeyValueStore.js.html">components/key-value-store/KeyValueStore.js</a>, <a href="components_key-value-store_KeyValueStore.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -221,11 +217,6 @@
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="ScriptManager.html#attach">ScriptManager#attach</a>
-    </li></ul></dd>
     
 
     
@@ -288,7 +279,7 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
@@ -305,7 +296,142 @@
 
             
 
-            <td class="description last"><p>Name of the script</p></td>
+            <td class="description last"><p>Key of the key / value pair to delete</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="get"><span class="type-signature type-signature-async">(async) </span>get<span class="signature">(key)</span><span class="type-signature"> &rarr; {Any}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Get a stored value.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_key-value-store_KeyValueStore.js.html">components/key-value-store/KeyValueStore.js</a>, <a href="components_key-value-store_KeyValueStore.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Key of the value to retrieve</p></td>
         </tr>
 
     
@@ -330,6 +456,10 @@
 <h5 class="h5-returns">Returns:</h5>
 
         
+<div class="param-desc">
+    <p>The value associated to the key</p>
+</div>
+
 
 
 <dl class="param-type">
@@ -338,7 +468,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;SharedScript></span>
+<span class="param-type">Any</span>
 
 
 
@@ -354,7 +484,7 @@
 
     
 
-    <h4 class="name" id="getCollection"><span class="type-signature type-signature-async">(async) </span>getCollection<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;SharedStateCollection>}</span></h4>
+    <h4 class="name" id="set"><span class="type-signature type-signature-async">(async) </span>set<span class="signature">(key, value)</span><span class="type-signature"></span></h4>
 
     
 
@@ -364,16 +494,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Return the SharedStateCollection of all the scripts underlying share states.
-Provided for build and error monitoring purposes. Can also be used to maintain
-a list of existing script, e.g. in a drop-down menu</p>
-<p>If you want a full featured / executable Script instance, use the attach instead.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Store a key / value pair</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line54">line 54</a>
+        <a href="components_key-value-store_KeyValueStore.js.html">components/key-value-store/KeyValueStore.js</a>, <a href="components_key-value-store_KeyValueStore.js.html#line44">line 44</a>
     </li></ul></dd>
     
 
@@ -383,229 +510,6 @@ a list of existing script, e.g. in a drop-down menu</p>
 
     
 
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="ScriptManager.html#getCollection">ScriptManager#getCollection</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;SharedStateCollection></span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="getList"><span class="type-signature"></span>getList<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;String>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Returns the list of all available scripts.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line42">line 42</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="ScriptManager.html#getList">ScriptManager#getList</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;String></span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="onUpdate"><span class="type-signature"></span>onUpdate<span class="signature">(callback, executeListener<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Register callback to execute when a script is created or deleted.</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_script-manager_ScriptManager.js.html">components/script-manager/ScriptManager.js</a>, <a href="components_script-manager_ScriptManager.js.html#line64">line 64</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="ScriptManager.html#onUpdate">ScriptManager#onUpdate</a>
-    </li></ul></dd>
     
 
     
@@ -656,11 +560,7 @@ a list of existing script, e.g. in a drop-down menu</p>
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -672,13 +572,13 @@ a list of existing script, e.g. in a drop-down menu</p>
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">String</span>
 
 
 
@@ -686,35 +586,23 @@ a list of existing script, e.g. in a drop-down menu</p>
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last"><p>Function to execute</p></td>
+            <td class="description last"><p>Key of the value to store</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>executeListener</code></td>
+                <td class="name"><code>value</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Any</span>
 
 
 
@@ -722,26 +610,10 @@ a list of existing script, e.g. in a drop-down menu</p>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    <code>false</code>
-                
-                </td>
-            
 
-            <td class="description last"><p>If true, execute the given callback immediately.</p></td>
+            <td class="description last"><p>Value to store</p></td>
         </tr>
 
     
