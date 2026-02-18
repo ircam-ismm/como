@@ -3,7 +3,7 @@ export default ComoClient;
  * Server-side representation of a ComoNode
  *
  * @extends ComoNode
- * @example
+ * @examplekeyValueStore
  * import { Client } from '@soundworks/core/client.js';
  * import { ComoClient } from '@ircam/como/client.js';
  *

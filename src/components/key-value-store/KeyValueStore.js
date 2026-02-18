@@ -3,8 +3,17 @@ import ComoComponent from '../../core/ComoComponent.js';
 
 /**
  * The KeyValueStore component allows to store and and retrieve key value pairs
- * on the filesystem, allowing to store and retrieve information between application
- * restarts.
+ * on the filesystem.
+ *
+ * For example, the KeyValueStore can be helpful to:
+ * - store and retrieve information between application restarts.
+ * - share values between different script instances
+ * - etc.
+ *
+ * ```js
+ * como.store.set('hello', 'world');
+ * const world = como.store.get('hello');
+ * ```
  */
 class KeyValueStore extends ComoComponent {
   /**

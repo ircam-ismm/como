@@ -15,7 +15,7 @@ import KeyValueStoreClient from '../components/key-value-store/KeyValueStoreClie
  * Server-side representation of a ComoNode
  *
  * @extends ComoNode
- * @example
+ * @examplekeyValueStore
  * import { Client } from '@soundworks/core/client.js';
  * import { ComoClient } from '@ircam/como/client.js';
  *
@@ -79,12 +79,12 @@ class ComoClient extends ComoNode {
      */
     new PlayerManagerClient(this, 'playerManager');
     /**
-     * @member store
+     * @member keyValueStore
      * @memberof ComoClient#
      * @readonly
      * @type {KeyValueStoreClient}
      */
-    new KeyValueStoreClient(this, 'store');
+    new KeyValueStoreClient(this, 'keyValueStore');
   }
 }
 

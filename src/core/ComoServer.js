@@ -104,12 +104,12 @@ class ComoServer extends ComoNode {
      */
     new PlayerManagerServer(this, 'playerManager');
     /**
-     * @member store
+     * @member keyValueStore
      * @memberof ComoServer#
      * @readonly
      * @type {KeyValueStoreServer}
      */
-    new KeyValueStoreServer(this, 'store');
+    new KeyValueStoreServer(this, 'keyValueStore');
 
     this.setRfcHandler('como:setProject', this.#setProject);
   }
