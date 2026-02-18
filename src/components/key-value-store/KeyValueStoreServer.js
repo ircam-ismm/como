@@ -1,6 +1,11 @@
 import KeyValueStore from './KeyValueStore.js';
 
-export default class KeyValueStoreServer extends KeyValueStore {
+/**
+ * Client-side representation of the {@link KeyValueStore}
+ *
+ * @extends {KeyValueStore}
+ */
+class KeyValueStoreServer extends KeyValueStore {
   #db;
 
   constructor(como) {
@@ -30,3 +35,5 @@ export default class KeyValueStoreServer extends KeyValueStore {
     return this.#db.delete();
   }
 }
+
+export default KeyValueStoreServer;

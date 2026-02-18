@@ -2,10 +2,11 @@
   "source": {
     "include": [
       "src/core/",
-      "src/components/source-manager",
+      "src/components/key-value-store",
+      "src/components/script-manager",
       "src/components/session-manager",
       "src/components/soundbank-manager",
-      "src/components/script-manager"
+      "src/components/source-manager"
     ]
   },
   "plugins": [

@@ -1,3 +1,10 @@
+- [ ] `scriptName` & `scriptSharedStateClassName` are not updated at the sae time which is confusing
+  + workaround `scriptNameRequest` -> [`scriptName` & `scriptSharedStateClassName`]
+- [ ] implement `player.getScriptSharedState`
+- [ ]
+    allow to `playerManager.getPlayer` to have player instances that do not mirror the script
+    OR `playerManager.getPlayerState()`
+
 
 - [ ] make sure projects directory can live alongside (not within) the application
 - [ ] documentation

@@ -1,3 +1,10 @@
 import KeyValueStore from './KeyValueStore.js';
 
-export default class KeyValueStoreClient extends KeyValueStore {}
+/**
+ * Client-side representation of the {@link KeyValueStore}
+ *
+ * @extends {KeyValueStore}
+ */
+class KeyValueStoreClient extends KeyValueStore {}
+
+export default KeyValueStoreClient;
