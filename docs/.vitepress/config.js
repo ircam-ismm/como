@@ -20,10 +20,12 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'API', link: '/api/index.html', target: '_blank' },
+      { text: 'API', link: '/api/index.html', target: '_self' },
     ],
 
     sidebar: [
+      { text: 'Introduction', link: '/introduction' },
+      { text: 'API', link: '/api/index.html', target: '_self' },
       {
         text: 'Generalities',
         items: [
