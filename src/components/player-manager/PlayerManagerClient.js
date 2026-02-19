@@ -4,7 +4,12 @@ import {
 
 import PlayerManager from './PlayerManager.js';
 
-export default class PlayerManagerClient extends PlayerManager {
+/**
+ * Client-side representation of the {@link PlayerManager}
+ *
+ * @extends {PlayerManager}
+ */
+class PlayerManagerClient extends PlayerManager {
   async start() {
     await super.start();
 
@@ -14,3 +19,5 @@ export default class PlayerManagerClient extends PlayerManager {
     }
   }
 }
+
+export default PlayerManagerClient;

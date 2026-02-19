@@ -12,10 +12,18 @@ import {
  * - source
  * - script
  * - optional shared state defined in script
+ * @private
  */
 const idGenerator = counter();
 
-export default class Player {
+/**
+ * The `Player` class represents a full-featured player instance defined as a link
+ * between a {@link ComoSource} and a {@link ComoScript}.
+ *
+ * A player is always instantiated on a given {@ComoNode}, although it si possible to
+ * create a mirror of a Player on a different node.
+ */
+class Player {
   #como;
   #sourceId;
   #state;
@@ -36,7 +44,11 @@ export default class Player {
   #outputNode;
   #sessionSoundbank = null;
 
-
+  /**
+   * @hideconstructor
+   * @param {*} como
+   * @param {*} sourceId
+   */
   constructor(como, sourceId) {
     // @todo - check arguments
 
@@ -52,25 +64,42 @@ export default class Player {
       .connect(this.#como.audioContext.destination);
   }
 
+  /**
+   * Id of the player
+   * @type {String}
+   */
   get id() {
     return this.state.get('id');
   }
 
+  /**
+   * Id of the como node
+   * @type {String}
+   */
   get nodeId() {
     return this.state.get('nodeId');
   }
 
+  /**
+   * Source of the player
+   * @type {SharedState}
+   */
   get source() {
     return this.#source;
   }
 
+  /**
+   * Underlying state of the player.
+   * @type {SharedState}
+   */
   get state() {
     return this.#state;
   }
 
   /**
-   * Reconnect output node to destination, this allows to have a script running
-   * outside a session.
+   * Reconnect output node to destination.
+   * Allows to have a script running outside a session.
+   * @private
    */
   #reconnectDestination() {
     // re-connect
@@ -80,6 +109,7 @@ export default class Player {
     this.#outputNode.gain.linearRampToValueAtTime(1, fadeInTime + 0.01);
   }
 
+  /** @private */
   async init(withState = null) {
     if (!this.#como.sourceManager.sourceExists(this.#sourceId)) {
       throw new Error(`Cannot execute "createPlayer" on PlayerManager: source with id ${this.#sourceId} does not exists`);
@@ -184,18 +214,27 @@ export default class Player {
     });
   }
 
+  /**
+   * Delete the player
+   */
   async delete() {
     // if the source is not owned we can delete it safely
     if (!this.#source.isOwned) {
       await this.#source.detach();
     }
 
-    // only delete "real" state, not attached ones
+    // Only delete "real" state, not attached ones.
+    // They must still live in the stateManager collection.
     if (this.#state.isOwned) {
       await this.#state.delete();
     }
   }
 
+  /**
+   * Set the script associated to this player
+   * @param {String} [scriptName=null] - Name of the script. If null just exit
+   *  from current script.
+   */
   async setScript(scriptName = null) {
     if (this.#state.get('scriptName') !== scriptName) {
       // Keep state in sync if method is called directly
@@ -240,6 +279,7 @@ export default class Player {
     return this.#reloadScript();
   }
 
+  /** @private */
   async #releaseScript({ silent = false } = {}) {
     // stop listening from the source
     if (this.#unsubscribeSource) {
@@ -303,6 +343,7 @@ export default class Player {
     this.#scriptContext = null;
   }
 
+  /** @private */
   async #reloadScript() {
     // keep current shared state values to maintain state after reload
     // note that when the script changes, this is explicitly set to null
@@ -478,3 +519,5 @@ export default class Player {
     outputNode.gain.linearRampToValueAtTime(1, now + 0.01);
   }
 }
+
+export default Player;

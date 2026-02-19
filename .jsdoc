@@ -3,6 +3,7 @@
     "include": [
       "src/core/",
       "src/components/key-value-store",
+      "src/components/player-manager",
       "src/components/script-manager",
       "src/components/session-manager",
       "src/components/soundbank-manager",

@@ -3,6 +3,11 @@ import PlayerManager from './PlayerManager.js';
 
 import playerDescription from './player-description.js';
 
+/**
+ * Server-side representation of the {@link PlayerManager}
+ *
+ * @extends {PlayerManager}
+ */
 export default class PlayerManagerServer extends PlayerManager {
   constructor(como, name) {
     super(como, name);
