@@ -33,6 +33,21 @@ export default defineConfig({
           { text: 'Scripts API', link: '/generalities/script-api' },
         ]
       },
+      {
+        text: 'CoMote Application',
+        items: [
+          { text: 'Description', link: '/comote/description' },
+          { text: 'Webview JS API', link: '/comote/webview-api' },
+        ]
+      },
+      {
+        text: 'Motion Sensor Format',
+        items: [
+          { text: 'v3 - <i>latest</i>', link: '/format/v3' },
+          { text: 'CoMote v2 - <i>legacy</i>', link: '/format/comote-v2' },
+          { text: 'RIoT v1 & v2 - <i>legacy</i>', link: '/comote/riot-v1-v2' },
+        ]
+      },
 
       {
         text: 'Ecosystem',

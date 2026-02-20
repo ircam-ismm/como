@@ -351,3 +351,23 @@ body {
       border-radius: 3px;
   }
 }
+
+/* ------ Comote ------- */
+
+a.appstore {
+  display:  inline-block;
+  width: 200px;
+  height: 59px;
+  background-image: url("/appstore-dl.png");
+  background-size: contain;
+  margin: 6px 10px;
+}
+
+a.playstore {
+  display:  inline-block;
+  width: 200px;
+  height: 59px;
+  background-image: url("/playstore-dl.png");
+  background-size: contain;
+  margin: 6px 10px;
+}
