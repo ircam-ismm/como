@@ -8,8 +8,8 @@ import KeyValueStore from './KeyValueStore.js';
 class KeyValueStoreServer extends KeyValueStore {
   #db;
 
-  constructor(como) {
-    super(como);
+  constructor(como, name) {
+    super(como, name);
 
     this.#db = this.como.host.createNamespacedDb('como');
 

@@ -33,14 +33,23 @@ declare class PlayerManager extends ComoComponent {
      * Create a player on a given {@link ComoNode}.
      *
      * @param {String} sourceId - Id of the source
-     * @param {String} [scriptName=null] - Optional script name to load
-     * @param {String} [nodeId=this.como.nodeId] - Optional id of the {@link ComoNode} where
+     * @param {Object} [options]
+     * @param {String} [options.nodeId=this.como.nodeId] - Optional id of the {@link ComoNode} where
      *  the player should be created, defaults to the node where the function is called
+     * @param {String} [options.id=null] - Optional user-defined id to assign
+     *  to the player. _Important: that for now this is the responsibility of the client code
+     *  to ensure the ids remain unique across the network._
      * @returns {String} Id of the player
      */
-    createPlayer(sourceId: string, scriptName?: string, nodeId?: string): string;
-    /** @todo */
-    deletePlayer(playerId: any): Promise<void>;
+    createPlayer(sourceId: string, { nodeId, id, }?: {
+        nodeId?: string;
+        id?: string;
+    }): string;
+    /**
+     * @todo - Implement
+     * @private
+     */
+    private deletePlayer;
     /**
      * Get the full {@link Player} API access of a given player.
      *

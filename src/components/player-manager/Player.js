@@ -3,6 +3,7 @@ import {
   decibelToLinear,
   sleep,
   isFunction,
+  isString,
 } from '@ircam/sc-utils';
 import {
   GainNode
@@ -29,6 +30,8 @@ class Player {
   #state;
   #source;
 
+  #requestedId = null;
+
   #script = null; // the script instance from the plugin
   #scriptModule = null; // the JS module as imported from the script
   #scriptSharedState = null; // the shared state defined by the script
@@ -49,11 +52,12 @@ class Player {
    * @param {*} como
    * @param {*} sourceId
    */
-  constructor(como, sourceId) {
+  constructor(como, sourceId, id = null) {
     // @todo - check arguments
 
     this.#como = como;
     this.#sourceId = sourceId;
+    this.#requestedId = id;
 
     this.#muteNode = new GainNode(this.#como.audioContext);
     this.#volumeNode = new GainNode(this.#como.audioContext);
@@ -122,8 +126,19 @@ class Player {
       this.#state = withState;
       this.#state.onDetach(async () => await this.delete());
     } else {
+      let playerId;
+      if (this.#requestedId === null) {
+        playerId = `${this.#como.id}-${idGenerator()}`
+      } else {
+        if (!isString(this.#requestedId)) {
+          throw new Error(`Cannot execute "createPlayer" on PlayerManager: requested player id is not a string`);
+        }
+
+        playerId = this.#requestedId;
+      }
+
       this.#state = await this.#como.stateManager.create(`${this.#como.playerManager.name}:player`, {
-        id: `${this.#como.id}-${idGenerator()}`,
+        id: playerId,
         nodeId: this.#como.nodeId,
         sourceId: this.source.get('id'),
       });
@@ -470,6 +485,7 @@ class Player {
       this.#state.set({
         scriptSharedStateClassName: this.#scriptSharedState.className,
         scriptSharedStateId: this.#scriptSharedState.id,
+        scriptLoaded: true,
       });
     }
 

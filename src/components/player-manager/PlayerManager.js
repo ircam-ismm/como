@@ -72,25 +72,31 @@ class PlayerManager extends ComoComponent {
    * Create a player on a given {@link ComoNode}.
    *
    * @param {String} sourceId - Id of the source
-   * @param {String} [scriptName=null] - Optional script name to load
-   * @param {String} [nodeId=this.como.nodeId] - Optional id of the {@link ComoNode} where
+   * @param {Object} [options]
+   * @param {String} [options.nodeId=this.como.nodeId] - Optional id of the {@link ComoNode} where
    *  the player should be created, defaults to the node where the function is called
+   * @param {String} [options.id=null] - Optional user-defined id to assign
+   *  to the player. _Important: that for now this is the responsibility of the client code
+   *  to ensure the ids remain unique across the network._
    * @returns {String} Id of the player
    */
-  async createPlayer(sourceId, scriptName = null, nodeId = this.como.nodeId) {
+  async createPlayer(sourceId, {
+    nodeId = this.como.nodeId,
+    id = null,
+  }) {
     if (!this.como.sourceManager.sourceExists(sourceId)) {
       throw new Error(`Cannot execute "createPlayer" on PlayerManager: source with id ("${sourceId}") does not exists`);
     }
 
     return await this.como.requestRfc(nodeId, `${this.name}:createPlayer`, {
       sourceId,
-      scriptName,
+      id,
     });
   }
 
   /** @private */
-  #createPlayer = async ({ sourceId, scriptName }) => {
-    const player = new Player(this.como, sourceId, scriptName);
+  #createPlayer = async ({ sourceId, id  }) => {
+    const player = new Player(this.como, sourceId, id );
     await player.init();
 
     this.#ownedPlayers.add(player);
@@ -98,7 +104,10 @@ class PlayerManager extends ComoComponent {
     return player.id;
   }
 
-  /** @todo */
+  /**
+   * @todo - Implement
+   * @private
+   */
   async deletePlayer(playerId) {
 
   }

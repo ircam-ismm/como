@@ -35,6 +35,10 @@ export default {
     nullable: true,
     default: null,
   },
+  scriptLoaded: {
+    type: 'boolean',
+    event: true,
+  },
 
   // audio
   mute: {

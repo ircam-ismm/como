@@ -5,7 +5,7 @@ export default KeyValueStoreServer;
  * @extends {KeyValueStore}
  */
 declare class KeyValueStoreServer extends KeyValueStore {
-    constructor(como: any);
+    constructor(como: any, name: any);
     #private;
 }
 import KeyValueStore from './KeyValueStore.js';

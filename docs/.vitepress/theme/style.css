@@ -290,178 +290,17 @@ body {
   margin-right: 50px;
 }
 
+
 .VPHome .intro > div {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.VPHome .features {
-  display: flex;
-  justify-content: space-between;
-}
-
-.VPHome .features img {
-  height: 240px;
-  margin-left: 20px;
-}
-
-.VPHome .projects {
-  display: flex;
-  justify-content: space-between;
-}
-
-.VPHome .projects .iframe {
-  display: block;
-  width: 560px;
-  height: 0;
-  margin: 0;
-  padding-bottom: 315px;
-  overflow: hidden;
-  position: relative;
-}
-
-.VPHome .projects iframe {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.VPHome .projects .details {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.VPHome .related-work {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.VPHome .related-work a {
-  display: block;
-  width: 23%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 50% 50%;
-  line-height: 0;
-  position: relative;
-  opacity: 0.85;
-  transition: opacity 200ms;
-}
-
-.VPHome .related-work a.web-apps {
-  background-image: url(/assets/home/related-apps-ismm.jpeg);
-}
-.VPHome .related-work a.youtube {
-  background-image: url(/assets/home/related-youtube.png);
-}
-.VPHome .related-work a.team {
-  background-image: url(/assets/home/related-team-website.png);
-}
-.VPHome .related-work a.libs {
-  background-image: url(/assets/home/related-code.png);
-}
-
-.VPHome .related-work a:hover {
-  opacity: 1;
-}
-
-.VPHome .related-work a:after {
-  content: "";
-  display: block;
-  padding-bottom: 100%;
-}
-
-.VPHome .related-work a span {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  display: block;
-  width: 100%;
-  height: 50px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  line-height: 50px;
-  font-weight: bold;
-  text-indent: 10px;
-}
-
-@media (max-width: 640px) {
-  .VPHome .related-work {
-    flex-direction: column;
-  }
-
-  .VPHome .related-work a {
-    width: 100%;
-    height: 110px;
-    margin-bottom: 10px;
-  }
-}
-
-.VPHome .credits {
-  margin-top: 60px;
-  border-top: 1px solid var(--vp-c-divider-light);
-  height: 3.5rem;
-  line-height: 3.5rem;
-  font-size: 0.8rem;
-  position: relative;
-}
-
-.VPHome .credits .license {
-  font-weight: bold;
-}
-
-.VPHome .credits .tutelles {
-  position: absolute;
-  right: 0;
-  top: 0;
-  background-color: #ffffff;
-  padding-left: 20px;
-}
-
-.VPHome .credits .tutelles a {
-  height: 30px;
-  width: 60px;
-  display: inline-block;
-  vertical-align: middle;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-  background-size: contain;
-  opacity: 1;
-  transition: opacity 0.1s ease;
-}
-
-.VPHome .credits .tutelles a:hover {
-  opacity: 0.5;
-}
-
-.VPHome .credits .tutelles .ircam {
-  background-image: url(/assets/home/ircam-black.jpg);
-}
-
-.VPHome .credits .tutelles .cnrs {
-  background-image: url(/assets/home/cnrs-black.png);
-}
-
-.VPHome .credits .tutelles .su {
-  background-image: url(/assets/home/su-black.png);
-}
-
-.VPHome .credits .tutelles .culture {
-  background-image: url(/assets/home/culture-black.jpg);
-}
-
-@media (max-width: 1024px) {
-  .VPHome h3 {
-    font-size: 1.1rem;
-  }
+.VPHome .intro .npm-badge {
+  width: auto;
+  height: 20px;
+  margin-top: 20px;
 }
 
 /* 1 column layout @1300px because side-bar is still there */
@@ -479,47 +318,6 @@ body {
 
   .VPHome .intro > div p {
     margin-bottom: 20px;
-  }
-
-  .VPHome .features {
-    flex-direction: column;
-  }
-
-  .VPHome .features img {
-    height: auto;
-    margin-left: 0px;
-    margin-top: 20px;
-  }
-
-  .VPHome .projects {
-    flex-direction: column;
-  }
-
-  .VPHome .projects .iframe {
-    width: 100%;
-    padding: 0% 0% 56.25%;  /* 16:9 ratio */
-  }
-
-  .VPHome .projects .details {
-    margin-top: 20px;
-  }
-
-  .VPHome .projects .details h3 {
-    margin: 12px 0;
-  }
-
-  .VPHome .credits {
-    height: auto;
-    line-height: inherit;
-  }
-
-  .VPHome .credits .tutelles {
-    position: relative;
-    margin-left: 0px;
-    margin-top: 12px;
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
   }
 }
 

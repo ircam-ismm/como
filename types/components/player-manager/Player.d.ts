@@ -12,7 +12,7 @@ declare class Player {
      * @param {*} como
      * @param {*} sourceId
      */
-    constructor(como: any, sourceId: any);
+    constructor(como: any, sourceId: any, id?: any);
     /**
      * Id of the player
      * @type {String}

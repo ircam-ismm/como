@@ -52,15 +52,20 @@ declare namespace _default {
         let _default_4: any;
         export { _default_4 as default };
     }
-    namespace mute {
+    namespace scriptLoaded {
         let type_8: string;
         export { type_8 as type };
+        export let event: boolean;
+    }
+    namespace mute {
+        let type_9: string;
+        export { type_9 as type };
         let _default_5: boolean;
         export { _default_5 as default };
     }
     namespace volume {
-        let type_9: string;
-        export { type_9 as type };
+        let type_10: string;
+        export { type_10 as type };
         export let min: number;
         export let max: number;
         let _default_6: number;
