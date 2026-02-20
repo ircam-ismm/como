@@ -17,7 +17,7 @@ layout: page
         </a>
       </p>
       <p>
-        Como has been used apply in artistic creation and pedagogy, workshops, as well as to education and rehabition, for both end-user and experimental use-cases. For example, specific applications have been derived from the generic framework, such as CoMo Education, Como-Rehabiliation or CoMo-Vox (in collaboration with Radio France, supported by the French Ministere of Education).
+        Como has been used apply in artistic creation and pedagogy, workshops, as well as to education and rehabilitation, for both end-user and experimental use-cases. For example, specific applications have been derived from the generic framework, such as CoMo Education, Como-Rehabilitation or CoMo-Vox (in collaboration with Radio France, supported by the French Ministry of Education).
       </p>
     </div>
   </div>
