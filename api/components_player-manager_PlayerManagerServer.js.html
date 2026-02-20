@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>core/ComoClient.js - como</title>
+    <title>components/player-manager/PlayerManagerServer.js - como</title>
     
     <meta name="description" content="Documentation of the como framework" />
     
@@ -50,7 +50,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">core/ComoClient.js</h1>
+    <h1 class="page-title">components/player-manager/PlayerManagerServer.js</h1>
     
 
     
@@ -60,97 +60,48 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import ComoNode from './ComoNode.js';
+            <pre class="prettyprint source linenums"><code>import { v4 as uuidv4 } from 'uuid';
+import PlayerManager from './PlayerManager.js';
 
-import ClientPluginPlatformInit from '@soundworks/plugin-platform-init/client.js';
-
-// components
-import SourceManagerClient from '../components/source-manager/SourceManagerClient.js';
-import ProjectManagerClient from '../components/project-manager/ProjectManagerClient.js';
-import ScriptManagerClient from '../components/script-manager/ScriptManagerClient.js';
-import SoundbankManagerClient from '../components/soundbank-manager/SoundbankManagerClient.js';
-import SessionManagerClient from '../components/session-manager/SessionManagerClient.js';
-import PlayerManagerClient from '../components/player-manager/PlayerManagerClient.js';
-import KeyValueStoreClient from '../components/key-value-store/KeyValueStoreClient.js';
+import playerDescription from './player-description.js';
 
 /**
- * Server-side representation of a ComoNode
+ * Server-side representation of the {@link PlayerManager}
  *
- * @extends ComoNode
- * @examplekeyValueStore
- * import { Client } from '@soundworks/core/client.js';
- * import { ComoClient } from '@ircam/como/client.js';
- *
- * const client = new Client(config);
- * const como = new ComoClient(client);
- * await como.start();
+ * @extends {PlayerManager}
  */
-class ComoClient extends ComoNode {
-  /**
-   * Constructs a new ComoClient instance
-   *
-   * @param {Client} node - Instance of soundworks client
-   */
-  constructor(node) {
-    super(node);
+export default class PlayerManagerServer extends PlayerManager {
+  constructor(como, name) {
+    super(como, name);
 
-    this.pluginManager.register('platform-init', ClientPluginPlatformInit, {
-      audioContext: this.audioContext,
+    this.como.stateManager.defineClass(`${this.name}:player`, playerDescription);
+    this.como.stateManager.registerUpdateHook(`${this.name}:player`, updates => {
+      // reset all script information so that we don't try to attach to
+      // an nonexisting state based on information from previous session
+      if ('sessionId' in updates) {
+        return {
+          scriptName: null,
+          scriptSharedStateClassName: null,
+          scriptSharedStateId: null,
+          ...updates,
+        }
+      }
     });
 
-    /**
-     * @member sourceManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {SourceManagerClient}
-     */
-    new SourceManagerClient(this, 'sourceManager');
-    /**
-     * @member projectManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {ProjectManagerClient}
-     */
-    new ProjectManagerClient(this, 'projectManager');
-    /**
-     * @member scriptManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {ScriptManagerClient}
-     */
-    new ScriptManagerClient(this, 'scriptManager');
-    /**
-     * @member soundbankManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {SoundbankManagerClient}
-     */
-    new SoundbankManagerClient(this, 'soundbankManager');
-    /**
-     * @member sessionManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {SessionManagerClient}
-     */
-    new SessionManagerClient(this, 'sessionManager');
-    /**
-     * @member playerManager
-     * @memberof ComoClient#
-     * @readonly
-     * @type {PlayerManagerClient}
-     */
-    new PlayerManagerClient(this, 'playerManager');
-    /**
-     * @member keyValueStore
-     * @memberof ComoClient#
-     * @readonly
-     * @type {KeyValueStoreClient}
-     */
-    new KeyValueStoreClient(this, 'keyValueStore');
+    this.como.setRfcHandler(`${this.name}:defineSharedStateClass`, this.#defineSharedStateClass);
+    this.como.setRfcHandler(`${this.name}:deleteSharedStateClass`, this.#deleteSharedStateClass);
+  }
+
+  #defineSharedStateClass = ({ scriptName, classDescription }) => {
+    const className = `${scriptName}_${uuidv4()}`;
+    this.como.stateManager.defineClass(className, classDescription);
+    return className;
+  }
+
+  #deleteSharedStateClass = ({ scriptSharedStateClassName }) => {
+    return this.como.stateManager.deleteClass(scriptSharedStateClassName);
   }
 }
-
-export default ComoClient;
 </code></pre>
         </article>
     </section>
