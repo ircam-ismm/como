@@ -21,15 +21,14 @@ The CoMote application is open-source and available on Github: [https://github.c
 
 ### Sensor format
 
-One of the main goal of the application is to provide unified axis and units across the different platforms. For this reason, we choose to follow a specification derived from Web Standards that is described in []()
+One of the main goal of the application is to provide unified axis and units across the different platforms. For this reason, we choose to follow a specification derived from Web Standards that is described in the [sensors data format](../format/v3)
 
 ### Integration
 
 To integrate the CoMote application within your own application, we provide 2 different related packages for Node.js and Max/MSP. You can find more information on our dedicated github repository [https://github.com/ircam-ismm/comote-helpers](https://github.com/ircam-ismm/comote-helpers).
 
-The Max/MSP package can be directly downloaded at the following url [https://github.com/ircam-ismm/comote-helpers/releases/latest/download/CoMote.zip](https://github.com/ircam-ismm/comote-helpers/releases/latest/download/CoMote.zip)
+The Max/MSP package can be directly downloaded at the following url [https://github.com/ircam-ismm/comote-helpers/releases/latest/](https://github.com/ircam-ismm/comote-helpers/releases/latest/)
 
-<!-- If you want to adapt existing application using R-IoTs to CoMote, you can follow the conversion guidelines described [here](https://ircam-ismm.github.io/misc/riot-devicemotion-compatibility.html#smartphone-and-r-iot-axes) -->
 
 ## Credits
 
