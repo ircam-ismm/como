@@ -87,14 +87,16 @@ class Player {
   /**
    * Source of the player
    * @type {SharedState}
+   * @see {@link https://soundworks.dev/soundworks/SharedState.html}
    */
   get source() {
     return this.#source;
   }
 
   /**
-   * Underlying state of the player.
-   * @type {SharedState}
+   * Underlying shared state of the player.
+   * @type {PlayerClassDescription}
+   * @see {@link https://soundworks.dev/soundworks/SharedState.html}
    */
   get state() {
     return this.#state;

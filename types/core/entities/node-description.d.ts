@@ -23,4 +23,29 @@ declare namespace _default {
     }
 }
 export default _default;
+/**
+ * Shared state class description representing a ComoNode
+ */
+export type ComoNodeClassDescription = {
+    /**
+     * - Topological id (can be fixed between different restarts):
+     * - For browser clients: generated from soundworks node id, or user defined
+     * through query parameter, i.e. http://host.local?id=my-client-id
+     * - For node clients: hostname
+     * - For server: 'server' constant
+     */
+    id: string;
+    /**
+     * - Underlying soundworks id, unstable across restarts
+     */
+    nodeId: number;
+    /**
+     * - Role of the node in the application
+     */
+    role: string;
+    /**
+     * - Javascript runtime in which the node is running
+     */
+    runtime: "browser" | "node";
+};
 //# sourceMappingURL=node-description.d.ts.map

@@ -8,7 +8,7 @@ import playerDescription from './player-description.js';
  *
  * @extends {PlayerManager}
  */
-export default class PlayerManagerServer extends PlayerManager {
+class PlayerManagerServer extends PlayerManager {
   constructor(como, name) {
     super(como, name);
 
@@ -40,3 +40,5 @@ export default class PlayerManagerServer extends PlayerManager {
     return this.como.stateManager.deleteClass(scriptSharedStateClassName);
   }
 }
+
+export default PlayerManagerServer;

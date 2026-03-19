@@ -26,13 +26,15 @@ declare class Player {
     /**
      * Source of the player
      * @type {SharedState}
+     * @see {@link https://soundworks.dev/soundworks/SharedState.html}
      */
     get source(): SharedState;
     /**
-     * Underlying state of the player.
-     * @type {SharedState}
+     * Underlying shared state of the player.
+     * @type {PlayerClassDescription}
+     * @see {@link https://soundworks.dev/soundworks/SharedState.html}
      */
-    get state(): SharedState;
+    get state(): PlayerClassDescription;
     /** @private */
     private init;
     /**

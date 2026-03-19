@@ -1,3 +1,10 @@
+/**
+ * @typedef {Object} SourceClassDescription
+ * @property {String} id - Id of the source, user-defined
+ * @property {String} type - Type of the source (e.g. comote, riot, etc.)
+ * @property {Number} nodeId - Id of the node where the source is created
+ * @property {Object} infos
+ */
 export default {
   // @todo - make this more robust:
   // - use proper `uuid` & rename `id` to `label`?

@@ -70,4 +70,19 @@ declare namespace _default {
     }
 }
 export default _default;
+export type SourceClassDescription = {
+    /**
+     * - Id of the source, user-defined
+     */
+    id: string;
+    /**
+     * - Type of the source (e.g. comote, riot, etc.)
+     */
+    type: string;
+    /**
+     * - Id of the node where the source is created
+     */
+    nodeId: number;
+    infos: any;
+};
 //# sourceMappingURL=source-description.d.ts.map

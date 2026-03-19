@@ -1,7 +1,8 @@
 {
   "source": {
     "include": [
-      "src/core/",
+      "src/core",
+      "src/core/entities",
       "src/components/key-value-store",
       "src/components/player-manager",
       "src/components/script-manager",

@@ -1,9 +1,10 @@
+export default PlayerManagerServer;
 /**
  * Server-side representation of the {@link PlayerManager}
  *
  * @extends {PlayerManager}
  */
-export default class PlayerManagerServer extends PlayerManager {
+declare class PlayerManagerServer extends PlayerManager {
     constructor(como: any, name: any);
     #private;
 }

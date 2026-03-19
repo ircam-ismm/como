@@ -241,7 +241,7 @@ class ComoNode {
    */
   async init() {
     if (this.#host.status === 'idle') {
-      await this.host.init();
+      await this.#host.init();
 
       for (let component of this.#components.values()) {
         await component.init();

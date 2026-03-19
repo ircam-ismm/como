@@ -73,4 +73,43 @@ declare namespace _default {
     }
 }
 export default _default;
+export type PlayerClassDescription = {
+    /**
+     * - Id of the player (generated or user-defined)
+     */
+    id: string;
+    /**
+     * - Id of the node on which the player has been created
+     */
+    nodeId: string;
+    /**
+     * - Id of the source associated with the player
+     */
+    sourceId: string;
+    /**
+     * - If the session with which the player is associated.
+     * null is associated to no session.
+     */
+    sessionId: string;
+    /**
+     * - True if the session is currently loading, false otherwise
+     */
+    sessionLoading: boolean;
+    /**
+     * - Name of the script associated to this player.
+     */
+    scriptName: string;
+    /**
+     * - Event that triggers whe the script is ready.
+     */
+    scriptLoaded: boolean;
+    /**
+     * - Mute the audio of this player.
+     */
+    mute: boolean;
+    /**
+     * - Volume of the audio of this player, in dB.
+     */
+    volume: number;
+};
 //# sourceMappingURL=player-description.d.ts.map

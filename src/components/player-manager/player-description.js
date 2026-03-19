@@ -1,3 +1,16 @@
+/**
+ * @typedef {Object} PlayerClassDescription
+ * @property {String} id - Id of the player (generated or user-defined)
+ * @property {String} nodeId - Id of the node on which the player has been created
+ * @property {String} sourceId - Id of the source associated with the player
+ * @property {String} sessionId - If the session with which the player is associated.
+ *  null is associated to no session.
+ * @property {Boolean} sessionLoading - True if the session is currently loading, false otherwise
+ * @property {String} scriptName - Name of the script associated to this player.
+ * @property {Boolean} scriptLoaded - Event that triggers whe the script is ready.
+ * @property {Boolean} mute - Mute the audio of this player.
+ * @property {Number} volume - Volume of the audio of this player, in dB.
+ */
 export default {
   id: {
     type: 'string',
