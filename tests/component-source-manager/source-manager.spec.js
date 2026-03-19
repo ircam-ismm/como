@@ -241,7 +241,7 @@ describe('# SourceManager', () => {
       });
 
       // @todo - make sure everything is synchronous here
-      it.only(`should create a source locally (client)`, async () => {
+      it(`should create a source locally (client)`, async () => {
         await client.sourceManager.createSource(configs.riot);
         await client.sourceManager.createSource(configs.comote);
 

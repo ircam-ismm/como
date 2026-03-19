@@ -19,29 +19,29 @@ describe('# key / value store', () => {
     const client = new ComoClient(_client);
     await client.start();
 
-    const value0 = await server.store.set('my-key', 'my-value');
+    const value0 = await server.keyValueStore.set('my-key', 'my-value');
     assert.isTrue(value0);
 
-    const value1 = await server.store.get('my-key');
+    const value1 = await server.keyValueStore.get('my-key');
     assert.equal(value1, 'my-value');
 
-    const value2 = await client.store.get('my-key');
+    const value2 = await client.keyValueStore.get('my-key');
     assert.equal(value2, 'my-value');
 
-    await client.store.set('como-frame', jsonFrame);
-    const value3 = await client.store.get('como-frame');
+    await client.keyValueStore.set('como-frame', jsonFrame);
+    const value3 = await client.keyValueStore.get('como-frame');
     assert.deepEqual(value3, jsonFrame);
 
-    // const value3 = await client.store.delete('my-key');
+    // const value3 = await client.keyValueStore.delete('my-key');
     // assert.isTrue(value3);
 
-    // const value4 = await client.store.delete('my-key');
+    // const value4 = await client.keyValueStore.delete('my-key');
     // assert.isFalse(value4);
 
-    // const value5 = await client.store.get('my-key');
+    // const value5 = await client.keyValueStore.get('my-key');
     // assert.isUndefined(value5);
 
-    // const value6 = await client.store.clear();
+    // const value6 = await client.keyValueStore.clear();
     // assert.isFalse(value6); // this is weird
 
     await client.stop();

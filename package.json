@@ -23,6 +23,7 @@
   "scripts": {
     "lint": "npx eslint src",
     "test": "npx mocha tests/**/*.spec.js",
+    "test:watch": "npx mocha tests/**/*.spec.js --watch",
     "test:only": "npx mocha",
     "types": "rm -rf types && tsc",
     "docs:api": "npm run types && rm -rf docs/public/api && jsdoc -c .jsdoc --verbose",

@@ -73,7 +73,7 @@ class PlayerManager extends ComoComponent {
    *
    * @param {String} sourceId - Id of the source
    * @param {Object} [options]
-   * @param {String} [options.nodeId=this.como.nodeId] - Optional id of the {@link ComoNode} where
+   * @param {String} [options.nodeId=null] - Optional id of the {@link ComoNode} where
    *  the player should be created, defaults to the node where the function is called
    * @param {String} [options.id=null] - Optional user-defined id to assign
    *  to the player. _Important: that for now this is the responsibility of the client code
@@ -83,7 +83,7 @@ class PlayerManager extends ComoComponent {
   async createPlayer(sourceId, {
     nodeId = this.como.nodeId,
     id = null,
-  }) {
+  } = {}) {
     if (!this.como.sourceManager.sourceExists(sourceId)) {
       throw new Error(`Cannot execute "createPlayer" on PlayerManager: source with id ("${sourceId}") does not exists`);
     }

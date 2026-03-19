@@ -293,7 +293,7 @@ class Player {
       }
     });
 
-    return this.#reloadScript();
+    await this.#reloadScript();
   }
 
   /** @private */
@@ -484,7 +484,7 @@ class Player {
 
 
       // 5. propagate shared state infos
-      this.#state.set({
+      await this.#state.set({
         scriptSharedStateClassName: this.#scriptSharedState.className,
         scriptSharedStateId: this.#scriptSharedState.id,
         scriptLoaded: true,

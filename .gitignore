@@ -16,3 +16,4 @@ docs/.vitepress/cache
 docs/public/api
 
 # types
+.data

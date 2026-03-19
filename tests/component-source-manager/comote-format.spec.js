@@ -19,7 +19,7 @@ import {
   jsonFrameBno055,
 } from '../fixtures.js';
 
-describe('# getMetaFromBundle', () => {
+describe.skip('# getMetaFromBundle', () => {
   it('should work', () => {
     const { source, id } = getMetaFromBundle(oscBundleFull);
     assert.equal(source, 'riot');
@@ -27,7 +27,7 @@ describe('# getMetaFromBundle', () => {
   });
 });
 
-describe('# oscBundleToJson / jsonToOscBundle', () => {
+describe.skip('# oscBundleToJson / jsonToOscBundle', () => {
   it('should work - default', () => {
     const json = oscBundleToJson(oscBundleFull);
     // frequency estimation

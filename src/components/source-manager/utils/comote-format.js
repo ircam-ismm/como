@@ -439,7 +439,6 @@ export function oscMessageToJson(message, {
   let json = null;
 
   const { api, id } = getMetaFromMessage(message);
-
   const { timestamp, frequency } = timestampUpdate();
 
   if (!frequency) {

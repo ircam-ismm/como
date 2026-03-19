@@ -1,4 +1,8 @@
-const G = 9.81;
+const {
+  audioContext,
+  audioBufferLoader,
+  como,
+} = getGlobalScriptingContext();
 
 export async function defineSharedState(como) {
   return {
@@ -13,28 +17,21 @@ export async function defineSharedState(como) {
         acknowledge: false,
         default: [],
       },
-      intensity: {
-        type: 'float',
-        acknowledge: false,
-        default: 0,
-      },
     },
     // initValues: presets.preset2,
   };
 }
 
 export async function enter(context) {
-  const { como, audioContext, sessionSoundFiles, sharedState } = context;
+  const { output, state, soundbank, scriptName } = context;
 }
 
 export async function exit(context) {
-  const { como, audioContext, sessionSoundFiles, sharedState } = context;
+  const { output, state, soundbank, scriptName } = context;
 }
 
 export async function process(context, frame) {
-  const { como, audioContext, sessionSoundFiles, sharedState } = context;
-
-  const { x, y, z } = frame[0].accelerometer;
-  const intensity = Math.sqrt(Math.pow(x / G, 2) * Math.pow(y / G, 2) + Math.pow(y / G, 2) / 3);
-  sharedState.set({ frame, intensity });
+  const { output, state, soundbank, scriptName } = context;
+  // propagate back source for comparison
+  state.set({ frame });
 }
