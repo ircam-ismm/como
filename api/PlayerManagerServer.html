@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>PlayerManagerServer - como</title>
+    
+    <meta name="description" content="Documentation of the como framework" />
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    
+    <link rel="icon" href="/como/favicon.ico">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    
+        <h2 class="home">
+            <a href="index.html" style="background-image: url('/como/logo-200x200.png')">
+                Home
+            </a>
+        </h2>
+    <h2><a href="../" class="menu-item" >Website</a></h2><h2><a href="https://github.com/ircam-ismm/como" target="_blank" class="menu-item" >Github</a></h2><h3>Classes</h3><ul><li><a href="ComoClient.html">ComoClient</a><ul class='members'><li data-type='member' style='display: none;'><a href="ComoClient.html#audioBufferLoader">audioBufferLoader</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#audioContext">audioContext</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#audioScheduler">audioScheduler</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#components">components</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#host">host</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#id">id</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#keyValueStore">keyValueStore</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#nodeId">nodeId</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#playerManager">playerManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#pluginManager">pluginManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#projectManager">projectManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#role">role</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#runtime">runtime</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#scheduler">scheduler</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#scriptManager">scriptManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#sessionManager">sessionManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#soundbankManager">soundbankManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#sourceManager">sourceManager</a></li><li data-type='member' style='display: none;'><a href="ComoClient.html#stateManager">stateManager</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="ComoClient.html#init">init</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#requestRfc">requestRfc</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#setProject">setProject</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#setRfcHandler">setRfcHandler</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#setRfcResolverHook">setRfcResolverHook</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#start">start</a></li><li data-type='method' style='display: none;'><a href="ComoClient.html#stop">stop</a></li></ul></li><li><a href="ComoNode.html">ComoNode</a><ul class='members'><li data-type='member' style='display: none;'><a href="ComoNode.html#audioBufferLoader">audioBufferLoader</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#audioContext">audioContext</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#audioScheduler">audioScheduler</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#components">components</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#host">host</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#id">id</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#nodeId">nodeId</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#pluginManager">pluginManager</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#role">role</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#runtime">runtime</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#scheduler">scheduler</a></li><li data-type='member' style='display: none;'><a href="ComoNode.html#stateManager">stateManager</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="ComoNode.html#init">init</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#requestRfc">requestRfc</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#setProject">setProject</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#setRfcHandler">setRfcHandler</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#setRfcResolverHook">setRfcResolverHook</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#start">start</a></li><li data-type='method' style='display: none;'><a href="ComoNode.html#stop">stop</a></li></ul></li><li><a href="ComoServer.html">ComoServer</a><ul class='members'><li data-type='member' style='display: none;'><a href="ComoServer.html#audioBufferLoader">audioBufferLoader</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#audioContext">audioContext</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#audioScheduler">audioScheduler</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#components">components</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#host">host</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#id">id</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#keyValueStore">keyValueStore</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#nodeId">nodeId</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#playerManager">playerManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#pluginManager">pluginManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#projectManager">projectManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#role">role</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#runtime">runtime</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#scheduler">scheduler</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#scriptManager">scriptManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#sessionManager">sessionManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#soundbankManager">soundbankManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#sourceManager">sourceManager</a></li><li data-type='member' style='display: none;'><a href="ComoServer.html#stateManager">stateManager</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="ComoServer.html#init">init</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#requestRfc">requestRfc</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#setProject">setProject</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#setRfcHandler">setRfcHandler</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#setRfcResolverHook">setRfcResolverHook</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#start">start</a></li><li data-type='method' style='display: none;'><a href="ComoServer.html#stop">stop</a></li></ul></li><li><a href="KeyValueStore.html">KeyValueStore</a><ul class='methods'><li data-type='method' style='display: none;'><a href="KeyValueStore.html#clear">clear</a></li><li data-type='method' style='display: none;'><a href="KeyValueStore.html#delete">delete</a></li><li data-type='method' style='display: none;'><a href="KeyValueStore.html#get">get</a></li><li data-type='method' style='display: none;'><a href="KeyValueStore.html#set">set</a></li></ul></li><li><a href="KeyValueStoreClient.html">KeyValueStoreClient</a><ul class='methods'><li data-type='method' style='display: none;'><a href="KeyValueStoreClient.html#clear">clear</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreClient.html#delete">delete</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreClient.html#get">get</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreClient.html#set">set</a></li></ul></li><li><a href="KeyValueStoreServer.html">KeyValueStoreServer</a><ul class='methods'><li data-type='method' style='display: none;'><a href="KeyValueStoreServer.html#clear">clear</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreServer.html#delete">delete</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreServer.html#get">get</a></li><li data-type='method' style='display: none;'><a href="KeyValueStoreServer.html#set">set</a></li></ul></li><li><a href="Player.html">Player</a><ul class='members'><li data-type='member' style='display: none;'><a href="Player.html#id">id</a></li><li data-type='member' style='display: none;'><a href="Player.html#nodeId">nodeId</a></li><li data-type='member' style='display: none;'><a href="Player.html#source">source</a></li><li data-type='member' style='display: none;'><a href="Player.html#state">state</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="Player.html#delete">delete</a></li><li data-type='method' style='display: none;'><a href="Player.html#setScript">setScript</a></li></ul></li><li><a href="PlayerManager.html">PlayerManager</a><ul class='members'><li data-type='member' style='display: none;'><a href="PlayerManager.html#players">players</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayerManager.html#createPlayer">createPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManager.html#getPlayer">getPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManager.html#getPlayerState">getPlayerState</a></li><li data-type='method' style='display: none;'><a href="PlayerManager.html#getScriptSharedState">getScriptSharedState</a></li><li data-type='method' style='display: none;'><a href="PlayerManager.html#playerExists">playerExists</a></li></ul></li><li><a href="PlayerManagerClient.html">PlayerManagerClient</a><ul class='members'><li data-type='member' style='display: none;'><a href="PlayerManagerClient.html#players">players</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayerManagerClient.html#createPlayer">createPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerClient.html#getPlayer">getPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerClient.html#getPlayerState">getPlayerState</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerClient.html#getScriptSharedState">getScriptSharedState</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerClient.html#playerExists">playerExists</a></li></ul></li><li><a href="PlayerManagerServer.html">PlayerManagerServer</a><ul class='members'><li data-type='member' style='display: none;'><a href="PlayerManagerServer.html#players">players</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayerManagerServer.html#createPlayer">createPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerServer.html#getPlayer">getPlayer</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerServer.html#getPlayerState">getPlayerState</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerServer.html#getScriptSharedState">getScriptSharedState</a></li><li data-type='method' style='display: none;'><a href="PlayerManagerServer.html#playerExists">playerExists</a></li></ul></li><li><a href="ScriptManager.html">ScriptManager</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ScriptManager.html#attach">attach</a></li><li data-type='method' style='display: none;'><a href="ScriptManager.html#getCollection">getCollection</a></li><li data-type='method' style='display: none;'><a href="ScriptManager.html#getList">getList</a></li><li data-type='method' style='display: none;'><a href="ScriptManager.html#onUpdate">onUpdate</a></li></ul></li><li><a href="ScriptManagerClient.html">ScriptManagerClient</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ScriptManagerClient.html#attach">attach</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerClient.html#getCollection">getCollection</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerClient.html#getList">getList</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerClient.html#onUpdate">onUpdate</a></li></ul></li><li><a href="ScriptManagerServer.html">ScriptManagerServer</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ScriptManagerServer.html#attach">attach</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerServer.html#getCollection">getCollection</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerServer.html#getList">getList</a></li><li data-type='method' style='display: none;'><a href="ScriptManagerServer.html#onUpdate">onUpdate</a></li></ul></li><li><a href="SessionManager.html">SessionManager</a><ul class='members'><li data-type='member' style='display: none;'><a href="SessionManager.html#sessions">sessions</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SessionManager.html#createSession">createSession</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#deleteSession">deleteSession</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#getSession">getSession</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#getSessionBus">getSessionBus</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#getSessionSoundbank">getSessionSoundbank</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#persistSession">persistSession</a></li><li data-type='method' style='display: none;'><a href="SessionManager.html#renameSession">renameSession</a></li></ul></li><li><a href="SessionManagerClient.html">SessionManagerClient</a><ul class='members'><li data-type='member' style='display: none;'><a href="SessionManagerClient.html#sessions">sessions</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#createSession">createSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#deleteSession">deleteSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#getSession">getSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#getSessionBus">getSessionBus</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#getSessionSoundbank">getSessionSoundbank</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#persistSession">persistSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerClient.html#renameSession">renameSession</a></li></ul></li><li><a href="SessionManagerServer.html">SessionManagerServer</a><ul class='members'><li data-type='member' style='display: none;'><a href="SessionManagerServer.html#sessions">sessions</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#createSession">createSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#deleteSession">deleteSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#getSession">getSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#getSessionBus">getSessionBus</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#getSessionSoundbank">getSessionSoundbank</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#persistSession">persistSession</a></li><li data-type='method' style='display: none;'><a href="SessionManagerServer.html#renameSession">renameSession</a></li></ul></li><li><a href="SoundbankManager.html">SoundbankManager</a><ul class='methods'><li data-type='method' style='display: none;'><a href="SoundbankManager.html#getBuffer">getBuffer</a></li><li data-type='method' style='display: none;'><a href="SoundbankManager.html#getBuffers">getBuffers</a></li><li data-type='method' style='display: none;'><a href="SoundbankManager.html#getTreeAsUrlMap">getTreeAsUrlMap</a></li><li data-type='method' style='display: none;'><a href="SoundbankManager.html#onUpdate">onUpdate</a></li></ul></li><li><a href="SoundbankManagerClient.html">SoundbankManagerClient</a><ul class='methods'><li data-type='method' style='display: none;'><a href="SoundbankManagerClient.html#getBuffer">getBuffer</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerClient.html#getBuffers">getBuffers</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerClient.html#getTreeAsUrlMap">getTreeAsUrlMap</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerClient.html#onUpdate">onUpdate</a></li></ul></li><li><a href="SoundbankManagerServer.html">SoundbankManagerServer</a><ul class='methods'><li data-type='method' style='display: none;'><a href="SoundbankManagerServer.html#getBuffer">getBuffer</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerServer.html#getBuffers">getBuffers</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerServer.html#getTreeAsUrlMap">getTreeAsUrlMap</a></li><li data-type='method' style='display: none;'><a href="SoundbankManagerServer.html#onUpdate">onUpdate</a></li></ul></li><li><a href="SourceManager.html">SourceManager</a><ul class='members'><li data-type='member' style='display: none;'><a href="SourceManager.html#list">list</a></li><li data-type='member' style='display: none;'><a href="SourceManager.html#sources">sources</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SourceManager.html#createSource">createSource</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#deleteRecording">deleteRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#deleteSource">deleteSource</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#getSource">getSource</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#getSourceFiltered">getSourceFiltered</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#listRecordings">listRecordings</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#readRecording">readRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManager.html#sourceExists">sourceExists</a></li></ul></li><li><a href="SourceManagerClient.html">SourceManagerClient</a><ul class='members'><li data-type='member' style='display: none;'><a href="SourceManagerClient.html#list">list</a></li><li data-type='member' style='display: none;'><a href="SourceManagerClient.html#sources">sources</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#createSource">createSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#deleteRecording">deleteRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#deleteSource">deleteSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#getSource">getSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#getSourceFiltered">getSourceFiltered</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#listRecordings">listRecordings</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#readRecording">readRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManagerClient.html#sourceExists">sourceExists</a></li></ul></li><li><a href="SourceManagerServer.html">SourceManagerServer</a><ul class='members'><li data-type='member' style='display: none;'><a href="SourceManagerServer.html#list">list</a></li><li data-type='member' style='display: none;'><a href="SourceManagerServer.html#sources">sources</a></li></ul><ul class='methods'><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#createSource">createSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#deleteRecording">deleteRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#deleteSource">deleteSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#getSource">getSource</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#getSourceFiltered">getSourceFiltered</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#listRecordings">listRecordings</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#readRecording">readRecording</a></li><li data-type='method' style='display: none;'><a href="SourceManagerServer.html#sourceExists">sourceExists</a></li></ul></li></ul><h3>Global</h3><ul>
+                    <li>
+                        <a href="global.html#ComoNodeClassDescription">Types</a>
+                        <ul>
+                            <li><a href="global.html#ComoNodeClassDescription">ComoNodeClassDescription</a></li><li><a href="global.html#PlayerClassDescription">PlayerClassDescription</a></li><li><a href="global.html#SourceClassDescription">SourceClassDescription</a></li>
+                        </ul>
+                    </li>
+                </ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">PlayerManagerServer</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+        </h2>
+        
+            <div class="class-description usertext"><p>Server-side representation of the <a href="PlayerManager.html">PlayerManager</a></p></div>
+        
+    
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="PlayerManager.html">PlayerManager</a></li>
+    </ul>
+
+
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="PlayerManagerServer"><span class="type-signature"></span>new PlayerManagerServer<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManagerServer.js.html">components/player-manager/PlayerManagerServer.js</a>, <a href="components_player-manager_PlayerManagerServer.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Attributes</h3>
+
+        
+            
+<h4 class="name" id="players"><span class="type-signature"></span>players<span class="type-signature"></span></h4>
+
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>The living collection of all players underlying shared states.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#players">PlayerManager#players</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="createPlayer"><span class="type-signature type-signature-async">(async) </span>createPlayer<span class="signature">(sourceId, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Create a player on a given <a href="ComoNode.html">ComoNode</a>.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line83">line 83</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#createPlayer">PlayerManager#createPlayer</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Id of the source</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>nodeId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Optional id of the <a href="ComoNode.html">ComoNode</a> where
+the player should be created, defaults to the node where the function is called</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Optional user-defined id to assign
+to the player. <em>Important: that for now this is the responsibility of the client code
+to ensure the ids remain unique across the network.</em></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Id of the player</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getPlayer"><span class="type-signature type-signature-async">(async) </span>getPlayer<span class="signature">(playerId)</span><span class="type-signature"> &rarr; {<a href="Player.html">Player</a>|null}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Get the full <a href="Player.html">Player</a> API access of a given player.</p>
+<p>If called on another <a href="ComoNode.html">ComoNode</a>, <code>getPlayerthis</code> basically creates
+a clone of the original player. Useful for example to duplicate the audio
+of a node on another node.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line126">line 126</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#getPlayer">PlayerManager#getPlayer</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>playerId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Player.html">Player</a></span>
+|
+
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getPlayerState"><span class="type-signature type-signature-async">(async) </span>getPlayerState<span class="signature">(playerId)</span><span class="type-signature"> &rarr; {<a href="Player.html">Player</a>|null}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Get the underlying state of a player without the full {<a href="Player.html">Player</a> logic
+and behavior.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line155">line 155</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#getPlayerState">PlayerManager#getPlayerState</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>playerId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Player.html">Player</a></span>
+|
+
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getScriptSharedState"><span class="type-signature type-signature-async">(async) </span>getScriptSharedState<span class="signature">(playerId)</span><span class="type-signature"> &rarr; {SharedState|null}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Return the SharedState associated to the script assigned to the given player.</p>
+<p>Return null if the player is not associated to a script, or if the associated
+script does not define a shared state.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line169">line 169</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#getScriptSharedState">PlayerManager#getScriptSharedState</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>playerId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">SharedState</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="playerExists"><span class="type-signature"></span>playerExists<span class="signature">(playerId)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Returns wether the player exists on the network</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_player-manager_PlayerManager.js.html">components/player-manager/PlayerManager.js</a>, <a href="components_player-manager_PlayerManager.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="PlayerManager.html#playerExists">PlayerManager#playerExists</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>playerId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Thu Mar 19 2026 15:00:32 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
