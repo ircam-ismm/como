@@ -496,12 +496,12 @@ class Player {
     outputNode.connect(this.#muteNode);
 
     // create context object for this script instance
-    this.#scriptContext = {
+    this.#scriptContext = Object.freeze({
       output: outputNode,
       state: this.#scriptSharedState,
       soundbank: this.#sessionSoundbank,
       scriptName: this.#script.name,
-    };
+    });
 
     // enter the script
     if (isFunction(this.#scriptModule.enter)) {
