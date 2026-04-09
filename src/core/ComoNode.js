@@ -44,6 +44,8 @@ class ComoNode {
   #node;
   #nodes; // collection of node-infos
 
+  #logger;
+
   // #plugins = [];
   #components = new Map();
 
@@ -221,6 +223,16 @@ class ComoNode {
   }
 
   /**
+   * Instance of the soundworks' logger plugin.
+   * Logs are written in the `logs` directory of the current project.
+   * @type {ServerPluginLogger|ClientPluginLogger}
+   * @see {@link https://soundworks.dev/plugins/logger.html}
+   */
+  get logger() {
+    return this.#logger;
+  }
+
+  /**
    * The init method is part of the initialization lifecycle of the como node.
    * Most of the time, this method will be implicitly executed by the `{@link ComoNode#start}` method.
    *
@@ -304,6 +316,9 @@ class ComoNode {
     this.#audioScheduler = new Scheduler(() => this.#audioContext.currentTime);
     // @todo
     // this.#syncedScheduler;
+
+    // exposed plugin
+    this.#logger = await this.pluginManager.get('logger');
   }
 
   /**

@@ -4,6 +4,7 @@ import fsPromises from 'node:fs/promises';
 
 import ServerPluginPlatformInit from '@soundworks/plugin-platform-init/server.js';
 import ServerPluginSync from '@soundworks/plugin-sync/server.js';
+import ServerPluginLogger from '@soundworks/plugin-logger/server.js';
 import { isString } from '@ircam/sc-utils';
 
 import ComoNode from './ComoNode.js';
@@ -50,10 +51,11 @@ class ComoServer extends ComoNode {
   } = {}) {
     super(server, { projectsDirname });
 
-    this.#projectsDirname = projectsDirname
+    this.#projectsDirname = projectsDirname;
 
     this.pluginManager.register('platform-init', ServerPluginPlatformInit);
     this.pluginManager.register('sync', ServerPluginSync);
+    this.pluginManager.register('logger', ServerPluginLogger);
 
     // register global shared states class descriptions
     this.stateManager.defineClass('como:global', globalDescription);
@@ -150,6 +152,10 @@ class ComoServer extends ComoNode {
       await this.project.set({
         name: infos.name,
         dirname: projectDirname,
+      });
+
+      await this.logger.switch({
+        dirname: path.join(projectDirname, 'logs'),
       });
     }
 

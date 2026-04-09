@@ -1,6 +1,7 @@
 import ComoNode from './ComoNode.js';
 
 import ClientPluginPlatformInit from '@soundworks/plugin-platform-init/client.js';
+import ClientPluginLogger from '@soundworks/plugin-logger/client.js';
 
 // components
 import SourceManagerClient from '../components/source-manager/SourceManagerClient.js';
@@ -35,6 +36,7 @@ class ComoClient extends ComoNode {
     this.pluginManager.register('platform-init', ClientPluginPlatformInit, {
       audioContext: this.audioContext,
     });
+    this.pluginManager.register('logger', ClientPluginLogger);
 
     /**
      * @member sourceManager
