@@ -6,6 +6,7 @@ import '@ircam/sc-components/sc-toggle.js';
 import '@ircam/sc-components/sc-bang.js';
 import '@ircam/sc-components/sc-slider.js';
 import '@ircam/sc-components/sc-radio.js';
+import '@ircam/sc-components/sc-select.js';
 import '@ircam/sc-components/sc-editor.js';
 
 class ComoPlayerScriptSharedState extends LitElement {
@@ -99,16 +100,29 @@ class ComoPlayerScriptSharedState extends LitElement {
           `;
         }
         case 'enum': {
-          return html`
-            <div>
-              <sc-text>${key}</sc-text>
-              <sc-radio
-                .options=${desc.list}
-                value=${this.scriptState.get(key)}
-                @change=${e => this.scriptState.set(key, e.detail.value)}
-              ></sc-radio>
-            </div>
-          `
+          if (desc.list.length < 4) {
+            return html`
+              <div>
+                <sc-text>${key}</sc-text>
+                <sc-radio
+                  .options=${desc.list}
+                  value=${this.scriptState.get(key)}
+                  @change=${e => this.scriptState.set(key, e.detail.value)}
+                ></sc-radio>
+              </div>
+            `
+          } else {
+            return html`
+              <div>
+                <sc-text>${key}</sc-text>
+                <sc-select
+                  .options=${desc.list}
+                  value=${this.scriptState.get(key)}
+                  @change=${e => this.scriptState.set(key, e.detail.value)}
+                ></sc-select>
+              </div>
+            `
+          }
         }
         case 'any': {
           console.log('Interface for "any" type not implemented yet')
