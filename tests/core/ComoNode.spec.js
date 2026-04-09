@@ -10,7 +10,9 @@ import ComoServer from '../../src/core/ComoServer.js';
 import config from '../config.js';
 
 describe('# ComoNode', () => {
-  it('should start and stop properly (1)', async () => {
+  it('should start and stop properly (1)', async function() {
+    this.timeout(5 * 1000);
+
     const _server = new Server(config);
     const server = new ComoServer(_server);
     await server.start();

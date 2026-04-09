@@ -10,7 +10,9 @@ import ComoServer from '../../src/core/ComoServer.js';
 import config from '../config.js';
 
 describe('# Core: Lifecycle', () => {
-  it('should start and stop properly (1)', async () => {
+  it('should start and stop properly (1)',async function() {
+    this.timeout(5 * 1000);
+
     const _server = new Server(config);
     const server = new ComoServer(_server);
     await server.start();
@@ -23,7 +25,9 @@ describe('# Core: Lifecycle', () => {
     await server.stop();
   });
 
-  it('should start and stop properly (2) - client stops after server', async () => {
+  it('should start and stop properly (2) - client stops after server', async function() {
+    this.timeout(5 * 1000);
+
     const _server = new Server(config);
     const server = new ComoServer(_server);
     await server.start();

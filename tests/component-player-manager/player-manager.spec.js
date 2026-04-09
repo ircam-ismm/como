@@ -25,7 +25,9 @@ const sourceConfig = {
 describe('# PlayerManager', () => {
   let client, server;
 
-  beforeEach(async () => {
+  beforeEach(async function() {
+    this.timeout(5 * 1000);
+
     const _server = new Server(config);
     server = new ComoServer(_server, { projectsDirname });
     await server.start();

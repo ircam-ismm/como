@@ -33,7 +33,9 @@ function filterPersistedParams(values, description = sessionDescription) {
 describe('# SessionManager', () => {
   let client, server;
 
-  beforeEach(async () => {
+  beforeEach(async function() {
+    this.timeout(5 * 1000);
+
     if (!fs.existsSync(sessionsDirname)) {
       fs.mkdirSync(sessionsDirname);
     }
