@@ -45,6 +45,7 @@ class ComoNode {
   #nodes; // collection of node-infos
 
   #logger;
+  #sync;
 
   // #plugins = [];
   #components = new Map();
@@ -233,6 +234,16 @@ class ComoNode {
   }
 
   /**
+   * Instance of the soundworks' sync plugin.
+   * On clients, the synchronization is made against the audioContent clock.
+   * @type {ServerPluginSync|ClientPluginSync}
+   * @see {@link https://soundworks.dev/plugins/sync.html}
+   */
+  get sync() {
+    return this.#sync;
+  }
+
+  /**
    * The init method is part of the initialization lifecycle of the como node.
    * Most of the time, this method will be implicitly executed by the `{@link ComoNode#start}` method.
    *
@@ -319,6 +330,7 @@ class ComoNode {
 
     // exposed plugin
     this.#logger = await this.pluginManager.get('logger');
+    this.#sync = await this.pluginManager.get('sync');
   }
 
   /**
