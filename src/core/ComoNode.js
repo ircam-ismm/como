@@ -344,6 +344,7 @@ class ComoNode {
     }
 
     await this.#host.stop();
+    await this.audioContext.close();
   }
 
   /**

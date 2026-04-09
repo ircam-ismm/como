@@ -121,6 +121,11 @@ class ComoServer extends ComoNode {
     await this.audioContext.resume();
   }
 
+  async stop() {
+    await this.logger.switch({ dirname: null });
+    await super.stop();
+  }
+
   #setProject = async ({ projectDirname }) => {
     // allow to go to idle state
     if (projectDirname === null) {
