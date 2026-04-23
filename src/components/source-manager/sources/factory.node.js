@@ -1,10 +1,3 @@
-// @IMPORTANT
-//
-// This file must be imported using:
-// ```
-// import SourceManager from '#sources/SourceManager.js';
-// ```
-// To satisfy both node and the bundler, cf. package.json `imports` field
 import {
   Server as ComoteServer
 } from '@ircam/comote-helpers/server.js';
@@ -18,6 +11,7 @@ import RiotSource from './RiotSource.js';
 import AggregatedSource from './AggregatedSource.js';
 import OscBridgeSource from './OscBridgeSource.js';
 import StreamPlayerSource from './StreamPlayerSource.js';
+import Lsm9ds1Source from './Lsm9ds1Source.js';
 
 export default class SourceFactory {
   #oscServers = new Map(); // <port, { Server, config }>
@@ -54,6 +48,9 @@ export default class SourceFactory {
       }
       case 'stream-player': {
         return await this.#createStreamPlayerSource(config);
+      }
+      case 'lsm9ds1': {
+        return await this.#createLsm9ds1Source(config);
       }
       default: {
         throw new Error(`Cannot execute "createSource" on SourceFactory: source of type "${type}" is not a valid source type for Node.js runtime`);
@@ -166,6 +163,13 @@ export default class SourceFactory {
   // common node / browser
   async #createStreamPlayerSource(config) {
     const source = new StreamPlayerSource(this.como, config);
+    await source.init();
+
+    return source;
+  }
+
+  async #createLsm9ds1Source(config) {
+    const source = new Lsm9ds1Source(this.como, config);
     await source.init();
 
     return source;

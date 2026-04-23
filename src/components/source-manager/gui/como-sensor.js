@@ -4,6 +4,8 @@ import MemoryBuffer from '../../../../src/utils/MemoryBuffer.js';
 import '@ircam/sc-components/sc-text.js';
 import '@ircam/sc-components/sc-toggle.js';
 
+// This is the other file you can edit
+
 export default class MemoryBuffer {
   #pointer = -1;
   #length = null;
