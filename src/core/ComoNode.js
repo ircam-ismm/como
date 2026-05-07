@@ -64,7 +64,7 @@ class ComoNode {
   #audioBufferLoader;
   #scheduler;
   #audioScheduler;
-  #syncedScheduler;
+  // #syncedScheduler;
 
   /**
    * @param {Client|Server} host - Instance of soundworks client or server
@@ -139,7 +139,7 @@ class ComoNode {
 
   /** @private */
   get nodes() {
-
+    return this.#nodes;
   }
 
   /** @private */
@@ -220,7 +220,7 @@ class ComoNode {
 
   /** @private */
   get syncedScheduler() {
-    throw new Error(`Cannot get "${syncedScheduler}" on ComoNode: not implemented yet`);
+    throw new Error(`Cannot get "syncedScheduler" on ComoNode: not implemented yet`);
   }
 
   /**
@@ -391,17 +391,17 @@ class ComoNode {
    */
   async requestRfc(executorNodeId, name, payload = {}) {
     if (!Number.isInteger(executorNodeId)) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 1 is not a valid node id');
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 1 (nodeId) is not a valid node id');
     }
 
     if (!isString(name)) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 2 is not a valid remote function call name, must be a string');
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 2 (name) is not a valid remote function call name, must be a string');
     }
 
     try {
       JSON.stringify(payload);
-    } catch (err) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 3 cannot be stringified to JSON');
+    } catch {
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 3 (payload) cannot be stringified to JSON');
     }
 
     const commandId = this.#rfcIdGenerator();

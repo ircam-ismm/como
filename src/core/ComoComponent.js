@@ -41,7 +41,7 @@ export default class ComoComponent {
   async init() {}
   async start() {}
   async stop() {}
-  async setProject(projectDirname) {}
+  async setProject(_projectDirname) {}
 
 }
 

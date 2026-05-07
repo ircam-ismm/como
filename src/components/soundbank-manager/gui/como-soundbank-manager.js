@@ -80,7 +80,7 @@ class ComoSoundbankManager extends LitElement {
       <div class="header">
         <sc-text>soundbank</sc-text>
         <sc-icon
-          @click=${e => this.expanded = !this.expanded}
+          @click=${() => this.expanded = !this.expanded}
           ?active=${this.expanded}
           type="plus"
         ></sc-icon>

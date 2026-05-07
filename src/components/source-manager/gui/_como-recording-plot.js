@@ -1,4 +1,3 @@
-
 import { LitElement, html, css } from 'lit';
 import Plotly from 'plotly.js-basic-dist';
 import { parseTxtAsStream } from '../utils/parse-txt-as-stream';

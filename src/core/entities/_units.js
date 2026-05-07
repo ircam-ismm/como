@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 /** @private */
 const timestamp = {
   unit: 'ms',

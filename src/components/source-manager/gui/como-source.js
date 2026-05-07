@@ -46,7 +46,7 @@ class ComoSource extends LitElement {
       <sc-icon
         type="waveform"
         ?active=${this.plotSensor}
-        @input=${e => this.plotSensor = !this.plotSensor}
+        @input=${() => this.plotSensor = !this.plotSensor}
       ></sc-icon>
       ${this.plotSensor
         ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
@@ -58,7 +58,7 @@ class ComoSource extends LitElement {
           <sc-icon
             type="gear"
             ?active=${this.showQrCode}
-            @input=${e => this.showQrCode = !this.showQrCode}
+            @input=${() => this.showQrCode = !this.showQrCode}
           ></sc-icon>
           ${this.showQrCode
             ? html`<sc-qrcode value=${rawLink(this.source.get('infos'))}></sc-qrcode>`

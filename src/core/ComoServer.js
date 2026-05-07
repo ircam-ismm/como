@@ -37,8 +37,6 @@ import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServ
  * await como.start();
  */
 class ComoServer extends ComoNode {
-  #projectsDirname;
-
   /**
    * Constructs a new ComoServer instance
    *
@@ -51,8 +49,6 @@ class ComoServer extends ComoNode {
     projectsDirname = 'projects',
   } = {}) {
     super(server, { projectsDirname });
-
-    this.#projectsDirname = projectsDirname;
 
     this.pluginManager.register('platform-init', ServerPluginPlatformInit);
     this.pluginManager.register('sync', ServerPluginSync);

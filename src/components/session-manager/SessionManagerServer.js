@@ -68,7 +68,7 @@ class SessionManagerServer extends SessionManager {
     await super.start();
 
     // if a soundfile is deleted, remove it from the soundbank of all sessions
-    this.como.soundbankManager.onUpdate(async ({ tree, events }) => {
+    this.como.soundbankManager.onUpdate(async ({ tree: _, events }) => {
       if (!events) {
         return;
       }
@@ -113,21 +113,23 @@ class SessionManagerServer extends SessionManager {
         return;
       }
       // return once all states are in the collection
-      return new Promise(async resolve => {
-        const unsubscribe = this.sessions.onAttach(_ => {
-          if (this.sessions.length === sessionFiles.length) {
-            unsubscribe();
-            resolve();
-          }
-        });
+      const { promise, resolve } = Promise.withResolvers();
 
-        for (let pathname of sessionFiles) {
-          const blob = await fsPromises.readFile(pathname);
-          const data = JSON.parse(blob.toString());
-          const state = await this.como.stateManager.create(`${this.name}:session`, data);
-          this.#currentSessions.add(state);
+      const unsubscribe = this.sessions.onAttach(_ => {
+        if (this.sessions.length === sessionFiles.length) {
+          unsubscribe();
+          resolve();
         }
       });
+
+      for (let pathname of sessionFiles) {
+        const blob = await fsPromises.readFile(pathname);
+        const data = JSON.parse(blob.toString());
+        const state = await this.como.stateManager.create(`${this.name}:session`, data);
+        this.#currentSessions.add(state);
+      }
+
+      return promise;
     }
   }
 
