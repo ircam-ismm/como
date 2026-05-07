@@ -24,6 +24,7 @@
     "lint": "npx eslint src",
     "preversion": "npm run test",
     "test": "npx mocha tests/**/*.spec.js",
+    "test:ci": "ENV=ci npx mocha tests/**/*.spec.js",
     "test:watch": "npx mocha tests/**/*.spec.js --watch",
     "test:only": "npx mocha",
     "types": "rm -rf types && tsc",

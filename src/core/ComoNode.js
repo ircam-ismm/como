@@ -72,7 +72,13 @@ class ComoNode {
   constructor(host, options) {
     this.#host = host;
     this.#config = options;
-    this.#audioContext = new AudioContext();
+
+    // do not try to access an actual soundcard in CI
+    const audioContextOptions = process.env.ENV === 'ci'
+      ? { sinkId: { type:'none' } }
+      : {};
+
+    this.#audioContext = new AudioContext(audioContextOptions);
     this.#audioBufferLoader = new AudioBufferLoader(this.#audioContext);
   }
 
