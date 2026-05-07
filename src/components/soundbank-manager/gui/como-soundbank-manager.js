@@ -13,7 +13,7 @@ class ComoSoundbankManager extends LitElement {
   static properties = {
     sessionId: {
       type: String,
-      attribute: 'session-id'
+      attribute: 'session-id',
     },
     expanded: {
       type: Boolean,
@@ -113,18 +113,18 @@ class ComoSoundbankManager extends LitElement {
                         @change=${e => {
                           const set = new Set(this.session.getUnsafe('soundbank'));
                           e.detail.value ? set.add(name) : set.delete(name);
-                          this.session.set({ soundbank: Array.from(set) })
+                          this.session.set({ soundbank: Array.from(set) });
                         }}
                       ></sc-toggle>
                     `
                   : nothing // @todo - upload / delete
                 }
               </div>
-            `
+            `;
           })
         : nothing
       }
-    `
+    `;
   }
 }
 

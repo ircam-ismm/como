@@ -60,7 +60,7 @@ class SessionManagerServer extends SessionManager {
       return {
         ...updates,
         dirty,
-      }
+      };
     });
   }
 
@@ -153,7 +153,7 @@ class SessionManagerServer extends SessionManager {
     this.#currentSessions.add(session);
 
     return sessionId;
-  }
+  };
 
   #persistSession = async ({ sessionId }) => {
     const session = this.getSession(sessionId);
@@ -167,7 +167,7 @@ class SessionManagerServer extends SessionManager {
 
     await fsPromises.writeFile(pathname, json);
     await session.set({ dirty: false });
-  }
+  };
 
   #renameSession = async ({ sessionId, newName }) => {
     const session = this.getSession(sessionId);
@@ -182,7 +182,7 @@ class SessionManagerServer extends SessionManager {
     await fsPromises.rename(oldFilename, newFilename);
     await session.set({ name: newName });
     await this.#persistSession({ sessionId });
-  }
+  };
 
   #deleteSession = async ({ sessionId }) => {
     const ownedSession = Array.from(this.#currentSessions).find(session => session.get('uuid') === sessionId);
@@ -195,7 +195,7 @@ class SessionManagerServer extends SessionManager {
     await ownedSession.delete();
     const pathname = this.#getPathname(sessionName);
     await fsPromises.rm(pathname, { force: true });
-  }
+  };
 }
 
 export default SessionManagerServer;

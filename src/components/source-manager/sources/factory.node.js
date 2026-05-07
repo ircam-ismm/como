@@ -6,11 +6,11 @@
 // ```
 // To satisfy both node and the bundler, cf. package.json `imports` field
 import {
-  Server as ComoteServer
+  Server as ComoteServer,
 } from '@ircam/comote-helpers/server.js';
 import {
   Server as OscServer,
-  Client as OscClient
+  Client as OscClient,
 } from 'node-osc';
 
 import ComoteSource from './ComoteSource.js';
@@ -113,7 +113,7 @@ export default class SourceFactory {
       }
 
       const server = await new Promise((resolve, reject) => {
-        const oscServer = new OscServer(port, '0.0.0.0')
+        const oscServer = new OscServer(port, '0.0.0.0');
         oscServer.on('listening', () => {
           if (config.verbose) {
             console.log(`> como: OSC server listening`);

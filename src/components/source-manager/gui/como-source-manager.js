@@ -63,7 +63,7 @@ class ComoSourceManager extends LitElement {
           : nothing
         }
       </section>
-    `
+    `;
   }
 }
 

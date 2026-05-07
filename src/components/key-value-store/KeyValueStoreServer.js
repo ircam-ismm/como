@@ -21,19 +21,19 @@ class KeyValueStoreServer extends KeyValueStore {
 
   #get = ({ key }) => {
     return this.#db.get(key);
-  }
+  };
 
   #set = ({ key, value }) => {
     return this.#db.set(key, value);
-  }
+  };
 
   #delete = ({ key }) => {
     return this.#db.delete(key);
-  }
+  };
 
   #clear = () => {
     return this.#db.delete();
-  }
+  };
 }
 
 export default KeyValueStoreServer;

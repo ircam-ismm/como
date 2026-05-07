@@ -28,4 +28,4 @@ export default {
     type: 'string',
     required: true,
   },
-}
+};

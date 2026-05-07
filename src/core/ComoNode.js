@@ -400,7 +400,7 @@ class ComoNode {
 
     try {
       JSON.stringify(payload);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Cannot execute "requestRfc" on ComoNode: argument 3 cannot be stringified to JSON');
     }
 
@@ -489,7 +489,7 @@ class ComoNode {
             resolve(infos.responseAck);
           }
         } else {
-          throw new Error(`Cannot retrieve command resolvers from this.#rfcPendingStore for command id: ${commandId}`)
+          throw new Error(`Cannot retrieve command resolvers from this.#rfcPendingStore for command id: ${commandId}`);
         }
       }
     } else {
@@ -507,7 +507,7 @@ class ComoNode {
           const response = {
             settled: true,
             ...infos,
-          }
+          };
 
           if (responseAck !== undefined || responseAck !== null) {
             response.responseAck = responseAck;
@@ -518,7 +518,7 @@ class ComoNode {
           this.#rfcMessageBus.set({
             settled: true,
             responseErr: serializeError(err),
-            ...infos
+            ...infos,
           });
         }
       }

@@ -30,7 +30,7 @@ class ComoScriptManager extends LitElement {
   render() {
     return html`
       <sw-editor .plugin=${this.como.scriptManager.scripting}></sw-editor>
-    `
+    `;
   }
 }
 

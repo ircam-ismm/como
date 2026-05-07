@@ -57,5 +57,5 @@ export default class OscBridgeSource extends AbstractSource {
         }
       }
     }
-  }
+  };
 }

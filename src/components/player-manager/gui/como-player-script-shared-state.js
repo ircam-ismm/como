@@ -42,7 +42,7 @@ class ComoPlayerScriptSharedState extends LitElement {
     }
     const description = this.scriptState.getDescription();
 
-    const title = html`<div><sc-text>script state</sc-text></div>`
+    const title = html`<div><sc-text>script state</sc-text></div>`;
     const parts = Object.keys(description).map(key => {
       const desc = description[key];
 
@@ -52,7 +52,7 @@ class ComoPlayerScriptSharedState extends LitElement {
             <sc-text>${key}</sc-text>
             <sc-bang
               ?active=${this.scriptState.get(key)}
-              @input=${e => this.scriptState.set(key, true)}
+              @input=${() => this.scriptState.set(key, true)}
             ></sc-bang>
           </div>
         `;
@@ -110,7 +110,7 @@ class ComoPlayerScriptSharedState extends LitElement {
                   @change=${e => this.scriptState.set(key, e.detail.value)}
                 ></sc-radio>
               </div>
-            `
+            `;
           } else {
             return html`
               <div>
@@ -121,17 +121,17 @@ class ComoPlayerScriptSharedState extends LitElement {
                   @change=${e => this.scriptState.set(key, e.detail.value)}
                 ></sc-select>
               </div>
-            `
+            `;
           }
         }
         case 'any': {
-          console.log('Interface for "any" type not implemented yet')
+          console.log('Interface for "any" type not implemented yet');
           return nothing;
         }
       }
     });
 
-    return [title, ...parts]
+    return [title, ...parts];
   }
 
   connectedCallback() {

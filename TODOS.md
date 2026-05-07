@@ -1,14 +1,17 @@
+- [ ] implement `xmmManager` component
+
 - [ ] `scriptName` & `scriptSharedStateClassName` are not updated at the sae time which is confusing
   + workaround `scriptNameRequest` -> [`scriptName` & `scriptSharedStateClassName`]
-- [ ] implement `player.getScriptSharedState`
-- [ ]
-    allow to `playerManager.getPlayer` to have player instances that do not mirror the script
-    OR `playerManager.getPlayerState()`
 
 
 - [ ] make sure projects directory can live alongside (not within) the application
 - [ ] documentation
 - [ ] template generator
+
+- [x] implement `player.getScriptSharedState`
+- [x] allow to `playerManager.getPlayer` to have player instances that do not mirror the script
+    OR `playerManager.getPlayerState()`
+
   + [x] merge @soundworks/create cf. https://github.com/collective-soundworks/soundworks-create/pull/10
 
 - [x] review scripting
@@ -29,7 +32,7 @@
 - [x] Implement project manager
 - [x] Move `RecordingManager` within `SourceManager`
 - [x] sketch scripts : `enter` / `exit` / `defineParams` / `process`
-- [ ] Implement SoundBankManager
+- [x] Implement SoundBankManager
 - [ ] add test for source recording
 - [ ] Errors issues - are swallowed somehow...
   + [ ] `como.setProject`
@@ -43,8 +46,6 @@
 
 - [ ] fix `instanceof` issue with peer dependency check in local (npm link)
 - [ ] check https://github.com/dbrekalo/validate-types for commands validation
-
-
 
 - [x] R-IoT 2 source (JIP)
 - [x] Algo - sc-motion

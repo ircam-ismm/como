@@ -1,6 +1,6 @@
 
-export default class RiotManager {
-  constructor(como) {
+// export default class RiotManager {
+//   constructor(_como) {
 
-  }
-}
+//   }
+// }

@@ -8,7 +8,7 @@ class ComoSensorPlot extends LitElement {
 
   static properties = {
     value: { type: String },
-  }
+  };
 
   get value() {
     return this.#value;

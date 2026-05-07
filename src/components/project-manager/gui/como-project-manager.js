@@ -11,8 +11,8 @@ class ComoProjectManager extends LitElement {
     extended: {
       type: Boolean,
       reflect: true,
-    }
-  }
+    },
+  };
 
   static styles = css`
     :host {
@@ -53,7 +53,7 @@ class ComoProjectManager extends LitElement {
         <sc-text>current project: ${this.como.project.get('name')}</sc-text>
         <sc-icon
           type="gear"
-          @input=${e => this.extended = !this.extended}
+          @input=${() => this.extended = !this.extended}
         ></sc-icon>
       </div>
       ${this.extended ? html`
@@ -93,7 +93,7 @@ class ComoProjectManager extends LitElement {
                   ></sc-text>
                   <sc-icon
                     type="upgrade"
-                    @input=${async e => {
+                    @input=${async () => {
                       try {
                         await this.como.setProject(project.get('name'));
                       } catch (err) {
@@ -103,7 +103,7 @@ class ComoProjectManager extends LitElement {
                   ></sc-icon>
                   <sc-icon
                     type="delete"
-                    @input=${async e => {
+                    @input=${async () => {
                       if (confirm(`Are you sure you want to delete the "${project.get('name')}" project?`)) {
                         try {
                           await this.como.projectManager.deleteProject(project.get('name'));
@@ -114,7 +114,7 @@ class ComoProjectManager extends LitElement {
                     }}
                   ></sc-icon>
                 </div>
-              `
+              `;
             })}
           </div>
         </div>

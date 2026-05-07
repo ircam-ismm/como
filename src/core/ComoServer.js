@@ -20,6 +20,7 @@ import ScriptManagerServer from '../components/script-manager/ScriptManagerServe
 import SoundbankManagerServer from '../components/soundbank-manager/SoundbankManagerServer.js';
 import SessionManagerServer from '../components/session-manager/SessionManagerServer.js';
 import PlayerManagerServer from '../components/player-manager/PlayerManagerServer.js';
+import ModelManagerServer from '../components/model-manager/ModelManagerServer.js';
 
 import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServer.js';
 
@@ -106,6 +107,13 @@ class ComoServer extends ComoNode {
      */
     new PlayerManagerServer(this, 'playerManager');
     /**
+     * @member modelManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {ModelManagerServer}
+     */
+    new ModelManagerServer(this, 'modelManager');
+    /**
      * @member keyValueStore
      * @memberof ComoServer#
      * @readonly
@@ -169,7 +177,7 @@ class ComoServer extends ComoNode {
     }
 
     return true;
-  }
+  };
 }
 
 export default ComoServer;

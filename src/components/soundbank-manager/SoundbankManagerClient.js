@@ -1,7 +1,7 @@
 import ClientPluginFilesystem from '@soundworks/plugin-filesystem/client.js';
 
 import {
-  isBrowser
+  isBrowser,
 } from '@ircam/sc-utils';
 
 import SoundbankManager from './SoundbankManager.js';

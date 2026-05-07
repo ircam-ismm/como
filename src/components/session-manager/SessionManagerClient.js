@@ -1,5 +1,5 @@
 import {
-  isBrowser
+  isBrowser,
 } from '@ircam/sc-utils';
 
 import SessionManager from './SessionManager.js';
@@ -10,10 +10,6 @@ import SessionManager from './SessionManager.js';
  * @extends {SessionManager}
  */
 class SessionManagerClient extends SessionManager {
-  constructor(como, name) {
-    super(como, name);
-  }
-
   async start() {
     await super.start();
 

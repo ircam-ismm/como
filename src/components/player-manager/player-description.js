@@ -64,4 +64,4 @@ export default {
     max: 12,
     default: 0,
   },
-}
+};

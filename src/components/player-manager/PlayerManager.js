@@ -102,17 +102,17 @@ class PlayerManager extends ComoComponent {
     this.#ownedPlayers.add(player);
 
     return player.id;
-  }
+  };
 
   /**
    * @todo - Implement
    * @private
    */
-  async deletePlayer(playerId) {
+  async deletePlayer(_playerId) {
 
   }
 
-      // attach to exiting script shared state, if any, rather than creating a new instance
+  // attach to exiting script shared state, if any, rather than creating a new instance
   /**
    * Get the full {@link Player} API access of a given player.
    *
@@ -179,7 +179,7 @@ class PlayerManager extends ComoComponent {
     if (scriptSharedStateClassName !== null) {
       const scriptState = await this.como.stateManager.attach(
         scriptSharedStateClassName,
-        scriptSharedStateId
+        scriptSharedStateId,
       );
 
       return scriptState;

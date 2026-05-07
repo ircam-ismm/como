@@ -87,7 +87,7 @@ class ComoScriptManager extends LitElement {
                   editable
                   @change=${async e => {
                     try {
-                      await this.como.sessionManager.renameSession(session.get('uuid'), e.detail.value.trim())
+                      await this.como.sessionManager.renameSession(session.get('uuid'), e.detail.value.trim());
                     } catch (err) {
                       console.log(err);
                     }
@@ -144,7 +144,7 @@ class ComoScriptManager extends LitElement {
           `;
         }) : nothing
       }
-    `
+    `;
   }
 
   connectedCallback() {

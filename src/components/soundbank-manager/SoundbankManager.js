@@ -76,7 +76,7 @@ class SoundbankManager extends ComoComponent {
       const toAdd = next.filter(item => !current.includes(item));
       const toRemove = current.filter(item => !next.includes(item));
       // clean current loaded buffers
-      toRemove.forEach(name => delete this.#buffers[name])
+      toRemove.forEach(name => delete this.#buffers[name]);
       // add new buffers
       for (let name in urlMap) {
         if (!toAdd.includes(name)) {
@@ -131,10 +131,14 @@ class SoundbankManager extends ComoComponent {
   /**
    * Get a set of AudioBuffers from their filenames
    *
-   * @param {Array<String>} fileList - List of filenames to retrieve
+   * @param {Array<String>|null} [fileList=null] - List of filenames to retrieve
    * @returns {Object<String, AudioBuffer>}
    */
-  async getBuffers(fileList) {
+  async getBuffers(fileList = null) {
+    if (fileList === null) {
+      return Object.assign({}, this.#buffers);
+    }
+
     if (!Array.isArray(fileList)) {
       throw new TypeError(`Cannot execute 'getBuffers' on SoundbankManager: argument 1 must be an array`);
     }

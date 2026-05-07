@@ -1,5 +1,5 @@
 import {
-  isBrowser
+  isBrowser,
 } from '@ircam/sc-utils';
 
 import PlayerManager from './PlayerManager.js';

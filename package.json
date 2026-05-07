@@ -71,7 +71,8 @@
     "plotly.js-basic-dist": "^3.3.0",
     "serialize-error": "^12.0.0",
     "usb": "^2.16.0",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "xmmjs": "^0.0.3"
   },
   "peerDependencies": {
     "@soundworks/core": "^5.4.1"
