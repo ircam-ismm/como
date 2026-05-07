@@ -21,4 +21,4 @@ jobs:
         run: npm run lint
 
       - name: Run Test
-        run: npm run test:ci
+        run: npm run test
