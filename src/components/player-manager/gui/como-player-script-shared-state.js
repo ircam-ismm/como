@@ -1,6 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import JSON5 from 'json5'
+import JSON5 from 'json5';
 
 import '@ircam/sc-components/sc-bang.js';
 import '@ircam/sc-components/sc-editor.js';
@@ -135,8 +135,7 @@ class ComoPlayerScriptSharedState extends LitElement {
                 @change=${e => this.scriptState.set(key, e.detail.value)}
               >${this.scriptState.get(key)}</sc-text>
             </div>
-          `
-          break;
+          `;
         }
         case 'any': {
           return html`

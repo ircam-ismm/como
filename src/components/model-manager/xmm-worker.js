@@ -14,7 +14,6 @@ parentPort.on('message', event => {
   } else {
     examples.forEach((example, index) => {
       const { label, input } = example;
-      console.log(label, input);
 
       if (index === 0) {
         const inputDimension = input[0].length;
