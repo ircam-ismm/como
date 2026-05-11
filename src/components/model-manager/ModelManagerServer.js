@@ -24,6 +24,8 @@ const presets = {
       covarianceMode: 'full',
       states: 1,
       transitionMode: 'ergodic',
+      regressionEstimator: 'full',
+      likelihoodWindow: 10,
     },
   },
   shortGestures: {
@@ -38,6 +40,8 @@ const presets = {
       covarianceMode: 'full',
       states: 4,
       transitionMode: 'leftright',
+      regressionEstimator: 'full',
+      likelihoodWindow: 10,
     },
   },
   longGestures: {
@@ -52,6 +56,8 @@ const presets = {
       covarianceMode: 'full',
       states: 10,
       transitionMode: 'leftright',
+      regressionEstimator: 'full',
+      likelihoodWindow: 10,
     },
   },
 };

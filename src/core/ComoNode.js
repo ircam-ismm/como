@@ -74,7 +74,7 @@ class ComoNode {
     this.#config = options;
 
     // do not try to access an actual soundcard in CI
-    const audioContextOptions = process.env.ENV === 'ci'
+    const audioContextOptions = (globalThis.process?.env.ENV === 'ci')
       ? { sinkId: { type:'none' } }
       : {};
 

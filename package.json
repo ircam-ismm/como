@@ -18,6 +18,10 @@
     "#isomorphic-utils.js": {
       "module": "./src/isomorphic-utils/browser.js",
       "node": "./src/isomorphic-utils/node.js"
+    },
+    "#xmm.js": {
+      "module": "./src/components/model-manager/xmm-export-wrap/browser.js",
+      "node": "./src/components/model-manager/xmm-export-wrap/node.js"
     }
   },
   "scripts": {
@@ -66,6 +70,7 @@
     "chai": "^6.2.1",
     "filenamify": "^7.0.1",
     "isomorphic-web-audio-api": "^1.0.2",
+    "json5": "^2.2.3",
     "lit": "^3.3.1",
     "mocha": "^11.7.5",
     "node-osc": "^11.1.1",

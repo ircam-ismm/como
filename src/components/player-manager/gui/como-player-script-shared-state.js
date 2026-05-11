@@ -1,13 +1,15 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import JSON5 from 'json5'
 
-import '@ircam/sc-components/sc-text.js';
-import '@ircam/sc-components/sc-toggle.js';
 import '@ircam/sc-components/sc-bang.js';
-import '@ircam/sc-components/sc-slider.js';
+import '@ircam/sc-components/sc-editor.js';
+import '@ircam/sc-components/sc-icon.js';
 import '@ircam/sc-components/sc-radio.js';
 import '@ircam/sc-components/sc-select.js';
-import '@ircam/sc-components/sc-editor.js';
+import '@ircam/sc-components/sc-slider.js';
+import '@ircam/sc-components/sc-text.js';
+import '@ircam/sc-components/sc-toggle.js';
 
 class ComoPlayerScriptSharedState extends LitElement {
   #unsubscribePlayerUpdate;
@@ -124,9 +126,33 @@ class ComoPlayerScriptSharedState extends LitElement {
             `;
           }
         }
+        case 'string': {
+          return html`
+            <div>
+              <sc-text>${key}</sc-text>
+              <sc-text
+                editable
+                @change=${e => this.scriptState.set(key, e.detail.value)}
+              >${this.scriptState.get(key)}</sc-text>
+            </div>
+          `
+          break;
+        }
         case 'any': {
-          console.log('Interface for "any" type not implemented yet');
-          return nothing;
+          return html`
+            <div>
+              <sc-text>${key}</sc-text>
+              <sc-icon
+                type="info"
+                title="Support only JSON-like format"
+              ></sc-icon>
+              <sc-editor
+                .options=${desc.list}
+                value=${JSON5.stringify(this.scriptState.get(key), null, 2)}
+                @change=${e => JSON5.parse(this.scriptState.set(key, e.detail.value))}
+              ></sc-editor>
+            </div>
+          `;
         }
       }
     });

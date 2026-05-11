@@ -1,12 +1,18 @@
-import xmm from 'xmmjs';
+import xmm from '#xmm.js';
 
 function getXmmDecoder(config, parameters) {
   switch (config.modelType) {
     case 'gmm': {
-      return xmm.MulticlassGMMPredictor(parameters);
+      const decoder = xmm.MulticlassGMMPredictor(parameters);
+      // @todo - review this weird default
+      decoder.setLikelihoodWindow(config.likelihoodWindow || 10);
+      return decoder;
     }
     case 'hhmm': {
-      return xmm.MulticlassHMMPredictor(parameters);
+      const decoder = xmm.MulticlassHMMPredictor(parameters);
+      // @todo - review this weird default
+      decoder.setLikelihoodWindow(config.likelihoodWindow || 10);
+      return decoder;
     }
     default: {
       throw new Error(`Cannot create xmm decoder: modelType "${config.modelType}" is not supported`);
@@ -90,12 +96,9 @@ class Model {
     return promise;
   }
 
-  // async train() {
-  //   await this.#modelManager.train(this.id);
-  // }
-
   process(frame) {
-    return this.#decoder.predict(frame);
+    this.#decoder.predict(frame);
+    return this.#decoder.results;
   }
 }
 

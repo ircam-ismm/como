@@ -1,7 +1,7 @@
 import { parentPort } from 'node:worker_threads';
 import { getTime } from '@ircam/sc-utils';
 
-import xmm from 'xmmjs';
+import xmm from '#xmm.js';
 
 parentPort.on('message', event => {
   const startTime = getTime();
@@ -14,6 +14,7 @@ parentPort.on('message', event => {
   } else {
     examples.forEach((example, index) => {
       const { label, input } = example;
+      console.log(label, input);
 
       if (index === 0) {
         const inputDimension = input[0].length;
