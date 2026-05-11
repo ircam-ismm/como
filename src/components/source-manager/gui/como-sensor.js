@@ -72,6 +72,10 @@ class ComoSensor extends LitElement {
     sourceId: {
       type: String,
       attribute: 'source-id',
+    },
+    sensorType: {
+      type: String,
+      attribute: 'sensor-type',
     }
   };
 
@@ -94,6 +98,7 @@ class ComoSensor extends LitElement {
     this.sourceId = null;
     this.numChannel = 1;
     this.channelIndex = 0;
+    this.sensorType = 'accelerometer'; // 'accelerometer', 'gyroscope', 'magnetometer'
 
     this.update = this.update.bind(this);
   }
@@ -117,7 +122,7 @@ class ComoSensor extends LitElement {
               ></sc-number>`
             : ''
           }
-          <sc-text style="width: 100%">x: 'steelblue', y: 'orange', z: 'green'</sc-text>
+          <sc-text style="width: 100%">X: purple  |   Y: orange  |  Z: red</sc-text>
         </div>
       </div>
     `;
@@ -201,8 +206,18 @@ class ComoSensor extends LitElement {
 
       let x = 0;
       const xDelta = this.#logicalWidth / (this.#buffer.length - 1);
-      const normalize = value => (value + 9.81) / (2 * 9.81);
-      const colors = ['steelblue', 'orange', 'green'];
+
+      // Normalisation selon le type de capteur
+      let normalize;
+      if (this.sensorType === 'accelerometer') {
+        normalize = value => (value + 19.62) / (2 * 19.62); //LSM9DS1 en reférence : ±2g = ±19.62 m/s^2
+      } else if (this.sensorType === 'gyroscope') {
+        normalize = value => (value + 4.28) / (2 * 4.28); // LSM9DS1 en reférence : ±245 dps ~ ±4.28 rad/s
+      } else if (this.sensorType === 'magnetometer') {
+        normalize = value => (value + 400) / (2 * 400); // LSM9DS1 en reférence : ±4 gauss = ±400 en uT
+      }
+
+      const colors = ['purple', 'orange', 'red'];
 
       ['x', 'y', 'z'].forEach((field, index) => {
         this.#ctx.strokeStyle = colors[index];
@@ -223,7 +238,7 @@ class ComoSensor extends LitElement {
 
           let entryValue = null;
           try {
-            entryValue = value.accelerometer[field];
+            entryValue = value[this.sensorType][field];
           } catch (err) {
             console.log('Faulty entry', value);
             throw err;

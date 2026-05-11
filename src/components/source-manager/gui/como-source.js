@@ -16,7 +16,11 @@ class ComoSource extends LitElement {
   };
 
   static styles = css`
-
+    :host {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
   `;
 
   constructor() {
@@ -30,19 +34,30 @@ class ComoSource extends LitElement {
 
   render() {
     return html`
-      <sc-text>source: ${this.source.get('id')}</sc-text>
-      <sc-status ?active=${this.source.get('active')}></sc-status>
-      <sc-record
-        ?value=${this.source.get('record')}
-        @change=${e => this.source.set('record', e.detail.value)}
-      ></sc-record>
-      <sc-icon
-        type="waveform"
-        ?active=${this.plotSensor}
-        @input=${e => this.plotSensor = !this.plotSensor}
-      ></sc-icon>
+      <div style="width: 100%; display: flex; gap: 10px; align-items: center;">
+        <sc-text>source: ${this.source.get('id')}</sc-text>
+        <sc-status ?active=${this.source.get('active')}></sc-status>
+        <sc-record
+          ?value=${this.source.get('record')}
+          @change=${e => this.source.set('record', e.detail.value)}
+        ></sc-record>
+        <sc-icon
+          type="waveform"
+          ?active=${this.plotSensor}
+          @input=${e => this.plotSensor = !this.plotSensor}
+        ></sc-icon>
+      </div>
       ${this.plotSensor
-        ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
+        ? html`
+          <sc-text>Accelerometer</sc-text>
+          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="accelerometer"></como-sensor>
+
+          <sc-text>Gyroscope</sc-text>
+          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="gyroscope"></como-sensor>
+
+          <sc-text>Magnetometer</sc-text>
+          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="magnetometer"></como-sensor>
+        `
         : nothing
       }
     `;
