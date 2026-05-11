@@ -36,6 +36,10 @@ describe('#ModelManager', () => {
   });
 
   describe('## async getModel(modelId)', () => {
+    afterEach(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
     it('should create a new Model if not exists', async () => {
       const modelId = 'test';
       const model = await client.modelManager.getModel(modelId);
@@ -63,6 +67,10 @@ describe('#ModelManager', () => {
   });
 
   describe(`## async addExample(label, input)`, () => {
+    afterEach(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
     it('should add examples to model', async () => {
       const modelId = 'test';
       const inputDimension = 3;
@@ -126,6 +134,10 @@ describe('#ModelManager', () => {
   });
 
   describe(`## async clearExamples(label = null)`, () => {
+    afterEach(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
     it('should remove examples with given label', async () => {
       const modelId = 'test';
       const inputDimension = 3;
@@ -179,6 +191,75 @@ describe('#ModelManager', () => {
       const infos = model.state.get('infos');
       assert.isUndefined(infos['one']);
       assert.isUndefined(infos['two']);
+    });
+  });
+
+  describe(`## persist & load models`, () => {
+    after(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
+    it('should properly store model when updated', async () => {
+      const modelId = 'test';
+      const inputDimension = 3;
+      const model = await client.modelManager.getModel(modelId);
+
+      for (let [index, label] of Object.entries(['one', 'two'])) {
+        const example = [];
+        for (let i = 0; i < 1000; i += 1) {
+          const frame = Array.from(Array(inputDimension), () => Math.random() + parseInt(index)); // get data from somewhere
+          example.push(frame);
+        }
+
+        await model.addExample(label, example);
+      }
+
+      // update file after `addExample`
+      {
+        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+        assert.isTrue(fs.existsSync(modelPathname));
+
+        const data = JSON.parse(fs.readFileSync(modelPathname).toString());
+        assert.equal(data.uuid, model.state.get('uuid'));
+        assert.equal(data.id, model.state.get('id'));
+        // as this is nested object, let's compare the stringified version
+        assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
+        assert.deepEqual(data.infos, model.state.get('infos'));
+        assert.equal(data.examples.length, 2);
+      }
+
+      await model.clearExamples('one');
+
+      // update file after `clearExamples`
+      {
+        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+        assert.isTrue(fs.existsSync(modelPathname));
+
+        const data = JSON.parse(fs.readFileSync(modelPathname).toString());
+        assert.equal(data.uuid, model.state.get('uuid'));
+        assert.equal(data.id, model.state.get('id'));
+        // as this is nested object, let's compare the stringified version
+        assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
+        assert.deepEqual(data.infos, model.state.get('infos'));
+        assert.equal(data.examples.length, 1);
+      }
+    });
+
+    it('should properly reload model at startup', async () => {
+      // this should retrieve the stored model from previous test
+      const modelId = 'test';
+      const model = await client.modelManager.getModel(modelId);
+
+      const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+      assert.isTrue(fs.existsSync(modelPathname));
+
+      const data = JSON.parse(fs.readFileSync(modelPathname).toString());
+      assert.equal(data.uuid, model.state.get('uuid'));
+      assert.equal(data.id, model.state.get('id'));
+      // as this is nested object, let's compare the stringified version
+      assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
+      assert.deepEqual(data.infos, model.state.get('infos'));
+      assert.equal(data.examples.length, 1);
     });
   });
 });

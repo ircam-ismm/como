@@ -20,23 +20,39 @@ function examplesInfos(examples) {
 class PrivateModel {
   #examples;
   #state;
-  #xmmWorker;
+  #manager;
   #idGenerator = counter();
   #idPromiseMap = new Map();
 
-  constructor(xmmWorker, state, examples = []) {
+  constructor(manager, state, examples = []) {
+    this.#manager = manager;
     this.#state = state;
     this.#examples = examples;
-    this.#xmmWorker = xmmWorker;
-
-    this.#xmmWorker.on('message', msg => {
-      const { promiseId, err, parameters, trainingDuration } = msg;
-      const { resolve, reject } = this.#idPromiseMap.get(promiseId);
-      this.#idPromiseMap.delete(promiseId);
-
-      err ? reject(new Error(err)) : resolve({ parameters, trainingDuration });
-    });
+    // Worker extends the Node.js "EventEmitter" not the W3C `EventTarget`
+    this.#manager.xmmWorker.addListener('message', this.#onWorkerMessage);
   }
+
+  get state() {
+    return this.#state;
+  }
+
+  get examples() {
+    return this.#examples;
+  }
+
+  /** @private */
+  async delete() {
+    this.#manager.xmmWorker.removeListener('message', this.#onWorkerMessage);
+    await this.#state.delete();
+  }
+
+  #onWorkerMessage = msg => {
+    const { promiseId, err, parameters, trainingDuration } = msg;
+    const { resolve, reject } = this.#idPromiseMap.get(promiseId);
+    this.#idPromiseMap.delete(promiseId);
+
+    err ? reject(new Error(err)) : resolve({ parameters, trainingDuration });
+  };
 
   async addExample(label, input, output = null) {
     const example = { label, input, output };
@@ -52,33 +68,9 @@ class PrivateModel {
       this.#examples = [];
     }
 
-    // retrain full model, removing a label may change something in other classes
-    // @todo - confirm this, the test is not clear
-    // cf. `tests/component-model-manager/xmm-vendor.spec.js`
-    const multiClass = true;
-    const config = this.#state.get('config').payload;
-    const examples = this.#examples;
-
-    const { promise, resolve, reject } = Promise.withResolvers();
-    const promiseId = this.#idGenerator();
-    this.#idPromiseMap.set(promiseId, { resolve, reject });
-
-    this.#xmmWorker.postMessage({
-      promiseId,
-      config,
-      examples,
-      multiClass,
-    });
-
-    try {
-      const { parameters, trainingDuration } = await promise;
-      console.log(`> Model "${this.#state.get('id')}" updated: ${Math.round(trainingDuration * 1e3)}ms`);
-
-      const infos = examplesInfos(this.#examples);
-      await this.#state.set({ parameters, infos });
-    } catch (err) {
-      return err;
-    }
+    // Retrain full model, removing a label may change something in other classes
+    // @todo - confirm (test is not clear) cf. `tests/component-model-manager/xmm-vendor.spec.js`
+    await this.train();
   }
 
   async train(label = null) {
@@ -97,7 +89,7 @@ class PrivateModel {
     const promiseId = this.#idGenerator();
     this.#idPromiseMap.set(promiseId, { resolve, reject });
 
-    this.#xmmWorker.postMessage({
+    this.#manager.xmmWorker.postMessage({
       promiseId,
       config,
       examples,
@@ -106,12 +98,12 @@ class PrivateModel {
 
     try {
       const { parameters: singleOrMultiClassParameters, trainingDuration } = await promise;
-      console.log(`> Training model "${this.#state.get('id')}": ${Math.round(trainingDuration * 1e3)}ms`);
+      console.log(`> Model "${this.#state.get('id')}" updated: ${Math.round(trainingDuration * 1e3)}ms`);
 
       let parameters;
 
       if (!multiClass) {
-        parameters = this.#state.getUnsafe('parameters');
+        parameters = this.#state.get('parameters');
         parameters.classes[label] = singleOrMultiClassParameters;
       } else {
         parameters = singleOrMultiClassParameters;
@@ -122,6 +114,8 @@ class PrivateModel {
     } catch (err) {
       return err;
     }
+
+    await this.#manager.persist(this);
   }
 }
 

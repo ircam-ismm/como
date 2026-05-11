@@ -1,14 +1,16 @@
 export default {
+  uuid: {
+    type: 'string',
+    required: true,
+  },
+  // user defined id, should be unique
   id: {
     type: 'string',
-    default: null,
     required: true,
   },
   config: {
     type: 'any',
-    default: {
-      // ...
-    },
+    required: true,
   },
   parameters: {
     type: 'any',
@@ -19,7 +21,4 @@ export default {
     type: 'any',
     default: {},
   },
-  // examplesPerLabels: {
-
-  // },
 };

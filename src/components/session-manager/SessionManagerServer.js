@@ -87,7 +87,10 @@ class SessionManagerServer extends SessionManager {
 
   }
 
-  /** @private */
+  /**
+   * @private
+   * @todo - share w/ ModelManager and others?
+   */
   async setProject(dirname) {
     // delete all existing states
     for (let session of this.#currentSessions.entries()) {
@@ -107,11 +110,12 @@ class SessionManagerServer extends SessionManager {
       const sessionFiles = files
         .map(filename => path.join(sessionDirname, filename))
         .filter(pathname => pathname.endsWith('.json'))
-        .filter(pathname => fs.statSync(pathname));
+        .filter(pathname => fs.statSync(pathname).isFile());
 
       if (sessionFiles.length === 0) {
         return;
       }
+
       // return once all states are in the collection
       const { promise, resolve } = Promise.withResolvers();
 
