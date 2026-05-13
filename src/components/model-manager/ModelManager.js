@@ -88,6 +88,14 @@ class ModelManager extends ComoComponent {
     );
   }
 
+  async deleteExample(modelId, uuid) {
+    await this.como.requestRfc(
+      this.como.constants.SERVER_ID,
+      `${this.name}:deleteExample`,
+      { modelId, uuid },
+    );
+  }
+
   async clearExamples(modelId, label = null) {
     await this.como.requestRfc(
       this.como.constants.SERVER_ID,

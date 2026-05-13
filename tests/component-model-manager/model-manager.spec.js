@@ -128,7 +128,69 @@ describe('#ModelManager', () => {
 
         const infos = model.state.get('infos');
         assert.equal(infos['one'].numExamples, 2);
+        assert.equal(infos['one'].uuids.length, 2);
         assert.equal(infos['two'].numExamples, 1);
+        assert.equal(infos['two'].uuids.length, 1);
+      }
+    });
+  });
+
+  describe(`## async deleteExamples(uuid)`, () => {
+    afterEach(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
+    it('should remove examples with given label', async () => {
+      const modelId = 'test';
+      const inputDimension = 3;
+      const model = await client.modelManager.getModel(modelId);
+
+      for (let [index, label] of Object.entries(['one', 'two', 'two'])) {
+        const example = [];
+        for (let i = 0; i < 1000; i += 1) {
+          const frame = Array.from(Array(inputDimension), () => Math.random() + parseInt(index)); // get data from somewhere
+          example.push(frame);
+        }
+
+        await model.addExample(label, example);
+      }
+
+      {
+        const infos = model.state.get('infos');
+        const twoUuid = infos['two'].uuids[0];
+        await model.deleteExample(twoUuid);
+      }
+
+      {
+        const parameters = model.state.get('parameters');
+        assert.equal(parameters.inputDimension, inputDimension);
+        assert.isDefined(parameters.classes['one']);
+        assert.isDefined(parameters.classes['two']);
+
+        const infos = model.state.get('infos');
+        assert.equal(infos['one'].numExamples, 1);
+        assert.equal(infos['one'].uuids.length, 1);
+        assert.equal(infos['two'].numExamples, 1);
+        assert.equal(infos['two'].uuids.length, 1);
+      }
+
+      {
+        const infos = model.state.get('infos');
+        const twoUuid = infos['two'].uuids[0];
+        await model.deleteExample(twoUuid);
+      }
+
+      {
+        const parameters = model.state.get('parameters');
+        assert.equal(parameters.inputDimension, inputDimension);
+        assert.isDefined(parameters.classes['one']);
+        assert.isUndefined(parameters.classes['two']);
+
+        const infos = model.state.get('infos');
+        assert.equal(infos['one'].numExamples, 1);
+        assert.equal(infos['one'].uuids.length, 1);
+        assert.isUndefined(infos['two']);
+        assert.isUndefined(infos['two']);
       }
     });
   });

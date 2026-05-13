@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { counter } from '@ircam/sc-utils';
 
 function examplesInfos(examples) {
@@ -7,9 +8,11 @@ function examplesInfos(examples) {
     if (!infos[example.label]) {
       infos[example.label] = {
         numExamples: 0,
+        uuids: [],
       };
     }
 
+    infos[example.label].uuids.push(example.uuid);
     infos[example.label].numExamples += 1;
   });
 
@@ -29,7 +32,7 @@ class PrivateModel {
     this.#state = state;
     this.#examples = examples;
     // Worker extends the Node.js "EventEmitter" not the W3C `EventTarget`
-    this.#manager.xmmWorker.addListener('message', this.#onWorkerMessage);
+    this.#manager.algorithms['xmm'].addListener('message', this.#onWorkerMessage);
   }
 
   get state() {
@@ -42,7 +45,7 @@ class PrivateModel {
 
   /** @private */
   async delete() {
-    this.#manager.xmmWorker.removeListener('message', this.#onWorkerMessage);
+    this.#manager.algorithms['xmm'].removeListener('message', this.#onWorkerMessage);
     await this.#state.delete();
   }
 
@@ -55,10 +58,27 @@ class PrivateModel {
   };
 
   async addExample(label, input, output = null) {
-    const example = { label, input, output };
+    const uuid = randomUUID();
+    const example = { uuid, label, input, output };
     this.#examples.push(example);
 
     await this.train(label);
+  }
+
+  async deleteExample(uuid) {
+    const example = this.#examples.find(example => example.uuid === uuid);
+
+    if (example) {
+      const label = example.label;
+      this.#examples = this.#examples.filter(ex => ex !== example);
+      const other = this.#examples.find(ex => ex.label === label);
+
+      if (other) {
+        await this.train(label);
+      } else {
+        await this.clearExamples(label);
+      }
+    }
   }
 
   async clearExamples(label = null) {
@@ -68,9 +88,15 @@ class PrivateModel {
       this.#examples = [];
     }
 
-    // Retrain full model, removing a label may change something in other classes
-    // @todo - confirm (test is not clear) cf. `tests/component-model-manager/xmm-vendor.spec.js`
-    await this.train();
+    if (label) {
+      const infos = examplesInfos(this.#examples);
+      const parameters = this.#state.get('parameters');
+      delete parameters.classes[label];
+      await this.#state.set({ parameters, infos });
+      await this.#manager.persist(this);
+    } else {
+      this.train(); // retrain empty model
+    }
   }
 
   async train(label = null) {
@@ -89,7 +115,7 @@ class PrivateModel {
     const promiseId = this.#idGenerator();
     this.#idPromiseMap.set(promiseId, { resolve, reject });
 
-    this.#manager.xmmWorker.postMessage({
+    this.#manager.algorithms['xmm'].postMessage({
       promiseId,
       config,
       examples,

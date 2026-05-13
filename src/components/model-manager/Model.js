@@ -1,24 +1,4 @@
-import xmm from '#xmm.js';
-
-function getXmmDecoder(config, parameters) {
-  switch (config.modelType) {
-    case 'gmm': {
-      const decoder = xmm.MulticlassGMMPredictor(parameters);
-      // @todo - review this weird default
-      decoder.setLikelihoodWindow(config.likelihoodWindow || 10);
-      return decoder;
-    }
-    case 'hhmm': {
-      const decoder = xmm.MulticlassHMMPredictor(parameters);
-      // @todo - review this weird default
-      decoder.setLikelihoodWindow(config.likelihoodWindow || 10);
-      return decoder;
-    }
-    default: {
-      throw new Error(`Cannot create xmm decoder: modelType "${config.modelType}" is not supported`);
-    }
-  }
-}
+import { getDecoder } from './algorithms/xmm-lib.js';
 
 class Model {
   #modelManager;
@@ -37,7 +17,7 @@ class Model {
       if ('parameters' in updates) {
         const { payload: config } = this.#state.get('config');
         const parameters = this.#state.getUnsafe('parameters');
-        this.#decoder = getXmmDecoder(config, parameters);
+        this.#decoder = getDecoder(config, parameters);
       }
     }, true);
   }
@@ -77,6 +57,25 @@ class Model {
     return promise;
   }
 
+  async deleteExample(uuid) {
+    const { promise, resolve, reject } = Promise.withResolvers();
+    const unsubscribe = this.#state.onUpdate(updates => {
+      if ('parameters' in updates) {
+        unsubscribe();
+        resolve();
+      }
+    });
+
+    try {
+      await this.#modelManager.deleteExample(this.id, uuid);
+    } catch (err) {
+      console.log(err.message);
+      reject(err);
+    }
+
+    return promise;
+  }
+
   async clearExamples(label = null) {
     const { promise, resolve, reject } = Promise.withResolvers();
     const unsubscribe = this.#state.onUpdate(updates => {
@@ -97,8 +96,7 @@ class Model {
   }
 
   process(frame) {
-    this.#decoder.predict(frame);
-    return this.#decoder.results;
+    return this.#decoder.process(frame);
   }
 }
 

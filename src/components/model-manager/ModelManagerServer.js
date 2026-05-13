@@ -1,7 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
-import { Worker } from 'node:worker_threads';
 import { randomUUID } from 'node:crypto';
 
 import { isString } from '@ircam/sc-utils';
@@ -11,56 +10,8 @@ import ModelManager from './ModelManager.js';
 import PrivateModel from './PrivateModel.js';
 import modelDescription from './model-description.js';
 
-const presets = {
-  postures: {
-    target: {
-      name: 'xmm',
-    },
-    payload: {
-      modelType: 'gmm',
-      gaussians: 1,
-      absoluteRegularization: 0.01,
-      relativeRegularization: 0.01,
-      covarianceMode: 'full',
-      states: 1,
-      transitionMode: 'ergodic',
-      regressionEstimator: 'full',
-      likelihoodWindow: 10,
-    },
-  },
-  shortGestures: {
-    target: {
-      name: 'xmm',
-    },
-    payload: {
-      modelType: 'hhmm',
-      gaussians: 1,
-      absoluteRegularization: 0.1,
-      relativeRegularization: 0.1,
-      covarianceMode: 'full',
-      states: 4,
-      transitionMode: 'leftright',
-      regressionEstimator: 'full',
-      likelihoodWindow: 10,
-    },
-  },
-  longGestures: {
-    target: {
-      name: 'xmm',
-    },
-    payload: {
-      modelType: 'hhmm',
-      gaussians: 1,
-      absoluteRegularization: 0.1,
-      relativeRegularization: 0.1,
-      covarianceMode: 'full',
-      states: 10,
-      transitionMode: 'leftright',
-      regressionEstimator: 'full',
-      likelihoodWindow: 10,
-    },
-  },
-};
+import { XmmWorker } from './algorithms/xmm-worker.js';
+import { presets } from './algorithms/xmm-lib.js';
 
 /**
  * Server-side representation of the {@link ModelManager}
@@ -69,20 +20,20 @@ const presets = {
  */
 class ModelManagerServer extends ModelManager {
   #privateModels = new Map();
-  #xmmWorker;
+  #algorithms = {};
 
   constructor(como, name) {
     super(como, name);
 
     this.como.setRfcHandler(`${this.name}:createModel`, this.#createModelHandler);
     this.como.setRfcHandler(`${this.name}:addExample`, this.#addExampleHandler);
+    this.como.setRfcHandler(`${this.name}:deleteExample`, this.#deleteExampleHandler);
     this.como.setRfcHandler(`${this.name}:clearExamples`, this.#clearExamplesHandler);
-    // this.como.setRfcHandler(`${this.name}:train`, this.#trainHandler);
   }
 
   /** @private */
-  get xmmWorker() {
-    return this.#xmmWorker;
+  get algorithms() {
+    return this.#algorithms;
   }
 
   async init() {
@@ -94,18 +45,14 @@ class ModelManagerServer extends ModelManager {
   async start() {
     await super.start();
 
-    // the worker is stateless, then we share it across model and projects
-    const { promise: onlinePromise, resolve } = Promise.withResolvers();
-    this.#xmmWorker = new Worker(path.join(import.meta.dirname, 'xmm-worker.js'));
-    this.#xmmWorker.on('online', resolve);
-    await onlinePromise;
+    this.#algorithms['xmm'] = new XmmWorker();
+    await this.#algorithms['xmm'].init();
   }
 
   async stop() {
-    const { promise: terminatePromise, resolve } = Promise.withResolvers();
-    this.#xmmWorker.on('exit', resolve);
-    this.#xmmWorker.terminate();
-    await terminatePromise;
+    for (let worker of Object.values(this.#algorithms)) {
+      await worker.terminate();
+    }
 
     await super.stop();
   }
@@ -222,6 +169,20 @@ class ModelManagerServer extends ModelManager {
     }
 
     return await model.addExample(label, example);
+  };
+
+  #deleteExampleHandler = async ({ modelId, uuid }) => {
+    const model = this.#privateModels.get(modelId);
+
+    if (!model) {
+      throw new Error(`Cannot delete example ("${uuid}") from model: model with id "${modelId}" does not exists`);
+    }
+
+    if (!isString(uuid)) {
+      throw new Error(`Cannot delete example ("${uuid}") from model "${modelId}": example uuid is not a string`);
+    }
+
+    return await model.deleteExample(uuid);
   };
 
   #clearExamplesHandler = async ({ modelId, label = null }) => {

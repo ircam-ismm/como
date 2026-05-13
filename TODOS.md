@@ -1,4 +1,8 @@
 - [ ] implement `xmmManager` component
+  - [x] clean xmm component / generalize to other algorithms
+  - [ ] add id to examples
+  - [ ] model controls
+  - [ ] high-level script interface
 
 - [ ] `scriptName` & `scriptSharedStateClassName` are not updated at the sae time which is confusing
   + workaround `scriptNameRequest` -> [`scriptName` & `scriptSharedStateClassName`]
