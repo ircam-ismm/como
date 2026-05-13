@@ -23,9 +23,17 @@ export class XmmWorker {
     await terminatePromise;
   }
 
-  addListener(...args) { this.#worker.addListener(...args) }
-  removeListener(...args) { this.#worker.removeListener(...args) }
-  postMessage(...args) { this.#worker.postMessage(...args) }
+  addListener(...args) {
+    this.#worker.addListener(...args);
+  }
+
+  removeListener(...args) {
+    this.#worker.removeListener(...args);
+  }
+
+  postMessage(...args) {
+    this.#worker.postMessage(...args);
+  }
 }
 
 if (!isMainThread) {

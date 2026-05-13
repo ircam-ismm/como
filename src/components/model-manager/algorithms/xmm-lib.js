@@ -22,8 +22,8 @@ export function getDecoder(config, parameters) {
     process(frame) {
       decoder.predict(frame);
       return decoder.results;
-    }
-  }
+    },
+  };
 }
 
 export function sanitizeConfig(config) {
