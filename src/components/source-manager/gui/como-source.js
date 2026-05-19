@@ -51,7 +51,7 @@ class ComoSource extends LitElement {
         <sc-icon
           type="waveform"
           ?active=${this.plotSensor}
-          @input=${e => this.plotSensor = !this.plotSensor}
+          @input=${() => this.plotSensor = !this.plotSensor}
         ></sc-icon>
       </div>
       ${this.plotSensor
