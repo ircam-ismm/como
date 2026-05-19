@@ -1,18 +1,27 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
+
+import { isString } from '@ircam/sc-utils';
 import JSON5 from 'json5';
 
-import '@ircam/sc-components/sc-bang.js';
-import '@ircam/sc-components/sc-editor.js';
-import '@ircam/sc-components/sc-icon.js';
-import '@ircam/sc-components/sc-radio.js';
-import '@ircam/sc-components/sc-select.js';
-import '@ircam/sc-components/sc-slider.js';
-import '@ircam/sc-components/sc-text.js';
-import '@ircam/sc-components/sc-toggle.js';
+import '@ircam/sc-components';
+
+async function stringToModule(str) {
+  module = `
+export function template(html, como, player, state) {
+  return html\`${str}\`;
+}
+  `;
+  const blob = new Blob([module], { type: 'text/javascript' })
+  const url = URL.createObjectURL(blob);
+  const { template } = await import(/* webpackIgnore: true */url);
+  URL.revokeObjectURL(url);
+  return template
+}
 
 class ComoPlayerScriptSharedState extends LitElement {
   #unsubscribePlayerUpdate;
+  #templates = new Map();
 
   static properties() {
 
@@ -39,22 +48,25 @@ class ComoPlayerScriptSharedState extends LitElement {
   }
 
   render() {
-    if (!this.scriptState) {
+    if (!this.state) {
       return nothing;
     }
-    const description = this.scriptState.getDescription();
+    const description = this.state.getDescription();
 
     const title = html`<div><sc-text>script state</sc-text></div>`;
-    const parts = Object.keys(description).map(key => {
-      const desc = description[key];
+    const parts = Object.entries(description).map(([name, desc]) => {
+      if (this.#templates.has(name)) {
+        const template = this.#templates.get(name);
+        return template(html, this.como, this.player, this.state);
+      }
 
       if (desc.event === true) {
         return html`
           <div>
-            <sc-text>${key}</sc-text>
+            <sc-text>${name}</sc-text>
             <sc-bang
-              ?active=${this.scriptState.get(key)}
-              @input=${() => this.scriptState.set(key, true)}
+              ?active=${this.state.get(name)}
+              @input=${() => this.state.set(name, true)}
             ></sc-bang>
           </div>
         `;
@@ -64,10 +76,10 @@ class ComoPlayerScriptSharedState extends LitElement {
         case 'boolean': {
           return html`
             <div>
-              <sc-text>${key}</sc-text>
+              <sc-text>${name}</sc-text>
               <sc-toggle
-                ?active=${this.scriptState.get(key)}
-                @change=${e => this.scriptState.set(key, e.detail.value)}
+                ?active=${this.state.get(name)}
+                @change=${e => this.state.set(name, e.detail.value)}
               ></sc-toggle>
             </div>
           `;
@@ -75,14 +87,14 @@ class ComoPlayerScriptSharedState extends LitElement {
         case 'integer': {
           return html`
             <div>
-              <sc-text>${key}</sc-text>
+              <sc-text>${name}</sc-text>
               <sc-slider
                 number-box
                 step="1"
                 min=${ifDefined(Number.isFinite(desc.min) ? desc.min : undefined)}
                 max=${ifDefined(Number.isFinite(desc.max) ? desc.max : undefined)}
-                value=${this.scriptState.get(key)}
-                @input=${e => this.scriptState.set(key, e.detail.value)}
+                value=${this.state.get(name)}
+                @input=${e => this.state.set(name, e.detail.value)}
               ></sc-slider>
             </div>
           `;
@@ -90,13 +102,13 @@ class ComoPlayerScriptSharedState extends LitElement {
         case 'float': {
           return html`
             <div>
-              <sc-text>${key}</sc-text>
+              <sc-text>${name}</sc-text>
               <sc-slider
                 number-box
                 min=${ifDefined(Number.isFinite(desc.min) ? desc.min : undefined)}
                 max=${ifDefined(Number.isFinite(desc.max) ? desc.max : undefined)}
-                value=${this.scriptState.get(key)}
-                @input=${e => this.scriptState.set(key, e.detail.value)}
+                value=${this.state.get(name)}
+                @input=${e => this.state.set(name, e.detail.value)}
               ></sc-slider>
             </div>
           `;
@@ -105,22 +117,22 @@ class ComoPlayerScriptSharedState extends LitElement {
           if (desc.list.length < 4) {
             return html`
               <div>
-                <sc-text>${key}</sc-text>
+                <sc-text>${name}</sc-text>
                 <sc-radio
                   .options=${desc.list}
-                  value=${this.scriptState.get(key)}
-                  @change=${e => this.scriptState.set(key, e.detail.value)}
+                  value=${this.state.get(name)}
+                  @change=${e => this.state.set(name, e.detail.value)}
                 ></sc-radio>
               </div>
             `;
           } else {
             return html`
               <div>
-                <sc-text>${key}</sc-text>
+                <sc-text>${name}</sc-text>
                 <sc-select
                   .options=${desc.list}
-                  value=${this.scriptState.get(key)}
-                  @change=${e => this.scriptState.set(key, e.detail.value)}
+                  value=${this.state.get(name)}
+                  @change=${e => this.state.set(name, e.detail.value)}
                 ></sc-select>
               </div>
             `;
@@ -129,26 +141,27 @@ class ComoPlayerScriptSharedState extends LitElement {
         case 'string': {
           return html`
             <div>
-              <sc-text>${key}</sc-text>
+              <sc-text>${name}</sc-text>
               <sc-text
                 editable
-                @change=${e => this.scriptState.set(key, e.detail.value)}
-              >${this.scriptState.get(key)}</sc-text>
+                .value=${this.state.get(name)}
+                @change=${e => this.state.set(name, e.detail.value)}
+              ></sc-text>
             </div>
           `;
         }
         case 'any': {
           return html`
             <div>
-              <sc-text>${key}</sc-text>
+              <sc-text>${name}</sc-text>
               <sc-icon
                 type="info"
                 title="Support only JSON-like format"
               ></sc-icon>
               <sc-editor
                 .options=${desc.list}
-                value=${JSON5.stringify(this.scriptState.get(key), null, 2)}
-                @change=${e => JSON5.parse(this.scriptState.set(key, e.detail.value))}
+                value=${JSON5.stringify(this.state.get(name), null, 2)}
+                @change=${e => JSON5.parse(this.state.set(name, e.detail.value))}
               ></sc-editor>
             </div>
           `;
@@ -168,13 +181,23 @@ class ComoPlayerScriptSharedState extends LitElement {
       // does not.
       if ('scriptSharedStateClassName' in updates) {
         if (updates.scriptSharedStateClassName !== null) {
-          this.scriptState = await this.como.playerManager.getScriptSharedState(this.player.get('id'));
+          this.state = await this.como.playerManager.getScriptSharedState(this.player.get('id'));
 
-          if (this.scriptState) {
-            this.scriptState.onUpdate(() => this.requestUpdate());
+          // compute template module if any
+          const description = this.state.getDescription();
+          for (let [name, desc] of Object.entries(description)) {
+            console.log(name, isString(desc.metas?.gui))
+            if (isString(desc.metas?.gui)) {
+              const template = await stringToModule(desc.metas.gui);
+              this.#templates.set(name, template);
+            }
+          }
+
+          if (this.state) {
+            this.state.onUpdate((updates) => this.requestUpdate());
           }
         } else {
-          this.scriptState = null;
+          this.state = null;
         }
 
         this.requestUpdate();

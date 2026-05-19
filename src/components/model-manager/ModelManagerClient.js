@@ -15,7 +15,7 @@ class ModelManagerClient extends ModelManager {
     await super.init();
 
     if (isBrowser()) {
-      // await import ('./gui/como-session-manager.js');
+      await import ('./gui/como-model-manager.js');
     }
   }
 }

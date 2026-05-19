@@ -1,23 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { counter } from '@ircam/sc-utils';
 
-function examplesInfos(examples) {
-  const infos = {};
 
-  examples.forEach(example => {
-    if (!infos[example.label]) {
-      infos[example.label] = {
-        numExamples: 0,
-        uuids: [],
-      };
-    }
-
-    infos[example.label].uuids.push(example.uuid);
-    infos[example.label].numExamples += 1;
-  });
-
-  return infos;
-}
 
 /** @private */
 class PrivateModel {
@@ -33,6 +17,15 @@ class PrivateModel {
     this.#examples = examples;
     // Worker extends the Node.js "EventEmitter" not the W3C `EventTarget`
     this.#manager.algorithms['xmm'].addListener('message', this.#onWorkerMessage);
+
+    // const infos = examplesInfos(this.#examples);
+    // this.state.set({ infos });
+
+    this.state.onUpdate(updates => {
+      if ('config' in updates) {
+        this.train();
+      }
+    });
   }
 
   get state() {
@@ -89,10 +82,10 @@ class PrivateModel {
     }
 
     if (label) {
-      const infos = examplesInfos(this.#examples);
+      // const infos = examplesInfos(this.#examples);
       const parameters = this.#state.get('parameters');
       delete parameters.classes[label];
-      await this.#state.set({ parameters, infos });
+      await this.#state.set({ parameters });
       await this.#manager.persist(this);
     } else {
       this.train(); // retrain empty model
@@ -135,8 +128,8 @@ class PrivateModel {
         parameters = singleOrMultiClassParameters;
       }
 
-      const infos = examplesInfos(this.#examples);
-      await this.#state.set({ parameters, infos });
+      // const infos = examplesInfos(this.#examples);
+      await this.#state.set({ parameters });
     } catch (err) {
       return err;
     }

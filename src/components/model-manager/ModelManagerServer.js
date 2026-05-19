@@ -13,6 +13,24 @@ import modelDescription from './model-description.js';
 import { XmmWorker } from './algorithms/xmm-worker.js';
 import { presets } from './algorithms/xmm-lib.js';
 
+function examplesInfos(examples) {
+  const infos = {};
+
+  examples.forEach(example => {
+    if (!infos[example.label]) {
+      infos[example.label] = {
+        numExamples: 0,
+        uuids: [],
+      };
+    }
+
+    infos[example.label].uuids.push(example.uuid);
+    infos[example.label].numExamples += 1;
+  });
+
+  return infos;
+}
+
 /**
  * Server-side representation of the {@link ModelManager}
  *
@@ -40,6 +58,19 @@ class ModelManagerServer extends ModelManager {
     await super.init();
 
     await this.como.stateManager.defineClass(`${this.name}:model`, modelDescription);
+    await this.como.stateManager.registerUpdateHook(`${this.name}:model`, (updates, currentValues) => {
+      // console.log()
+      if ('parameters' in updates) {
+        const { id } = currentValues;
+        const privateModel = this.#privateModels.get(id);
+        const infos = examplesInfos(privateModel.examples);
+
+        return {
+          infos,
+          ...updates,
+        };
+      }
+    });
   }
 
   async start() {
@@ -105,7 +136,8 @@ class ModelManagerServer extends ModelManager {
       for (let pathname of modelFiles) {
         const blob = await fsPromises.readFile(pathname);
         const data = JSON.parse(blob.toString());
-        const { uuid, id, config, parameters, infos, examples } = data;
+        const { uuid, id, config, parameters, examples } = data;
+        const infos = examplesInfos(examples);
         const state = await this.como.stateManager.create(`${this.name}:model`, {
           uuid,
           id,
@@ -125,13 +157,22 @@ class ModelManagerServer extends ModelManager {
 
   /** @private */
   async persist(model) {
-    const uuid = model.state.get('uuid');
+    const {
+      uuid,
+      id,
+      config,
+      parameters,
+    } = model.state.getValuesUnsafe();
+
     const pathname = this.#getPathname(uuid);
 
     const json = JSON.stringify({
-      ...model.state.getValuesUnsafe(),
+      uuid,
+      id,
+      config,
+      parameters,
       examples: model.examples,
-    });
+    }, null, 2);
 
     await fsPromises.writeFile(pathname, json);
   }
@@ -151,7 +192,10 @@ class ModelManagerServer extends ModelManager {
     return modelId;
   };
 
-  // #deleteModelHandler = async (modelId) => {}
+  #deleteModelHandler = async (modelId) => {
+    // delete privateModel
+    // delete associated file
+  }
 
   #addExampleHandler = async ({ modelId, label, example }) => {
     const model = this.#privateModels.get(modelId);
@@ -171,18 +215,18 @@ class ModelManagerServer extends ModelManager {
     return await model.addExample(label, example);
   };
 
-  #deleteExampleHandler = async ({ modelId, uuid }) => {
+  #deleteExampleHandler = async ({ modelId, exampleUuid }) => {
     const model = this.#privateModels.get(modelId);
 
     if (!model) {
-      throw new Error(`Cannot delete example ("${uuid}") from model: model with id "${modelId}" does not exists`);
+      throw new Error(`Cannot delete example ("${exampleUuid}") from model: model with id "${modelId}" does not exists`);
     }
 
-    if (!isString(uuid)) {
-      throw new Error(`Cannot delete example ("${uuid}") from model "${modelId}": example uuid is not a string`);
+    if (!isString(exampleUuid)) {
+      throw new Error(`Cannot delete example ("${exampleUuid}") from model "${modelId}": example uuid is not a string`);
     }
 
-    return await model.deleteExample(uuid);
+    return await model.deleteExample(exampleUuid);
   };
 
   #clearExamplesHandler = async ({ modelId, label = null }) => {
@@ -198,11 +242,6 @@ class ModelManagerServer extends ModelManager {
 
     return await model.clearExamples(label);
   };
-
-  // #trainHandler = async (modelId) => {
-  //   // train all classes
-  //   // persist to filesystem
-  // };
 }
 
 export default ModelManagerServer;
