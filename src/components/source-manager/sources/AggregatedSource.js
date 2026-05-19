@@ -18,20 +18,20 @@ export default class AggregatedSource extends AbstractSource {
   }
 
   async init() {
-    for (let [index, id] of this.#config.sources.entries()) {
-      const source = await this.como.sourceManager.getSource(id);
-      source.onUpdate(updates => this.#onSourceUpdate(id, index, updates));
-      this.#sources[index] = source;
-    }
-
     const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
       id: this.#config.id,
       type: AggregatedSource.type,
       nodeId: this.como.nodeId,
       infos: {
         sources: this.#config.sources,
-      }
+      },
     });
+
+    for (let [index, id] of this.#config.sources.entries()) {
+      const source = await this.como.sourceManager.getSource(id);
+      source.onUpdate(updates => this.#onSourceUpdate(id, index, updates));
+      this.#sources[index] = source;
+    }
 
     super.init(state);
   }

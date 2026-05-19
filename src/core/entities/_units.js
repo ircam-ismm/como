@@ -1,13 +1,13 @@
-
+/* eslint-disable */
 /** @private */
 const timestamp = {
   unit: 'ms',
-}
+};
 
 /** @private */
 const frequency = {
   unit: 'Hz',
-}
+};
 
 /** @private */
 const accelerometer = {

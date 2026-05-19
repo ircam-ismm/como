@@ -50,7 +50,7 @@ class ComoSourceManager extends LitElement {
         <sc-icon
           type="plus"
           ?active=${this.expanded}
-          @input=${e => this.expanded = !this.expanded}
+          @input=${() => this.expanded = !this.expanded}
         ></sc-icon>
       </header>
       <section>
@@ -63,7 +63,7 @@ class ComoSourceManager extends LitElement {
           : nothing
         }
       </section>
-    `
+    `;
   }
 }
 

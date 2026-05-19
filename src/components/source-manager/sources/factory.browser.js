@@ -6,7 +6,7 @@
 // ```
 // To satisfy both node and the bundler, cf. package.json `imports` field
 
-import StreamPlayerSource from "./StreamPlayerSource.js";
+import StreamPlayerSource from './StreamPlayerSource.js';
 
 export default class SourceFactory {
   constructor(como) {

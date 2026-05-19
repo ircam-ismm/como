@@ -70,7 +70,7 @@ class ComoPlayerManager extends LitElement {
         <sc-icon
           type="plus"
           ?active=${this.expanded}
-          @input=${e => this.expanded = !this.expanded}
+          @input=${() => this.expanded = !this.expanded}
         ></sc-icon>
       </header>
       ${this.expanded ?
@@ -157,8 +157,6 @@ class ComoPlayerManager extends LitElement {
     this.#unsubscribeSessionsChange();
     this.#unsubscribeSourcesChange();
   }
-
-  #updateSessionList() {}
 }
 
 if (customElements.get('como-player-manager') === undefined) {

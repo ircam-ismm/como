@@ -1,4 +1,4 @@
-import { EOL as _EOL } from "node:os";
+import { EOL as _EOL } from 'node:os';
 import os from 'node:os';
 import { SERVER_ID } from '../core/constants.js';
 

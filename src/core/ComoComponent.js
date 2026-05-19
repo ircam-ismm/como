@@ -37,11 +37,11 @@ export default class ComoComponent {
     return this.#como;
   }
 
-  // lifecycle method - binded to soundworks lifecycle
+  // lifecycle method - bound to soundworks lifecycle
   async init() {}
   async start() {}
   async stop() {}
-  async setProject(projectDirname) {}
+  async setProject(_projectDirname) {}
 
 }
 

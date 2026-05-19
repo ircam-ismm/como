@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css } from 'lit';
 
 import '@soundworks/helpers/components/sw-editor.js';
 
@@ -30,7 +30,7 @@ class ComoScriptManager extends LitElement {
   render() {
     return html`
       <sw-editor .plugin=${this.como.scriptManager.scripting}></sw-editor>
-    `
+    `;
   }
 }
 

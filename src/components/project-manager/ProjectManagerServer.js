@@ -1,13 +1,13 @@
 import fs from 'node:fs';
-import * as fsPromises from 'node:fs/promises'
+import * as fsPromises from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  default as _filenamify
+  default as _filenamify,
 } from 'filenamify';
 import {
-  isString
+  isString,
 } from '@ircam/sc-utils';
 
 import ProjectManager from './ProjectManager.js';
@@ -44,7 +44,7 @@ export default class ProjectManagerServer extends ProjectManager {
 
     const projectDirectories = fs.readdirSync(projectsDirname, { withFileTypes: true })
       .filter(entry => entry.isDirectory()) // is a directory
-      .filter(entry => fs.existsSync(path.join(projectsDirname, entry.name, this.como.constants.PROJECT_INFOS_FILENAME))) // contains a `project-infos.json` file
+      .filter(entry => fs.existsSync(path.join(projectsDirname, entry.name, this.como.constants.PROJECT_INFOS_FILENAME))); // contains a `project-infos.json` file
 
     for (let entry of projectDirectories) {
       const dirname = path.join(projectsDirname, entry.name);
@@ -119,7 +119,7 @@ export default class ProjectManagerServer extends ProjectManager {
 
     project.onDelete(() => this.#projectStore.delete(project));
     this.#projectStore.add(project);
-  }
+  };
 
   #renameProject = async ({ oldName, newName }) => {
     if (!isString(oldName)) {
@@ -170,7 +170,7 @@ export default class ProjectManagerServer extends ProjectManager {
     if (this.como.project.get('name') === oldName) {
       await this.como.setProject(dirname);
     }
-  }
+  };
 
   #deleteProject = async ({ name }) => {
     if (!isString(name)) {
@@ -191,5 +191,5 @@ export default class ProjectManagerServer extends ProjectManager {
     if (this.como.project.get('name') === name) {
       await this.como.setProject(null);
     }
-  }
+  };
 };

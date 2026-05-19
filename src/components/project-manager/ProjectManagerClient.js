@@ -1,5 +1,5 @@
 import {
-  isBrowser
+  isBrowser,
 } from '@ircam/sc-utils';
 
 import ProjectManager from './ProjectManager.js';

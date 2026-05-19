@@ -97,7 +97,7 @@ export default class RiotSource extends AbstractSource {
   };
 
   #onOscBundle = bundle => {
-    const { source, api, id } = getMetaFromBundle(bundle);
+    const { id /*, source, api */ } = getMetaFromBundle(bundle);
 
     if (id === this.#config.id) {
       clearTimeout(this.#activeTimeoutId);

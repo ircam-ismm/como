@@ -20,6 +20,7 @@ import ScriptManagerServer from '../components/script-manager/ScriptManagerServe
 import SoundbankManagerServer from '../components/soundbank-manager/SoundbankManagerServer.js';
 import SessionManagerServer from '../components/session-manager/SessionManagerServer.js';
 import PlayerManagerServer from '../components/player-manager/PlayerManagerServer.js';
+import ModelManagerServer from '../components/model-manager/ModelManagerServer.js';
 
 import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServer.js';
 
@@ -36,8 +37,6 @@ import KeyValueStoreServer from '../components/key-value-store/KeyValueStoreServ
  * await como.start();
  */
 class ComoServer extends ComoNode {
-  #projectsDirname;
-
   /**
    * Constructs a new ComoServer instance
    *
@@ -50,8 +49,6 @@ class ComoServer extends ComoNode {
     projectsDirname = 'projects',
   } = {}) {
     super(server, { projectsDirname });
-
-    this.#projectsDirname = projectsDirname;
 
     this.pluginManager.register('platform-init', ServerPluginPlatformInit);
     this.pluginManager.register('sync', ServerPluginSync);
@@ -105,6 +102,13 @@ class ComoServer extends ComoNode {
      * @type {PlayerManagerServer}
      */
     new PlayerManagerServer(this, 'playerManager');
+    /**
+     * @member modelManager
+     * @memberof ComoServer#
+     * @readonly
+     * @type {ModelManagerServer}
+     */
+    new ModelManagerServer(this, 'modelManager');
     /**
      * @member keyValueStore
      * @memberof ComoServer#
@@ -169,7 +173,7 @@ class ComoServer extends ComoNode {
     }
 
     return true;
-  }
+  };
 }
 
 export default ComoServer;

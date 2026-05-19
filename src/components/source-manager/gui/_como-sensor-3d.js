@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { LitElement, html, css } from 'lit';
 import * as THREE from 'three';
 

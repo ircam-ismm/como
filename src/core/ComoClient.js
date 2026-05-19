@@ -11,6 +11,8 @@ import ScriptManagerClient from '../components/script-manager/ScriptManagerClien
 import SoundbankManagerClient from '../components/soundbank-manager/SoundbankManagerClient.js';
 import SessionManagerClient from '../components/session-manager/SessionManagerClient.js';
 import PlayerManagerClient from '../components/player-manager/PlayerManagerClient.js';
+import ModelManagerClient from '../components/model-manager/ModelManagerClient.js';
+
 import KeyValueStoreClient from '../components/key-value-store/KeyValueStoreClient.js';
 
 /**
@@ -84,6 +86,13 @@ class ComoClient extends ComoNode {
      * @type {PlayerManagerClient}
      */
     new PlayerManagerClient(this, 'playerManager');
+    /**
+     * @member modelManager
+     * @memberof ComoClient#
+     * @readonly
+     * @type {ModelManagerClient}
+     */
+    new ModelManagerClient(this, 'modelManager');
     /**
      * @member keyValueStore
      * @memberof ComoClient#

@@ -6,7 +6,7 @@ import {
   isString,
 } from '@ircam/sc-utils';
 import {
-  GainNode
+  GainNode,
 } from 'isomorphic-web-audio-api';
 /**
  * Basically wrap 3 different states
@@ -45,7 +45,6 @@ class Player {
   #muteNode;
   #volumeNode;
   #outputNode;
-  #sessionSoundbank = null;
 
   /**
    * @hideconstructor
@@ -130,7 +129,7 @@ class Player {
     } else {
       let playerId;
       if (this.#requestedId === null) {
-        playerId = `${this.#como.id}-${idGenerator()}`
+        playerId = `${this.#como.id}-${idGenerator()}`;
       } else {
         if (!isString(this.#requestedId)) {
           throw new Error(`Cannot execute "createPlayer" on PlayerManager: requested player id is not a string`);
@@ -183,8 +182,6 @@ class Player {
               break;
             }
 
-            // load session files
-            this.#sessionSoundbank = await this.#como.sessionManager.getSessionSoundbank(sessionId);
             // load default script
             const defaultScript = session.get('defaultScript');
             await this.setScript(defaultScript);
@@ -207,9 +204,8 @@ class Player {
                     break;
                   }
                   case 'soundbank': {
-                    const sessionId = session.get('uuid');
-                    this.#sessionSoundbank = await this.#como.sessionManager.getSessionSoundbank(sessionId);
                     await this.#reloadScript();
+                    break;
                   }
                 }
               }
@@ -351,8 +347,8 @@ class Player {
       this.#como.requestRfc(
         this.#como.constants.SERVER_ID,
         `${this.#como.playerManager.name}:deleteSharedStateClass`,
-        { scriptSharedStateClassName }
-      )
+        { scriptSharedStateClassName },
+      );
     }
 
     this.#scriptModule = null;
@@ -368,7 +364,7 @@ class Player {
       this.#scriptLastState = {
         description: this.#scriptSharedState.getDescription(),
         values: this.#scriptSharedState.getValues(),
-      }
+      };
     }
 
     // release old version of the script
@@ -438,7 +434,7 @@ class Player {
           {
             scriptName: this.#script.name,
             classDescription,
-          }
+          },
         );
       } catch (err) {
         this.#script.reportRuntimeError(err);
@@ -495,12 +491,18 @@ class Player {
     const outputNode = new GainNode(this.#como.audioContext, { gain: 0 });
     outputNode.connect(this.#muteNode);
 
+    // load soundbank, filtered if in session
+    const sessionId = this.#state.get('sessionId');
+    const soundbank = sessionId
+      ? await this.#como.sessionManager.getSessionSoundbank(sessionId)
+      : await this.#como.soundbankManager.getBuffers();
+
     // create context object for this script instance
     this.#scriptContext = Object.freeze({
+      scriptName: this.#script.name,
       output: outputNode,
       state: this.#scriptSharedState,
-      soundbank: this.#sessionSoundbank,
-      scriptName: this.#script.name,
+      soundbank,
     });
 
     // enter the script

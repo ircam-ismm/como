@@ -60,7 +60,7 @@ class SessionManagerServer extends SessionManager {
       return {
         ...updates,
         dirty,
-      }
+      };
     });
   }
 
@@ -68,7 +68,7 @@ class SessionManagerServer extends SessionManager {
     await super.start();
 
     // if a soundfile is deleted, remove it from the soundbank of all sessions
-    this.como.soundbankManager.onUpdate(async ({ tree, events }) => {
+    this.como.soundbankManager.onUpdate(async ({ tree: _, events }) => {
       if (!events) {
         return;
       }
@@ -87,7 +87,10 @@ class SessionManagerServer extends SessionManager {
 
   }
 
-  /** @private */
+  /**
+   * @private
+   * @todo - share w/ ModelManager and others?
+   */
   async setProject(dirname) {
     // delete all existing states
     for (let session of this.#currentSessions.entries()) {
@@ -107,27 +110,30 @@ class SessionManagerServer extends SessionManager {
       const sessionFiles = files
         .map(filename => path.join(sessionDirname, filename))
         .filter(pathname => pathname.endsWith('.json'))
-        .filter(pathname => fs.statSync(pathname));
+        .filter(pathname => fs.statSync(pathname).isFile());
 
       if (sessionFiles.length === 0) {
         return;
       }
-      // return once all states are in the collection
-      return new Promise(async resolve => {
-        const unsubscribe = this.sessions.onAttach(_ => {
-          if (this.sessions.length === sessionFiles.length) {
-            unsubscribe();
-            resolve();
-          }
-        });
 
-        for (let pathname of sessionFiles) {
-          const blob = await fsPromises.readFile(pathname);
-          const data = JSON.parse(blob.toString());
-          const state = await this.como.stateManager.create(`${this.name}:session`, data);
-          this.#currentSessions.add(state);
+      // return once all states are in the collection
+      const { promise, resolve } = Promise.withResolvers();
+
+      const unsubscribe = this.sessions.onAttach(_ => {
+        if (this.sessions.length === sessionFiles.length) {
+          unsubscribe();
+          resolve();
         }
       });
+
+      for (let pathname of sessionFiles) {
+        const blob = await fsPromises.readFile(pathname);
+        const data = JSON.parse(blob.toString());
+        const state = await this.como.stateManager.create(`${this.name}:session`, data);
+        this.#currentSessions.add(state);
+      }
+
+      return promise;
     }
   }
 
@@ -153,7 +159,7 @@ class SessionManagerServer extends SessionManager {
     this.#currentSessions.add(session);
 
     return sessionId;
-  }
+  };
 
   #persistSession = async ({ sessionId }) => {
     const session = this.getSession(sessionId);
@@ -167,7 +173,7 @@ class SessionManagerServer extends SessionManager {
 
     await fsPromises.writeFile(pathname, json);
     await session.set({ dirty: false });
-  }
+  };
 
   #renameSession = async ({ sessionId, newName }) => {
     const session = this.getSession(sessionId);
@@ -182,7 +188,7 @@ class SessionManagerServer extends SessionManager {
     await fsPromises.rename(oldFilename, newFilename);
     await session.set({ name: newName });
     await this.#persistSession({ sessionId });
-  }
+  };
 
   #deleteSession = async ({ sessionId }) => {
     const ownedSession = Array.from(this.#currentSessions).find(session => session.get('uuid') === sessionId);
@@ -195,7 +201,7 @@ class SessionManagerServer extends SessionManager {
     await ownedSession.delete();
     const pathname = this.#getPathname(sessionName);
     await fsPromises.rm(pathname, { force: true });
-  }
+  };
 }
 
 export default SessionManagerServer;

@@ -62,7 +62,7 @@ class ComoScriptManager extends LitElement {
         <sc-icon
           type="plus"
           ?active=${this.expanded}
-          @input=${e => this.expanded = !this.expanded}
+          @input=${() => this.expanded = !this.expanded}
         ></sc-icon>
         <sc-text class="small">new session</sc-text>
         <sc-text
@@ -87,7 +87,7 @@ class ComoScriptManager extends LitElement {
                   editable
                   @change=${async e => {
                     try {
-                      await this.como.sessionManager.renameSession(session.get('uuid'), e.detail.value.trim())
+                      await this.como.sessionManager.renameSession(session.get('uuid'), e.detail.value.trim());
                     } catch (err) {
                       console.log(err);
                     }
@@ -98,7 +98,7 @@ class ComoScriptManager extends LitElement {
                 ></sc-status>
                 <sc-icon
                   type="save"
-                  @input=${async e => {
+                  @input=${async () => {
                     try {
                       await this.como.sessionManager.persistSession(session.get('uuid'));
                     } catch (err) {
@@ -108,7 +108,7 @@ class ComoScriptManager extends LitElement {
                 ></sc-icon>
                 <sc-icon
                   type="delete"
-                  @input=${async e => {
+                  @input=${async () => {
                     if (confirm(`Are you sure you want to delete the "${session.get('name')}" session`)) {
                       try {
                         await this.como.sessionManager.deleteSession(session.get('uuid'));
@@ -144,7 +144,7 @@ class ComoScriptManager extends LitElement {
           `;
         }) : nothing
       }
-    `
+    `;
   }
 
   connectedCallback() {

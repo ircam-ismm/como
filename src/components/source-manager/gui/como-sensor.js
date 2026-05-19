@@ -1,5 +1,4 @@
 import { LitElement, html, css } from 'lit';
-import MemoryBuffer from '../../../../src/utils/MemoryBuffer.js';
 
 import '@ircam/sc-components/sc-text.js';
 import '@ircam/sc-components/sc-toggle.js';
@@ -16,7 +15,7 @@ export default class MemoryBuffer {
       type: String,
       attribute: 'source-id',
     },
-  }
+  };
 
   constructor(size, _initData) {
     this.#length = size;
@@ -45,12 +44,12 @@ export default class MemoryBuffer {
 
     for (let i = 0; i <= this.#pointer; i++) {
       func(this.#stack[i], virtualIndex);
-      virtualIndex += 1
+      virtualIndex += 1;
     }
   }
 
   toArray() {
-    const copy = new Array(this.#length)
+    const copy = new Array(this.#length);
     this.forEach((value, index) => copy[index] = value);
   }
 }
@@ -142,7 +141,7 @@ class ComoSensor extends LitElement {
       throw new Error('como-sensor: attribute sourceId is mandatory');
     }
 
-    if (!this.como === null) {
+    if (this.como === null) {
       throw new Error('como-sensor: property como not set');
     }
 
@@ -204,7 +203,6 @@ class ComoSensor extends LitElement {
     this.#rafId = window.requestAnimationFrame(() => {
       this.#ctx.clearRect(0, 0, this.#logicalWidth, this.#logicalHeight);
 
-      let x = 0;
       const xDelta = this.#logicalWidth / (this.#buffer.length - 1);
 
       // Normalisation selon le type de capteur
@@ -257,7 +255,7 @@ class ComoSensor extends LitElement {
         this.#ctx.stroke();
       });
     });
-  }
+  };
 }
 
 if (customElements.get('como-sensor') === undefined) {

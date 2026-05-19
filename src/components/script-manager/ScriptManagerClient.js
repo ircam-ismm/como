@@ -1,6 +1,6 @@
 import ClientPluginScripting from '@soundworks/plugin-scripting/client.js';
 import {
-  isBrowser
+  isBrowser,
 } from '@ircam/sc-utils';
 
 import ScriptManager from './ScriptManager.js';
@@ -26,4 +26,4 @@ class ScriptManagerClient extends ScriptManager {
   }
 }
 
-export default ScriptManagerClient
+export default ScriptManagerClient;

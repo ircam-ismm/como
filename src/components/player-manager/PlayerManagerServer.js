@@ -22,7 +22,7 @@ class PlayerManagerServer extends PlayerManager {
           scriptSharedStateClassName: null,
           scriptSharedStateId: null,
           ...updates,
-        }
+        };
       }
     });
 
@@ -34,11 +34,11 @@ class PlayerManagerServer extends PlayerManager {
     const className = `${scriptName}_${uuidv4()}`;
     this.como.stateManager.defineClass(className, classDescription);
     return className;
-  }
+  };
 
   #deleteSharedStateClass = ({ scriptSharedStateClassName }) => {
     return this.como.stateManager.deleteClass(scriptSharedStateClassName);
-  }
+  };
 }
 
 export default PlayerManagerServer;

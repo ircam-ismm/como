@@ -46,7 +46,7 @@ export default {
     default: false,
   },
   // Pause the propagation of the underlying source, currently only implemented
-  // in stream sources.
+  // in stream player sources.
   // @todo -  Generalize to other sources
   control: {
     type: 'enum',
@@ -88,4 +88,4 @@ export default {
 
 
   // ---------------------------------------------------
-}
+};

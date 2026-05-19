@@ -42,7 +42,7 @@ export default class StreamPlayerSource extends AbstractSource {
     }
 
     if (this.#stream.length < 2) {
-       throw new Error(`Cannot construct StreamPlayerSource: Invalid stream, should contain at least 2 frames`);
+      throw new Error(`Cannot construct StreamPlayerSource: Invalid stream, should contain at least 2 frames`);
     }
 
     this.#processorBinded = this.#processor.bind(this);

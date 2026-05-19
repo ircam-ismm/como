@@ -12,3 +12,5 @@ export const PROJECT_SOUNDBANK_DIRNAME = `soundbank`;
 export const PROJECT_RECORDINGS_DIRNAME = `recordings`;
 /** @private */
 export const PROJECT_SESSIONS_DIRNAME = `sessions`;
+/** @private */
+export const PROJECT_MODELS_DIRNAME = `models`;

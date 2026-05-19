@@ -106,7 +106,7 @@ class SourceManager extends ComoComponent {
     this.#sources = await this.como.stateManager.getCollection(`${this.name}:source`,
       // parameter whitelist - we really don't want the streams here
       // @todo - move to blacklist once implemented in soundworks
-      ['id', 'type', 'infos', 'active', 'record', 'control']
+      ['id', 'type', 'infos', 'active', 'record', 'control'],
     );
 
     this.como.setRfcHandler(`${this.name}:createSource`, this.#createSourceHandler);
@@ -221,7 +221,7 @@ class SourceManager extends ComoComponent {
     this.#ownedSources.add(source);
 
     return source.id;
-  }
+  };
 
   #createSourceResolverHook = async (err, sourceId) => {
     if (err) {
@@ -232,29 +232,29 @@ class SourceManager extends ComoComponent {
     // cf. https://github.com/collective-soundworks/soundworks/issues/118
     //
     // 1. check that the source is not already in list, this may happen server-side
-    const source = this.como.sourceManager.sources.find(s => s.get('id') === sourceId);
+    const source = this.#sources.find(s => s.get('id') === sourceId);
 
     if (source !== undefined) {
       return Promise.resolve();
     }
 
     // 2. else, wait for the source to attach to the collection before resolving
-    return new Promise(resolve => {
-      // detach listener will be defined as we will be asynchronous
-      //
-      const detachListener = this.como.sourceManager.sources.onAttach(source => {
-        // console.log(source.get('id'), sourceId);
-        if (source.get('id') === sourceId) {
-          detachListener();
-          resolve();
-        }
-      });
+    const { promise, resolve } = Promise.withResolvers();
+    // detach listener will be defined as we will be asynchronous
+    const detachListener = this.#sources.onAttach(source => {
+      // console.log(source.get('id'), sourceId);
+      if (source.get('id') === sourceId) {
+        detachListener();
+        resolve();
+      }
     });
-  }
+
+    return promise;
+  };
 
   #deleteSourceHandler = async (config) => {
     return this.#factory.deleteSource(config);
-  }
+  };
 
   // ----------------------------------------------------------------------
   // RECORDINGS MANAGEMENT

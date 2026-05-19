@@ -64,7 +64,7 @@ class ComoNode {
   #audioBufferLoader;
   #scheduler;
   #audioScheduler;
-  #syncedScheduler;
+  // #syncedScheduler;
 
   /**
    * @param {Client|Server} host - Instance of soundworks client or server
@@ -72,7 +72,13 @@ class ComoNode {
   constructor(host, options) {
     this.#host = host;
     this.#config = options;
-    this.#audioContext = new AudioContext();
+
+    // do not try to access an actual soundcard in CI
+    const audioContextOptions = (globalThis.process?.env.ENV === 'ci')
+      ? { sinkId: { type:'none' } }
+      : {};
+
+    this.#audioContext = new AudioContext(audioContextOptions);
     this.#audioBufferLoader = new AudioBufferLoader(this.#audioContext);
   }
 
@@ -139,7 +145,7 @@ class ComoNode {
 
   /** @private */
   get nodes() {
-
+    return this.#nodes;
   }
 
   /** @private */
@@ -220,7 +226,7 @@ class ComoNode {
 
   /** @private */
   get syncedScheduler() {
-    throw new Error(`Cannot get "${syncedScheduler}" on ComoNode: not implemented yet`);
+    throw new Error(`Cannot get "syncedScheduler" on ComoNode: not implemented yet`);
   }
 
   /**
@@ -391,17 +397,17 @@ class ComoNode {
    */
   async requestRfc(executorNodeId, name, payload = {}) {
     if (!Number.isInteger(executorNodeId)) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 1 is not a valid node id');
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 1 (nodeId) is not a valid node id');
     }
 
     if (!isString(name)) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 2 is not a valid remote function call name, must be a string');
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 2 (name) is not a valid remote function call name, must be a string');
     }
 
     try {
       JSON.stringify(payload);
-    } catch(err) {
-      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 3 cannot be stringified to JSON');
+    } catch {
+      throw new Error('Cannot execute "requestRfc" on ComoNode: argument 3 (payload) cannot be stringified to JSON');
     }
 
     const commandId = this.#rfcIdGenerator();
@@ -489,7 +495,7 @@ class ComoNode {
             resolve(infos.responseAck);
           }
         } else {
-          throw new Error(`Cannot retrieve command resolvers from this.#rfcPendingStore for command id: ${commandId}`)
+          throw new Error(`Cannot retrieve command resolvers from this.#rfcPendingStore for command id: ${commandId}`);
         }
       }
     } else {
@@ -507,7 +513,7 @@ class ComoNode {
           const response = {
             settled: true,
             ...infos,
-          }
+          };
 
           if (responseAck !== undefined || responseAck !== null) {
             response.responseAck = responseAck;
@@ -518,7 +524,7 @@ class ComoNode {
           this.#rfcMessageBus.set({
             settled: true,
             responseErr: serializeError(err),
-            ...infos
+            ...infos,
           });
         }
       }

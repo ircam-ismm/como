@@ -1,9 +1,9 @@
 import {
-  Server as ComoteServer
+  Server as ComoteServer,
 } from '@ircam/comote-helpers/server.js';
 import {
   Server as OscServer,
-  Client as OscClient
+  Client as OscClient,
 } from 'node-osc';
 
 import ComoteSource from './ComoteSource.js';
@@ -109,17 +109,17 @@ export default class SourceFactory {
         console.log(`> como: Launching OSC server on port: ${port}`);
       }
 
-      const server = await new Promise((resolve, reject) => {
-        const oscServer = new OscServer(port, '0.0.0.0')
-        oscServer.on('listening', () => {
-          if (config.verbose) {
-            console.log(`> como: OSC server listening`);
-          }
-          resolve(oscServer);
-        });
+      const { promise, resolve } = Promise.withResolvers();
+      const oscServer = new OscServer(port, '0.0.0.0');
+      oscServer.on('listening', () => {
+        if (config.verbose) {
+          console.log(`> como: OSC server listening`);
+        }
+        resolve();
       });
+      await promise;
 
-      this.#oscServers.set(port, server);
+      this.#oscServers.set(port, oscServer);
     }
 
     const server = this.#oscServers.get(port);

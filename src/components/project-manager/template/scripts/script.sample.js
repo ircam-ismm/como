@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Return the description of a shared state, to dynamically create remote interfaces
  * cf. https://soundworks.dev/soundworks/global.html#SharedStateClassDescription
@@ -38,5 +39,5 @@ export async function exit(context) {
  */
 export async function process(context, frame) {
   const { scriptName, audioContext, outputNode, sharedState, soundbank } = context;
-  console.log('[script:process]]', scriptName, frame)
+  console.log('[script:process]]', scriptName, frame);
 }
