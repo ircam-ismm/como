@@ -192,10 +192,10 @@ class ModelManagerServer extends ModelManager {
     return modelId;
   };
 
-  #deleteModelHandler = async (modelId) => {
-    // delete privateModel
-    // delete associated file
-  }
+  // #deleteModelHandler = async (modelId) => {
+  //   // delete privateModel
+  //   // delete associated file
+  // }
 
   #addExampleHandler = async ({ modelId, label, example }) => {
     const model = this.#privateModels.get(modelId);

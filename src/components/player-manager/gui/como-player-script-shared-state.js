@@ -1,22 +1,22 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { isString } from '@ircam/sc-utils';
+import { isString } from '@ircam/sc-utils';
 import JSON5 from 'json5';
 
 import '@ircam/sc-components';
 
 async function stringToModule(str) {
-  module = `
+  const module = `
 export function template(html, como, player, state) {
   return html\`${str}\`;
 }
   `;
-  const blob = new Blob([module], { type: 'text/javascript' })
+  const blob = new Blob([module], { type: 'text/javascript' });
   const url = URL.createObjectURL(blob);
   const { template } = await import(/* webpackIgnore: true */url);
   URL.revokeObjectURL(url);
-  return template
+  return template;
 }
 
 class ComoPlayerScriptSharedState extends LitElement {
@@ -186,7 +186,6 @@ class ComoPlayerScriptSharedState extends LitElement {
           // compute template module if any
           const description = this.state.getDescription();
           for (let [name, desc] of Object.entries(description)) {
-            console.log(name, isString(desc.metas?.gui))
             if (isString(desc.metas?.gui)) {
               const template = await stringToModule(desc.metas.gui);
               this.#templates.set(name, template);
@@ -194,7 +193,7 @@ class ComoPlayerScriptSharedState extends LitElement {
           }
 
           if (this.state) {
-            this.state.onUpdate((updates) => this.requestUpdate());
+            this.state.onUpdate(() => this.requestUpdate());
           }
         } else {
           this.state = null;

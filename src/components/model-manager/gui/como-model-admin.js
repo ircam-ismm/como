@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
 import '@ircam/sc-components/sc-button.js';
@@ -46,7 +46,7 @@ class ComoModelAdmin extends LitElement {
       ></sc-editor>
       <sc-text>Examples</sc-text>
       <sc-button
-        @input=${e => this.como.modelManager.clearExamples(model.get('id'))}
+        @input=${() => this.como.modelManager.clearExamples(model.get('id'))}
       >clear all</sc-button>
       ${repeat(Object.entries(model.get('infos')), ([label]) => label, ([label, infos]) => {
         return html`
@@ -54,17 +54,17 @@ class ComoModelAdmin extends LitElement {
             <sc-text>${label} (${infos.numExamples})</sc-text>
             <sc-icon
               type="delete"
-              @input=${e => this.como.modelManager.clearExamples(model.get('id'), label)}
+              @input=${() => this.como.modelManager.clearExamples(model.get('id'), label)}
             ></sc-icon>
             ${infos.uuids.map((uuid, index) => {
               return html`
                 <sc-button
-                  @input=${e => this.como.modelManager.deleteExample(model.get('id'), uuid)}
+                  @input=${() => this.como.modelManager.deleteExample(model.get('id'), uuid)}
                 >delete example ${index + 1}</sc-button>
               `;
             })}
           </div>
-        `
+        `;
       })}
     `;
   }
