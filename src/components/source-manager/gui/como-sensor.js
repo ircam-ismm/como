@@ -75,7 +75,7 @@ class ComoSensor extends LitElement {
     sensorType: {
       type: String,
       attribute: 'sensor-type',
-    }
+    },
   };
 
   static styles = css`
