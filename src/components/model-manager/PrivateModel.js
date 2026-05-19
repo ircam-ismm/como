@@ -128,7 +128,6 @@ class PrivateModel {
         parameters = singleOrMultiClassParameters;
       }
 
-      // const infos = examplesInfos(this.#examples);
       await this.#state.set({ parameters });
     } catch (err) {
       return err;

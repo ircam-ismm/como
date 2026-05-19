@@ -59,7 +59,7 @@ class ModelManagerServer extends ModelManager {
 
     await this.como.stateManager.defineClass(`${this.name}:model`, modelDescription);
     await this.como.stateManager.registerUpdateHook(`${this.name}:model`, (updates, currentValues) => {
-      // console.log()
+
       if ('parameters' in updates) {
         const { id } = currentValues;
         const privateModel = this.#privateModels.get(id);
@@ -185,9 +185,9 @@ class ModelManagerServer extends ModelManager {
     });
 
     const model = new PrivateModel(this, state);
-    await model.train();
-
     this.#privateModels.set(modelId, model);
+    // train after storing in Map, because update hook relies on the Map
+    await model.train();
 
     return modelId;
   };

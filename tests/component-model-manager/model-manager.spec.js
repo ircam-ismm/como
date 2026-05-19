@@ -43,7 +43,6 @@ describe('#ModelManager', () => {
     it('should create a new Model if not exists', async () => {
       const modelId = 'test';
       const model = await client.modelManager.getModel(modelId);
-
       assert.equal(model.state.get('id'), modelId);
       assert.isNotNull(model.state.get('config'));
       assert.isNotNull(model.state.get('parameters'));
@@ -286,8 +285,9 @@ describe('#ModelManager', () => {
         assert.equal(data.id, model.state.get('id'));
         // as this is nested object, let's compare the stringified version
         assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
-        assert.deepEqual(data.infos, model.state.get('infos'));
         assert.equal(data.examples.length, 2);
+        // infos are not stored but should be recomputed
+        assert.isDefined(model.state.get('infos'));
       }
 
       await model.clearExamples('one');
@@ -302,8 +302,9 @@ describe('#ModelManager', () => {
         assert.equal(data.id, model.state.get('id'));
         // as this is nested object, let's compare the stringified version
         assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
-        assert.deepEqual(data.infos, model.state.get('infos'));
         assert.equal(data.examples.length, 1);
+        // infos are not stored but should be recomputed
+        assert.isDefined(model.state.get('infos'));
       }
     });
 
@@ -320,8 +321,9 @@ describe('#ModelManager', () => {
       assert.equal(data.id, model.state.get('id'));
       // as this is nested object, let's compare the stringified version
       assert.equal(JSON.stringify(data.parameters), JSON.stringify(model.state.get('parameters')));
-      assert.deepEqual(data.infos, model.state.get('infos'));
       assert.equal(data.examples.length, 1);
+      // infos are not stored but should be recomputed
+      assert.isDefined(model.state.get('infos'));
     });
   });
 });
