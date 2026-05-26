@@ -49,7 +49,7 @@ class SourceManagerServer extends SourceManager {
         if (updates.record === true) {
           // create a clone that receive the motion stream
           const source = await this.getSource(sourceId);
-          const writer = await this.#logger.createWriter(sourceId);
+          const writer = await this.#logger.createWriter(sourceId, { bufferSize: 100 });
 
           source.onUpdate(updates => {
             if ('frame' in updates) {
