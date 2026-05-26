@@ -69,7 +69,6 @@
     "@soundworks/plugin-sync": "^5.0.0",
     "chai": "^6.2.1",
     "filenamify": "^7.0.1",
-    "i2c": "^0.4.0",
     "isomorphic-web-audio-api": "^1.0.2",
     "json5": "^2.2.3",
     "lit": "^3.3.1",
@@ -80,6 +79,9 @@
     "usb": "^2.16.0",
     "uuid": "^13.0.0",
     "xmmjs": "^0.0.3"
+  },
+  "optionalDependencies": {
+    "i2c": "^0.4.0"
   },
   "peerDependencies": {
     "@soundworks/core": "^5.4.1"
