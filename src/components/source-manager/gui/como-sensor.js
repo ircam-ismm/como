@@ -201,7 +201,7 @@ class ComoSensor extends LitElement {
                     value=${this.sensorsInfos[sensorType].colors[index]}
                     @change=${e => this.sensorsInfos[sensorType].colors[index] = e.detail.value}
                   ></sc-color-picker>
-                `
+                `;
               })}
             </div>
           `;
@@ -229,7 +229,7 @@ class ComoSensor extends LitElement {
       throw new Error('como-sensor: property como not set');
     }
 
-    this.#resizeObserver = new ResizeObserver(entries => {
+    this.#resizeObserver = new ResizeObserver(_ => {
       // const entry = entries[0];
       let { width, height } = this.shadowRoot.querySelector('canvas');
       width = Math.max(width, 400); // min to 400px
