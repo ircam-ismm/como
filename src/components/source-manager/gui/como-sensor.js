@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 
 import '@ircam/sc-components/sc-text.js';
 import '@ircam/sc-components/sc-toggle.js';
+import '@ircam/sc-components/sc-number.js';
 
 // This is the other file you can edit
 
@@ -82,10 +83,37 @@ class ComoSensor extends LitElement {
     :host {
       display: inline-block;
       box-sizing: border-box;
-      width: 300px;
-      height: 200px;
       background-color: white;
       margin-bottom: 60px;
+      display: flex;
+      flex-direction: row;
+      width: 700px;
+      height: 270px;
+    }
+
+    .controls {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--sc-color-primary-1);
+    }
+
+    .controls > div {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .controls > div.main {
+      justify-content: space-between;
+    }
+
+    .controls > div.main div {
+      display: flex;
+    }
+
+    .controls > div.sensor-controls sc-text {
+      width: 35px;
+      text-align: center;
     }
   `;
 
@@ -97,33 +125,89 @@ class ComoSensor extends LitElement {
     this.sourceId = null;
     this.numChannel = 1;
     this.channelIndex = 0;
-    this.sensorType = 'accelerometer'; // 'accelerometer', 'gyroscope', 'magnetometer'
+
+    this.sensorsInfos = {
+      accelerometer: {
+        unit: 'm/s^2',
+        normalizeFactor: 2 * 9.81,  // 2G
+        axis: ['x', 'y', 'z'],
+        colors: ['#003a7d', '#ff73b6', '#c6b201'], // dark blue, pink, yellow
+        show: true,
+      },
+      gyroscope: {
+        unit: 'rad/s',
+        normalizeFactor: 4.28, // ±245 dps ~ ±4.28 rad/s
+        axis: ['x', 'y', 'z'],
+        colors: ['#008dff', '#4ecd8b', '#ff9d3a'], // med blue, green, orange
+        show: true,
+      },
+      magnetometer: {
+        unit: 'uT',
+        normalizeFactor: 400, // ±4 gauss = ±400 en uT
+        axis: ['x', 'y', 'z'],
+        colors: ['#c701ff', '#d83034', '#326b77'], // purple, red, green blue
+        show: true,
+      },
+      gravity: {
+        unit: 'm/s^2',
+        normalizeFactor: 2 * 9.81, // ±4 gauss = ±400 en uT
+        axis: ['x', 'y', 'z'],
+        colors: ['#006b0c', '#44347f', '#714404'], // green, purple, brown
+        show: true,
+      },
+    };
 
     this.update = this.update.bind(this);
   }
 
   render() {
     return html`
-      <canvas></canvas>
       <div class="controls">
-        <div>
-          <sc-text style="width: 85px;">pause</sc-text>
-          <sc-toggle @change=${e => this.pause = e.detail.value}></sc-toggle>
-          ${this.numChannel > 1
-            ? html`
-              <sc-text style="width: 85px;">channel</sc-text>
-              <sc-number
-                style="width: 81px;"
-                value=0
-                min=${0}
-                max=${this.numChannel - 1}
-                @change=${e => this.channelIndex = e.detail.value}
-              ></sc-number>`
-            : ''
-          }
-          <sc-text style="width: 100%">X: purple  |   Y: orange  |  Z: red</sc-text>
+        <div class="main">
+          <div>
+            <sc-text style="width: 85px;">channel</sc-text>
+            <sc-number
+              style="width: 50px;"
+              integer
+              value=0
+              min=${0}
+              max=${this.numChannel - 1}
+              @change=${e => this.channelIndex = e.detail.value}
+            ></sc-number>
+          </div>
+          <div>
+            <sc-text style="width: 85px;">pause</sc-text>
+            <sc-toggle @change=${e => this.pause = e.detail.value}></sc-toggle>
+          </div>
         </div>
+        ${Object.keys(this.sensorsInfos).map(sensorType => {
+          return html`
+            <div>
+              <sc-toggle
+                value=${this.sensorsInfos[sensorType].show}
+                @change=${e => this.sensorsInfos[sensorType].show = e.detail.value}
+              ></sc-toggle>
+              <sc-text>${sensorType} (${this.sensorsInfos[sensorType].unit})</sc-text>
+            </div>
+            <div class="sensor-controls">
+              <sc-number
+                .value=${this.sensorsInfos[sensorType].normalizeFactor}
+                @change=${e => this.sensorsInfos[sensorType].normalizeFactor = e.detail.value}
+              ></sc-number>
+              ${this.sensorsInfos[sensorType].axis.map((value, index) => {
+                return html`
+                  <sc-text>${value}</sc-text>
+                  <sc-color-picker
+                    value=${this.sensorsInfos[sensorType].colors[index]}
+                    @change=${e => this.sensorsInfos[sensorType].colors[index] = e.detail.value}
+                  ></sc-color-picker>
+                `
+              })}
+            </div>
+          `;
+        })}
       </div>
+      <canvas></canvas>
     `;
   }
 
@@ -146,8 +230,10 @@ class ComoSensor extends LitElement {
     }
 
     this.#resizeObserver = new ResizeObserver(entries => {
-      const entry = entries[0];
-      const { width, height } = entry.contentRect;
+      // const entry = entries[0];
+      let { width, height } = this.shadowRoot.querySelector('canvas');
+      width = Math.max(width, 400); // min to 400px
+      height = Math.max(height, 270); // min to 400px
 
       this.#logicalWidth = width * window.devicePixelRatio;
       this.#logicalHeight = height * window.devicePixelRatio;
@@ -205,55 +291,45 @@ class ComoSensor extends LitElement {
 
       const xDelta = this.#logicalWidth / (this.#buffer.length - 1);
 
-      // Normalisation selon le type de capteur
-      let normalize;
-      if (this.sensorType === 'accelerometer') {
-        normalize = value => (value + 19.62) / (2 * 19.62); //LSM9DS1 en reférence : ±2g = ±19.62 m/s^2
-      } else if (this.sensorType === 'gyroscope') {
-        normalize = value => (value + 4.28) / (2 * 4.28); // LSM9DS1 en reférence : ±245 dps ~ ±4.28 rad/s
-      } else if (this.sensorType === 'magnetometer') {
-        normalize = value => (value + 400) / (2 * 400); // LSM9DS1 en reférence : ±4 gauss = ±400 en uT
-      }
+      for (let [sensorType, infos] of Object.entries(this.sensorsInfos)) {
+        if (infos.show === false) {
+          continue;
+        }
 
-      const colors = ['purple', 'orange', 'red'];
+        const normalizeFactor = infos.normalizeFactor;
 
-      ['x', 'y', 'z'].forEach((field, index) => {
-        this.#ctx.strokeStyle = colors[index];
-        this.#ctx.beginPath();
+        infos.axis.forEach((axis, index) => {
+          this.#ctx.strokeStyle = infos.colors[index];
+          this.#ctx.beginPath();
 
-        this.#buffer.forEach((value, index) => {
-          // console.log(value);
-          if (value === undefined) {
-            return;
-          }
+          this.#buffer.forEach((frame, index) => {
+            if (frame === undefined) {
+              return;
+            }
 
-          // como-sensor.js:208 Uncaught TypeError: Cannot read properties of undefined (reading 'x')
-          // at como-sensor.js:208:36
-          // at MemoryBuffer.forEach (como-sensor.js:46:7)
-          // at como-sensor.js:202:22
-          // at Array.forEach (<anonymous>)
-          // at como-sensor.js:198:23
+            let value = null;
 
-          let entryValue = null;
-          try {
-            entryValue = value[this.sensorType][field];
-          } catch (err) {
-            console.log('Faulty entry', value);
-            throw err;
-          }
-          const entryNorm = normalize(entryValue);
-          const x = xDelta * index;
-          const y = this.#logicalHeight - (this.#logicalHeight * entryNorm);
+            try {
+              value = frame[sensorType][axis];
+            } catch (err) {
+              console.log('Faulty entry', frame);
+              throw err;
+            }
 
-          if (index === 0) {
-            this.#ctx.moveTo(x, y);
-          } else {
-            this.#ctx.lineTo(x, y);
-          }
+            const norm = (value + normalizeFactor) / (2. * normalizeFactor);
+            const x = xDelta * index;
+            const y = this.#logicalHeight - (this.#logicalHeight * norm);
+
+            if (index === 0) {
+              this.#ctx.moveTo(x, y);
+            } else {
+              this.#ctx.lineTo(x, y);
+            }
+          });
+
+          this.#ctx.stroke();
         });
-
-        this.#ctx.stroke();
-      });
+      }
     });
   };
 }

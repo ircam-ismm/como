@@ -11,13 +11,15 @@ class ComoSource extends LitElement {
   #unsubscribeSource;
 
   static properties = {
-    plotSensor: {
+    plotSensors: {
       type: Boolean,
       reflect: true,
-      attribute: 'plot-sensor',
+      attribute: 'plot-sensors',
     },
     showQrCode: {
       type: Boolean,
+      reflect: true,
+      attribute: 'show-qr-code',
     },
   };
 
@@ -35,8 +37,7 @@ class ComoSource extends LitElement {
     this.como = null;
     this.source = null;
 
-    this.plotSensor = false;
-    this.plotSensor = false;
+    this.plotSensors = false;
   }
 
   render() {
@@ -50,21 +51,12 @@ class ComoSource extends LitElement {
         ></sc-record>
         <sc-icon
           type="waveform"
-          ?active=${this.plotSensor}
-          @input=${() => this.plotSensor = !this.plotSensor}
+          ?active=${this.plotSensors}
+          @input=${() => this.plotSensors = !this.plotSensors}
         ></sc-icon>
       </div>
-      ${this.plotSensor
-        ? html`
-          <sc-text>Accelerometer</sc-text>
-          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="accelerometer"></como-sensor>
-
-          <sc-text>Gyroscope</sc-text>
-          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="gyroscope"></como-sensor>
-
-          <sc-text>Magnetometer</sc-text>
-          <como-sensor .como=${this.como} source-id=${this.source.get('id')} sensor-type="magnetometer"></como-sensor>
-        `
+      ${this.plotSensors
+        ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
         : nothing
       }
       <!-- QRCode for comote -->
