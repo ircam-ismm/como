@@ -26,7 +26,7 @@
   },
   "scripts": {
     "lint": "npx eslint src",
-    "preversion": "npm run test",
+    "preversion": "npm run lint && npm run test",
     "test": "npx mocha tests/**/*.spec.js",
     "test:ci": "ENV=ci npx mocha tests/**/*.spec.js",
     "test:watch": "npx mocha tests/**/*.spec.js --watch",

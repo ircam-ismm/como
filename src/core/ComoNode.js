@@ -3,7 +3,6 @@ import {
   isFunction,
   isString,
   getTime,
-  isBrowser,
 } from '@ircam/sc-utils';
 import {
   Scheduler,
