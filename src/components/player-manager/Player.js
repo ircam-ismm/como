@@ -5,9 +5,7 @@ import {
   isFunction,
   isString,
 } from '@ircam/sc-utils';
-import {
-  GainNode,
-} from 'isomorphic-web-audio-api';
+
 /**
  * Basically wrap 3 different states
  * - source

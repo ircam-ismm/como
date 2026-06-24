@@ -1,7 +1,4 @@
 import {
-  GainNode,
-} from 'isomorphic-web-audio-api';
-import {
   isString,
   decibelToLinear,
 } from '@ircam/sc-utils';
