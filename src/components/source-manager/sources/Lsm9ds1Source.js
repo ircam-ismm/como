@@ -1,5 +1,6 @@
 import AbstractSource from './AbstractSource.js';
 import { getTime } from '@ircam/sc-utils';
+import { Gravity } from '@ircam/sc-motion';
 
 
 // Conditional import: i2c is only available on Linux
@@ -74,6 +75,7 @@ class Lsm9ds1Source extends AbstractSource {
   #activeTimeoutId = null;
   #activeTimeoutPeriod = null;
 
+  #gravityProcessor = new Gravity({ outputApi: 'v3' });
 
   constructor(como, config) {
     super(como);
@@ -255,6 +257,8 @@ class Lsm9ds1Source extends AbstractSource {
           frequency: 1000 / (this.#config.interval || DEFAULT_INTERVAL_MS),
         },
       };
+
+      data.gravity = this.#gravityProcessor(data);
 
       clearTimeout(this.#activeTimeoutId);
 
