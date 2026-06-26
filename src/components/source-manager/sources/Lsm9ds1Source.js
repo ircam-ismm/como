@@ -176,18 +176,21 @@ class Lsm9ds1Source extends AbstractSource {
     // WHO_AM_I gyroscope/accelerometer check (should return 0x68)
     const gyroAccelId = await this.#readRegister(this.#gyroAccelWire, GYRO_ACCEL_REGISTER.WHO_AM_I, 1);
     if (gyroAccelId[0] !== 0x68) {
-      throw new Error(`LSM9DS1 gyroscope and accelerometer not detected (WHO_AM_I=0x${gyroAccelId[0].toString(16)}, attendu 0x68)`);
+      throw new Error(`LSM9DS1 gyroscope and accelerometer not detected (WHO_AM_I=0x${gyroAccelId[0].toString(16)}, looking for 0x68 register)`);
     }
-    console.log('LSM9DS1 gyroscope and accelerometer identified');
+    if (this.#config.verbose) {
+      console.log('LSM9DS1 gyroscope and accelerometer identified');
+    }
 
 
     // WHO_AM_I magnetometer check (should return 0x3D)
     const magnetoId = await this.#readRegister(this.#magnetoWire, MAGNETO_REGISTER.WHO_AM_I_M, 1);
     if (magnetoId[0] !== 0x3D) {
-      throw new Error(`LSM9DS1 magnetometer not detected (WHO_AM_I=0x${magnetoId [0].toString(16)}, attendu 0x3D)`);
+      throw new Error(`LSM9DS1 magnetometer not detected (WHO_AM_I=0x${magnetoId[0].toString(16)}, looking for 0x3D register)`);
     }
-    console.log('LSM9DS1 Magnetometer identified');
-
+    if (this.#config.verbose) {
+      console.log('LSM9DS1 Magnetometer identified');
+    }
 
     // --------- Gyroscope and Magnetometer Settings ------------
     await this.#writeRegister(this.#gyroAccelWire, GYRO_ACCEL_REGISTER.CTRL_REG8, 0x04); // Auto-incrementing address
@@ -200,10 +203,9 @@ class Lsm9ds1Source extends AbstractSource {
     await this.#writeRegister(this.#magnetoWire, MAGNETO_REGISTER.CTRL_REG2_M, 0x00); // ±4 gauss
     await this.#writeRegister(this.#magnetoWire, MAGNETO_REGISTER.CTRL_REG3_M, 0x00); // Continuous mode
     await this.#writeRegister(this.#magnetoWire, MAGNETO_REGISTER.CTRL_REG4_M, 0x0C); // Ultra-high performance Z-axis
-
-
-    console.log('LSM9DS1 sensor initialized');
-
+    if (this.#config.verbose) {
+      console.log('LSM9DS1 sensor initialized');
+    }
   }
 
 
