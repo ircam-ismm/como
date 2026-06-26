@@ -11,18 +11,24 @@ class ComoSource extends LitElement {
   #unsubscribeSource;
 
   static properties = {
-    plotSensor: {
+    plotSensors: {
       type: Boolean,
       reflect: true,
-      attribute: 'plot-sensor',
+      attribute: 'plot-sensors',
     },
     showQrCode: {
       type: Boolean,
+      reflect: true,
+      attribute: 'show-qr-code',
     },
   };
 
   static styles = css`
-
+    :host {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
   `;
 
   constructor() {
@@ -31,24 +37,25 @@ class ComoSource extends LitElement {
     this.como = null;
     this.source = null;
 
-    this.plotSensor = false;
-    this.plotSensor = false;
+    this.plotSensors = false;
   }
 
   render() {
     return html`
-      <sc-text>source: ${this.source.get('id')}</sc-text>
-      <sc-status ?active=${this.source.get('active')}></sc-status>
-      <sc-record
-        ?value=${this.source.get('record')}
-        @change=${e => this.source.set('record', e.detail.value)}
-      ></sc-record>
-      <sc-icon
-        type="waveform"
-        ?active=${this.plotSensor}
-        @input=${() => this.plotSensor = !this.plotSensor}
-      ></sc-icon>
-      ${this.plotSensor
+      <div style="width: 100%; display: flex; gap: 10px; align-items: center;">
+        <sc-text>source: ${this.source.get('id')}</sc-text>
+        <sc-status ?active=${this.source.get('active')}></sc-status>
+        <sc-record
+          ?value=${this.source.get('record')}
+          @change=${e => this.source.set('record', e.detail.value)}
+        ></sc-record>
+        <sc-icon
+          type="waveform"
+          ?active=${this.plotSensors}
+          @input=${() => this.plotSensors = !this.plotSensors}
+        ></sc-icon>
+      </div>
+      ${this.plotSensors
         ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
         : nothing
       }

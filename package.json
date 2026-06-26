@@ -80,6 +80,9 @@
     "uuid": "^13.0.0",
     "xmmjs": "^0.0.3"
   },
+  "optionalDependencies": {
+    "i2c": "^0.4.0"
+  },
   "peerDependencies": {
     "@soundworks/core": "^5.4.1"
   }
