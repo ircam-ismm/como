@@ -96,7 +96,7 @@ class PlayerManager extends ComoComponent {
 
   /** @private */
   #createPlayer = async ({ sourceId, id  }) => {
-    const player = new Player(this.como, sourceId, id );
+    const player = new Player(this.como, sourceId, id);
     await player.init();
 
     this.#ownedPlayers.add(player);

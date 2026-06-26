@@ -1,6 +1,8 @@
 import { EOL as _EOL } from 'node:os';
 import os from 'node:os';
 import { SERVER_ID } from '../core/constants.js';
+// make web audio api available globally
+import 'node-web-audio-api/polyfill.js';
 
 export const EOL = _EOL;
 

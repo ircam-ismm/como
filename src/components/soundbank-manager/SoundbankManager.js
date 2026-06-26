@@ -1,6 +1,6 @@
 import {
   AudioBufferLoader,
-} from '@ircam/sc-audio';
+} from '@ircam/sc-loader';
 import {
   isString,
 } from '@ircam/sc-utils';

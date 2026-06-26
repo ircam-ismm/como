@@ -3,7 +3,6 @@ import {
   isFunction,
   isString,
   getTime,
-  isBrowser,
 } from '@ircam/sc-utils';
 import {
   Scheduler,
@@ -15,15 +14,9 @@ import {
   serializeError,
   deserializeError,
 } from 'serialize-error';
-import * as webaudio from 'isomorphic-web-audio-api';
 
 import * as constants from './constants.js';
 import { getId } from '#isomorphic-utils.js';
-
-// register webaudio globally on node clients
-if (!isBrowser()) {
-  Object.assign(globalThis, webaudio);
-}
 
 /**
  * A Node in a como application.
