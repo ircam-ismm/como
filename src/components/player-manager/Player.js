@@ -269,9 +269,9 @@ class Player {
 
     this.#script = await this.#como.scriptManager.attach(scriptName);
     this.#script.onUpdate(async updates => {
+      // console.log(updates);
       if ('runtimeError' in updates && updates.runtimeError !== null) {
         // silently release the script, we don't want to pack up runtime errors
-        console.log(updates.runtimeError);
         console.log('releasing script');
         this.#releaseScript({ silent: true });
         return;
@@ -367,6 +367,11 @@ class Player {
 
     // release old version of the script
     await this.#releaseScript();
+
+    if (this.#script.buildError) {
+      console.log(this.#script.buildError);
+      return;
+    }
 
     // import script and check API
     try {
@@ -508,11 +513,9 @@ class Player {
       try {
         await this.#scriptModule.enter(this.#scriptContext);
       } catch (err) {
-        console.log(err.message.slice(0, 200));
-        process.exit(0);
-        // this.#script.reportRuntimeError(err);
-        // this.#scriptErrored = true;
-        // return;
+        this.#script.reportRuntimeError(err);
+        this.#scriptErrored = true;
+        return;
       }
     }
 
