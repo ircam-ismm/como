@@ -75,13 +75,25 @@ class Lsm9ds1Source extends AbstractSource {
   #activeTimeoutId = null;
   #activeTimeoutPeriod = null;
 
-  #gravityProcessor = new Gravity({ outputApi: 'v3' });
+
+  /*#gravityProcessor = new Gravity({ outputApi: 'v3' });*/
+
+  #gravityProcessor = null;
+
 
   constructor(como, config) {
     super(como);
 
     this.#config = config;
+
+    const interval = config.interval || DEFAULT_INTERVAL_MS;
+
+    this.#gravityProcessor = new Gravity({
+      outputApi: 'v3',
+      frequency: 1000 / interval,
+    });
   }
+
 
   async init() {
     const state = await this.como.stateManager.create(`${this.como.sourceManager.name}:source`, {
@@ -223,6 +235,7 @@ class Lsm9ds1Source extends AbstractSource {
       const accelBuffer = await this.#readRegister(this.#gyroAccelWire, GYRO_ACCEL_REGISTER.OUT_X_XL, 6);
       const magnetoBuffer = await this.#readRegister(this.#magnetoWire, MAGNETO_REGISTER.OUT_X_M, 6);
 
+      const nowSeconds = getTime();
       const now = getTime() * 1e3; // ms
 
       const data = {
@@ -260,7 +273,16 @@ class Lsm9ds1Source extends AbstractSource {
         },
       };
 
-      data.gravity = this.#gravityProcessor(data);
+      /*data.gravity = this.#gravityProcessor.process(data);*/
+
+
+      data.gravity = this.#gravityProcessor.process({
+        api: data.api,
+        accelerometer: data.accelerometer,
+        gyroscope: data.gyroscope,
+        timestamp: nowSeconds,
+      });
+
 
       clearTimeout(this.#activeTimeoutId);
 

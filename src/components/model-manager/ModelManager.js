@@ -30,8 +30,12 @@ class ModelManager extends ComoComponent {
     ]);
   }
 
-  async getModel(modelId) {
+  async getModel(modelId, options = {}) {
     // if model already exists, attach to it, else create it
+    const {
+      preset = 'postures',
+    } = options;
+
     let state = this.#models.find(model => model.get('id') === modelId);
     const model = new Model(this);
 
@@ -39,7 +43,10 @@ class ModelManager extends ComoComponent {
       const id = await this.como.requestRfc(
         this.como.constants.SERVER_ID,
         `${this.name}:createModel`,
-        { modelId },
+        {
+          modelId,
+          preset,
+        },
       );
       // getModelResolverHook guarantees the model is in the collection
       state = this.#models.find(model => model.get('id') === id);
