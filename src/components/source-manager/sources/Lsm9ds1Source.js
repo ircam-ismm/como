@@ -180,7 +180,7 @@ class Lsm9ds1Source extends AbstractSource {
 
 
     // WHO_AM_I magnetometer check (should return 0x3D)
-    const magnetoId = await this.#readRegister( this.#magnetoWire, MAGNETO_REGISTER.WHO_AM_I_M, 1);
+    const magnetoId = await this.#readRegister(this.#magnetoWire, MAGNETO_REGISTER.WHO_AM_I_M, 1);
     if (magnetoId[0] !== 0x3D) {
       throw new Error(`LSM9DS1 magnetometer not detected (WHO_AM_I=0x${magnetoId [0].toString(16)}, attendu 0x3D)`);
     }
@@ -221,7 +221,6 @@ class Lsm9ds1Source extends AbstractSource {
 
       const now = getTime() * 1e3; // ms
 
-
       const data = {
         source: Lsm9ds1Source.type,
         api: 'v3',
@@ -256,7 +255,6 @@ class Lsm9ds1Source extends AbstractSource {
           frequency: 1000 / (this.#config.interval || DEFAULT_INTERVAL_MS),
         },
       };
-
 
       clearTimeout(this.#activeTimeoutId);
 
