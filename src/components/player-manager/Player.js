@@ -374,14 +374,8 @@ class Player {
     }
 
     // import script and check API
-    try {
-      this.#scriptModule = await this.#script.import();
-    } catch (err) {
-      this.#script.reportRuntimeError(err);
-      this.#scriptErrored = true;
-    }
-
-    // return if no import was found
+    this.#scriptModule = await this.#script.import();
+    // import failed, return
     if (this.#scriptModule === null) {
       return;
     }
