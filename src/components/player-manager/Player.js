@@ -332,7 +332,13 @@ class Player {
 
     // clean script shared state if any
     if (this.#scriptSharedState !== null) {
-      await this.#scriptSharedState.delete();
+      try {
+        await this.#scriptSharedState.delete();
+      } catch (err) {
+        // in some case, the script has already been deleted for reason to be
+        // understood..., just ignore for now
+        // to reproduce, just need make `exit` throw somehow
+      }
       const scriptSharedStateClassName = this.state.get('scriptSharedStateClassName');
 
       // clean state
