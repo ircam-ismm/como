@@ -152,7 +152,7 @@ class PlayerManager extends ComoComponent {
    * @param {String} playerId
    * @returns {Player|null}
    */
-  async getPlayerState(playerId) {
+  getPlayerState(playerId) {
     const player = this.players.find(player => player.get('id') === playerId);
     return player || null;
   }
