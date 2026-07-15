@@ -334,7 +334,7 @@ class Player {
     if (this.#scriptSharedState !== null) {
       try {
         await this.#scriptSharedState.delete();
-      } catch (err) {
+      } catch {
         // in some case, the script has already been deleted for reason to be
         // understood..., just ignore for now
         // to reproduce, just need make `exit` throw somehow
