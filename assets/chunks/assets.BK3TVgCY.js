@@ -1,0 +1,1 @@
+var e=`/como/assets/logo-400x400.DBUBnLrP.png`;export{e as t};
