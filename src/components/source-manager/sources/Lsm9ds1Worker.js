@@ -216,7 +216,7 @@ async function readSensor() {
     return null;
   }
 
-  const gyroBuffer = await readRegister(gyroAccelWire, GYRO_ACCEL_REGISTER.OUT_X_G, 6 );
+  const gyroBuffer = await readRegister(gyroAccelWire, GYRO_ACCEL_REGISTER.OUT_X_G, 6);
   const accelBuffer = await readRegister(gyroAccelWire, GYRO_ACCEL_REGISTER.OUT_X_XL, 6);
   const magnetoBuffer = await readRegister(magnetoWire, MAGNETO_REGISTER.OUT_X_M, 6);
 

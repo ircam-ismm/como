@@ -1,7 +1,5 @@
 import { Worker } from 'node:worker_threads';
-import { getTime } from '@ircam/sc-utils';
 import AbstractSource from './AbstractSource.js';
-
 
 
 const DEFAULT_INTERVAL_MS = 10; // ms ---> 100 Hz by default
