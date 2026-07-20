@@ -62,7 +62,7 @@
     "@ircam/sc-signal": "^1.2.0",
     "@ircam/sc-utils": "^1.11.0",
     "@soundworks/helpers": "^5.0.0",
-    "@soundworks/plugin-filesystem": "^5.1.0",
+    "@soundworks/plugin-filesystem": "^5.1.4",
     "@soundworks/plugin-logger": "^5.0.0",
     "@soundworks/plugin-platform-init": "^5.0.0",
     "@soundworks/plugin-scripting": "^5.0.4",
