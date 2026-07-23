@@ -58,8 +58,8 @@ class ModelManagerServer extends ModelManager {
     await super.init();
 
     await this.como.stateManager.defineClass(`${this.name}:model`, modelDescription);
-    await this.como.stateManager.registerUpdateHook(`${this.name}:model`, (updates, currentValues) => {
 
+    await this.como.stateManager.registerUpdateHook(`${this.name}:model`, (updates, currentValues) => {
       if ('parameters' in updates) {
         const { id } = currentValues;
         const privateModel = this.#privateModels.get(id);
@@ -145,7 +145,7 @@ class ModelManagerServer extends ModelManager {
           parameters,
           infos,
         });
-        // do not re-train, just rely on stored parameters
+        // do not re-train, just use on stored parameters
         const model = new PrivateModel(this, state, examples);
 
         this.#privateModels.set(id, model);

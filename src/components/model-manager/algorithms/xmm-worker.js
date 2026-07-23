@@ -39,7 +39,7 @@ export class XmmWorker {
 if (!isMainThread) {
   parentPort.on('message', event => {
     const startTime = getTime();
-    const { promiseId, config, examples, multiClass } = event;
+    const { modelUuid, promiseId, config, examples, multiClass } = event;
     let trainingSet;
 
     if (examples.length === 0) {
@@ -76,7 +76,7 @@ if (!isMainThread) {
           : xmm.trainGMM(trainingSet, xmmConfig);
 
         const trainingDuration = getTime() - startTime;
-        parentPort.postMessage({ promiseId, parameters, trainingDuration });
+        parentPort.postMessage({ modelUuid, promiseId, parameters, trainingDuration });
         break;
       }
       case 'hhmm': {
@@ -95,11 +95,11 @@ if (!isMainThread) {
           : xmm.trainHMM(trainingSet, xmmConfig);
 
         const trainingDuration = getTime() - startTime;
-        parentPort.postMessage({ promiseId, parameters, trainingDuration });
+        parentPort.postMessage({ modelUuid, promiseId, parameters, trainingDuration });
         break;
       }
       default: {
-        parentPort.postMessage({ promiseId, err: 'Invalid model type "' + config.modelType + '", should be gmm or hhmm' });
+        parentPort.postMessage({ modelUuid, promiseId, err: 'Invalid model type "' + config.modelType + '", should be gmm or hhmm' });
         break;
       }
     }

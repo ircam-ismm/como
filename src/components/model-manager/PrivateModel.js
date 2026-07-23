@@ -1,8 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { counter } from '@ircam/sc-utils';
 
-
-
 /** @private */
 class PrivateModel {
   #examples;
@@ -17,9 +15,6 @@ class PrivateModel {
     this.#examples = examples;
     // Worker extends the Node.js "EventEmitter" not the W3C `EventTarget`
     this.#manager.algorithms['xmm'].addListener('message', this.#onWorkerMessage);
-
-    // const infos = examplesInfos(this.#examples);
-    // this.state.set({ infos });
 
     this.state.onUpdate(updates => {
       if ('config' in updates) {
@@ -41,22 +36,6 @@ class PrivateModel {
     this.#manager.algorithms['xmm'].removeListener('message', this.#onWorkerMessage);
     await this.#state.delete();
   }
-
-  #onWorkerMessage = msg => {
-    const { promiseId, err, parameters, trainingDuration } = msg;
-    const promiseHandlers = this.#idPromiseMap.get(promiseId);
-
-    // To be able to have multiple models
-    if (!promiseHandlers) {
-      return;
-    }
-
-    const { resolve, reject } = promiseHandlers;
-
-    this.#idPromiseMap.delete(promiseId);
-
-    err ? reject(new Error(err)) : resolve({ parameters, trainingDuration });
-  };
 
   async addExample(label, input, output = null) {
     const uuid = randomUUID();
@@ -117,6 +96,7 @@ class PrivateModel {
     this.#idPromiseMap.set(promiseId, { resolve, reject });
 
     this.#manager.algorithms['xmm'].postMessage({
+      modelUuid: this.#state.get('uuid'),
       promiseId,
       config,
       examples,
@@ -143,6 +123,19 @@ class PrivateModel {
 
     await this.#manager.persist(this);
   }
+
+  #onWorkerMessage = msg => {
+    const { modelUuid, promiseId, err, parameters, trainingDuration } = msg;
+    // training results from another model
+    if (modelUuid !== this.#state.get('uuid')) {
+      return;
+    }
+
+    const { resolve, reject } = this.#idPromiseMap.get(promiseId);
+    this.#idPromiseMap.delete(promiseId);
+
+    err ? reject(new Error(err)) : resolve({ parameters, trainingDuration });
+  };
 }
 
 export default PrivateModel;
