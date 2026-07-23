@@ -44,7 +44,15 @@ class PrivateModel {
 
   #onWorkerMessage = msg => {
     const { promiseId, err, parameters, trainingDuration } = msg;
-    const { resolve, reject } = this.#idPromiseMap.get(promiseId);
+    const promiseHandlers = this.#idPromiseMap.get(promiseId);
+
+    // To be able to have multiple models
+    if (!promiseHandlers) {
+      return;
+    }
+
+    const { resolve, reject } = promiseHandlers;
+
     this.#idPromiseMap.delete(promiseId);
 
     err ? reject(new Error(err)) : resolve({ parameters, trainingDuration });
