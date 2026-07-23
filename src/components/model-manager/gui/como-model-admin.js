@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
 import '@ircam/sc-components/sc-button.js';
@@ -9,7 +9,21 @@ import '@ircam/sc-components/sc-text.js';
 import JSON5 from 'json5';
 
 class ComoModelAdmin extends LitElement {
-  #unsubscribeModels = null;
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: row;
+      background-color: #232323;
+      padding: 4px;
+      gap: 10px;
+    }
+
+    .examples {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  `;
 
   static properties = {
     modelId: {
@@ -18,6 +32,8 @@ class ComoModelAdmin extends LitElement {
       attribute: 'model-id',
     },
   };
+
+  #unsubscribeModels = null;
 
   constructor() {
     super();
@@ -44,28 +60,32 @@ class ComoModelAdmin extends LitElement {
         }}
         save-button
       ></sc-editor>
-      <sc-text>Examples</sc-text>
-      <sc-button
-        @input=${() => this.como.modelManager.clearExamples(model.get('id'))}
-      >clear all</sc-button>
-      ${repeat(Object.entries(model.get('infos')), ([label]) => label, ([label, infos]) => {
-        return html`
-          <div>
-            <sc-text>${label} (${infos.numExamples})</sc-text>
-            <sc-icon
-              type="delete"
-              @input=${() => this.como.modelManager.clearExamples(model.get('id'), label)}
-            ></sc-icon>
-            ${infos.uuids.map((uuid, index) => {
-              return html`
-                <sc-button
-                  @input=${() => this.como.modelManager.deleteExample(model.get('id'), uuid)}
-                >delete example ${index + 1}</sc-button>
-              `;
-            })}
-          </div>
-        `;
-      })}
+      <div class="examples">
+        <div>
+          <sc-text>Examples</sc-text>
+          <sc-button
+            @input=${() => this.como.modelManager.clearExamples(model.get('id'))}
+          >clear all</sc-button>
+        </div>
+        ${repeat(Object.entries(model.get('infos')), ([label]) => label, ([label, infos]) => {
+          return html`
+            <div>
+              <sc-text>${label} (${infos.numExamples})</sc-text>
+              <sc-icon
+                type="delete"
+                @input=${() => this.como.modelManager.clearExamples(model.get('id'), label)}
+              ></sc-icon>
+              ${infos.uuids.map((uuid, index) => {
+                return html`
+                  <sc-button
+                    @input=${() => this.como.modelManager.deleteExample(model.get('id'), uuid)}
+                  >delete example ${index + 1}</sc-button>
+                `;
+              })}
+            </div>
+          `;
+        })}
+      </div>
     `;
   }
 

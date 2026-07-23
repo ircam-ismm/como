@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
 import '@ircam/sc-components/sc-icon.js';
@@ -7,7 +7,14 @@ import '@ircam/sc-components/sc-text.js';
 import './como-model-admin.js';
 
 class ComoModelManager extends LitElement {
-  #unsubscribeModels = null;
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: column;
+      padding: 4px;
+      gap: 10px;
+    }
+  `;
 
   static properties = {
     expanded: {
@@ -15,6 +22,8 @@ class ComoModelManager extends LitElement {
       reflect: true,
     },
   };
+
+  #unsubscribeModels = null;
 
   constructor() {
     super();
