@@ -37,6 +37,7 @@ export default {
     type: 'string',
     nullable: true,
     default: null,
+    filterChange: false,
   },
   scriptSharedStateClassName: {
     type: 'string',

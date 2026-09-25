@@ -49,16 +49,14 @@ class ComoSource extends LitElement {
           ?value=${this.source.get('record')}
           @change=${e => this.source.set('record', e.detail.value)}
         ></sc-record>
-        <sc-icon
+        <sc-modal
           type="waveform"
+          movable
+          resizable
           ?active=${this.plotSensors}
-          @input=${() => this.plotSensors = !this.plotSensors}
-        ></sc-icon>
+          .open=${() => html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`}
+        ></sc-modal>
       </div>
-      ${this.plotSensors
-        ? html`<como-sensor .como=${this.como} source-id=${this.source.get('id')}></como-sensor>`
-        : nothing
-      }
       <!-- QRCode for comote -->
       ${this.source.get('type') === 'comote' ?
         html`
