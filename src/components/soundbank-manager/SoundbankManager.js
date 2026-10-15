@@ -93,6 +93,14 @@ class SoundbankManager extends ComoComponent {
   }
 
   /**
+   * Get the list of the audio files name
+   * @returns {Array}
+   */
+  getList() {
+    return Object.keys(this.#buffers);
+  }
+
+  /**
    * Get the list of audio files (mp3 or wav) as filename / url object
    * @see {@link https://github.com/collective-soundworks/soundworks-plugin-filesystem?tab=readme-ov-file#gettreeasurlmap-1}
    * @returns {Object<String, String>}
@@ -111,6 +119,18 @@ class SoundbankManager extends ComoComponent {
    */
   onUpdate(...args) {
     return this.filesystem.onUpdate(...args);
+  }
+
+  upload(filename, data) {
+    return this.filesystem.writeFile(filename, data);
+  }
+
+  rename(oldFilename, newFilename) {
+    return this.filesystem.rename(oldFilename, newFilename);
+  }
+
+  delete(filename) {
+    return this.filesystem.rm(filename);
   }
 
   /**

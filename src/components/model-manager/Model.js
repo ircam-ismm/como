@@ -37,62 +37,67 @@ class Model {
   /**
    * Add an
    * @param {Array} example
+   * @return {String} uuid
    */
   async addExample(label, example) {
-    const { promise, resolve, reject } = Promise.withResolvers();
-    const unsubscribe = this.#state.onUpdate(updates => {
-      if ('parameters' in updates) {
-        unsubscribe();
-        resolve();
-      }
-    });
+    return await this.#modelManager.addExample(this.id, label, example);
+    // const { promise, resolve, reject } = Promise.withResolvers();
 
-    try {
-      await this.#modelManager.addExample(this.id, label, example);
-    } catch (err) {
-      console.log(err.message);
-      reject(err);
-    }
+    // const unsubscribe = this.#state.onUpdate(updates => {
+    //   if ('parameters' in updates) {
+    //     unsubscribe();
+    //     resolve();
+    //   }
+    // });
 
-    return promise;
+    // try {
+    //   await this.#modelManager.addExample(this.id, label, example);
+    // } catch (err) {
+    //   console.log(err.message);
+    //   reject(err);
+    // }
+
+    // return promise;
   }
 
   async deleteExample(uuid) {
-    const { promise, resolve, reject } = Promise.withResolvers();
-    const unsubscribe = this.#state.onUpdate(updates => {
-      if ('parameters' in updates) {
-        unsubscribe();
-        resolve();
-      }
-    });
+    await this.#modelManager.deleteExample(this.id, uuid);
+    // const { promise, resolve, reject } = Promise.withResolvers();
+    // const unsubscribe = this.#state.onUpdate(updates => {
+    //   if ('parameters' in updates) {
+    //     unsubscribe();
+    //     resolve();
+    //   }
+    // });
 
-    try {
-      await this.#modelManager.deleteExample(this.id, uuid);
-    } catch (err) {
-      console.log(err.message);
-      reject(err);
-    }
+    // try {
+    //   await this.#modelManager.deleteExample(this.id, uuid);
+    // } catch (err) {
+    //   console.log(err.message);
+    //   reject(err);
+    // }
 
-    return promise;
+    // return promise;
   }
 
   async clearExamples(label = null) {
-    const { promise, resolve, reject } = Promise.withResolvers();
-    const unsubscribe = this.#state.onUpdate(updates => {
-      if ('parameters' in updates) {
-        unsubscribe();
-        resolve();
-      }
-    });
+    await this.#modelManager.clearExamples(this.id, label);
+    // const { promise, resolve, reject } = Promise.withResolvers();
+    // const unsubscribe = this.#state.onUpdate(updates => {
+    //   if ('parameters' in updates) {
+    //     unsubscribe();
+    //     resolve();
+    //   }
+    // });
 
-    try {
-      await this.#modelManager.clearExamples(this.id, label);
-    } catch (err) {
-      console.log(err.message);
-      reject(err);
-    }
+    // try {
+    //   await this.#modelManager.clearExamples(this.id, label);
+    // } catch (err) {
+    //   console.log(err.message);
+    //   reject(err);
+    // }
 
-    return promise;
+    // return promise;
   }
 
   process(frame) {

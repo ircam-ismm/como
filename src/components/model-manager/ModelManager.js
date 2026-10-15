@@ -88,7 +88,7 @@ class ModelManager extends ComoComponent {
   };
 
   async addExample(modelId, label, example) {
-    await this.como.requestRfc(
+    return await this.como.requestRfc(
       this.como.constants.SERVER_ID,
       `${this.name}:addExample`,
       { modelId, label, example },

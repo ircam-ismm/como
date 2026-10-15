@@ -13,10 +13,10 @@ class PlayerManagerServer extends PlayerManager {
     super(como, name);
 
     this.como.stateManager.defineClass(`${this.name}:player`, playerDescription);
-    this.como.stateManager.registerUpdateHook(`${this.name}:player`, updates => {
+    this.como.stateManager.registerUpdateHook(`${this.name}:player`, (updates, currentValues) => {
       // reset all script information so that we don't try to attach to
       // an nonexisting state based on information from previous session
-      if ('sessionId' in updates) {
+      if ('sessionId' in updates && updates.sessionId !== currentValues.sessionId) {
         return {
           scriptName: null,
           scriptSharedStateClassName: null,

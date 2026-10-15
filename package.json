@@ -65,7 +65,7 @@
     "@soundworks/plugin-filesystem": "^5.1.4",
     "@soundworks/plugin-logger": "^5.0.0",
     "@soundworks/plugin-platform-init": "^5.0.0",
-    "@soundworks/plugin-scripting": "^5.0.4",
+    "@soundworks/plugin-scripting": "^5.1.1",
     "@soundworks/plugin-sync": "^5.0.0",
     "chai": "^6.2.1",
     "filenamify": "^7.0.1",

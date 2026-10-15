@@ -269,10 +269,8 @@ class Player {
 
     this.#script = await this.#como.scriptManager.attach(scriptName);
     this.#script.onUpdate(async updates => {
-      // console.log(updates);
       if ('runtimeError' in updates && updates.runtimeError !== null) {
         // silently release the script, we don't want to pack up runtime errors
-        console.log('releasing script');
         this.#releaseScript({ silent: true });
         return;
       }
@@ -345,6 +343,7 @@ class Player {
       await this.state.set({
         scriptSharedStateClassName: null,
         scriptSharedStateId: null,
+        scriptLoaded: false,
       });
 
       // clean class
@@ -499,6 +498,7 @@ class Player {
     const soundbank = sessionId
       ? await this.#como.sessionManager.getSessionSoundbank(sessionId)
       : await this.#como.soundbankManager.getBuffers();
+    const session = sessionId ? this.#como.sessionManager.getSession(sessionId) : null;
 
     // create context object for this script instance
     this.#scriptContext = Object.freeze({
@@ -506,6 +506,7 @@ class Player {
       output: outputNode,
       state: this.#scriptSharedState,
       soundbank,
+      session,
     });
 
     // enter the script

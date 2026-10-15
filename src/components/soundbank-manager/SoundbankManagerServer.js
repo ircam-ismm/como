@@ -14,11 +14,6 @@ class SoundbankManagerServer extends SoundbankManager {
     super(como, name);
 
     this.como.pluginManager.register(`${this.name}:filesystem`, ServerPluginFilesystem);
-
-    // this.como.setRfcHandler(`${this.name}:createSession`, this.#createSession)
-    // this.como.setRfcHandler(`${this.name}:persistSession`, this.#persistSession)
-    // this.como.setRfcHandler(`${this.name}:renameSession`, this.#renameSession)
-    // this.como.setRfcHandler(`${this.name}:deleteSession`, this.#deleteSession)
   }
 
   async start() {
@@ -32,7 +27,6 @@ class SoundbankManagerServer extends SoundbankManager {
           dirname: soundbankDirname,
           publicPath: soundbankDirname,
         });
-        // console.log(this.filesystem.getTreeAsUrlMap('wav|mp3'));
       } else {
         await this.filesystem.switch({ dirname: null });
       }

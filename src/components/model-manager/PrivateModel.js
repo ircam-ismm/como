@@ -43,6 +43,8 @@ class PrivateModel {
     this.#examples.push(example);
 
     await this.train(label);
+
+    return uuid;
   }
 
   async deleteExample(uuid) {
@@ -75,7 +77,7 @@ class PrivateModel {
       await this.#state.set({ parameters });
       await this.#manager.persist(this);
     } else {
-      this.train(); // retrain empty model
+      await this.train(); // retrain empty model
     }
   }
 

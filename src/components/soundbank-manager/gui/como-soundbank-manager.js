@@ -1,10 +1,11 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
-import '@ircam/sc-components/sc-text.js';
-import '@ircam/sc-components/sc-transport.js';
 import '@ircam/sc-components/sc-icon.js';
+import '@ircam/sc-components/sc-dragndrop.js';
+import '@ircam/sc-components/sc-text.js';
 import '@ircam/sc-components/sc-toggle.js';
+import '@ircam/sc-components/sc-transport.js';
 
 class ComoSoundbankManager extends LitElement {
   #unsubscribeSession;
@@ -16,6 +17,10 @@ class ComoSoundbankManager extends LitElement {
       attribute: 'session-id',
     },
     expanded: {
+      type: Boolean,
+      reflect: true,
+    },
+    editable: {
       type: Boolean,
       reflect: true,
     },
@@ -86,42 +91,71 @@ class ComoSoundbankManager extends LitElement {
         ></sc-icon>
       </div>
 
-      ${this.expanded
-        ? repeat(Object.entries(urlMap), ([url]) => url, ([name, url]) => {
-            return html`
-              <div class="soundfile">
-                <sc-text>${name}</sc-text>
-                <sc-transport
-                  .buttons=${['play', 'stop']}
-                  value="stop"
-                  @change=${e => {
-                    const audio = e.currentTarget.nextElementSibling;
+      ${this.expanded // change this syntax, this is too weird...
+        ? [
+            this.editable ? html`
+              <sc-dragndrop
+                format="raw"
+                @change=${async e => {
+                  for (let [name, file] of Object.entries(e.detail.value)) {
+                    this.como.soundbankManager.upload(name, file);
+                  }
+                }}
+              ></sc-dragndrop>
+            ` : nothing,
+            repeat(Object.entries(urlMap), ([url]) => url, ([name, url]) => {
+              return html`
+                <div class="soundfile">
+                  <sc-text
+                    ?editable=${this.editable}
+                    @change=${e => this.como.soundbankManager.rename(name, e.detail.value)}
+                  >${name}</sc-text>
+                  <sc-transport
+                    .buttons=${['play', 'stop']}
+                    value="stop"
+                    @change=${e => {
+                      const audio = e.currentTarget.nextElementSibling;
 
-                    if (e.detail.value === 'play') {
-                      audio.play();
-                    } else {
-                      audio.pause();
-                      audio.currentTime = 0;
-                    }
-                  }}
-                ></sc-transport>
-                <audio src=${url} controls></audio>
-                ${this.session
-                  ? html`
-                      <sc-toggle
-                        ?active=${this.session.getUnsafe('soundbank').includes(name)}
-                        @change=${e => {
-                          const set = new Set(this.session.getUnsafe('soundbank'));
-                          e.detail.value ? set.add(name) : set.delete(name);
-                          this.session.set({ soundbank: Array.from(set) });
+                      if (e.detail.value === 'play') {
+                        audio.play();
+                      } else {
+                        audio.pause();
+                        audio.currentTime = 0;
+                      }
+                    }}
+                  ></sc-transport>
+                  <audio src=${url} loop></audio>
+                  ${this.editable ?
+                    html`
+                      <sc-icon
+                        type="close"
+                        @input=${e => {
+                          // if (confirm('are you sure?')) {
+                            this.como.soundbankManager.delete(name);
+                          // }
                         }}
-                      ></sc-toggle>
-                    `
-                  : nothing // @todo - upload / delete
-                }
-              </div>
-            `;
-          })
+                      ></sc-icon>
+                    ` : nothing
+                  }
+
+                  <!-- activate by session -->
+                  ${this.session
+                    ? html`
+                        <sc-toggle
+                          ?active=${this.session.getUnsafe('soundbank').includes(name)}
+                          @change=${e => {
+                            const set = new Set(this.session.getUnsafe('soundbank'));
+                            e.detail.value ? set.add(name) : set.delete(name);
+                            this.session.set({ soundbank: Array.from(set) });
+                          }}
+                        ></sc-toggle>
+                      `
+                    : nothing // @todo - upload / delete
+                  }
+                </div>
+              `;
+            })
+          ]
         : nothing
       }
     `;

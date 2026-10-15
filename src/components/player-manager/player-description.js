@@ -51,7 +51,8 @@ export default {
   },
   scriptLoaded: {
     type: 'boolean',
-    event: true,
+    default: false,
+    filterChange: false,
   },
 
   // audio

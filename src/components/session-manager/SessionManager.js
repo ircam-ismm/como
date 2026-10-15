@@ -158,7 +158,17 @@ class SessionManager extends ComoComponent {
   }
 
   /**
-   * Create a new session in the current project
+   * Create a new session in the current project.
+   *
+   * By default the session will have no sound file from the soundbank manager
+   * associated. To opt-in:
+   *
+   * ```js
+   * await sessionId = await como.sessionManager.create('my-session');
+   * const session = como.sessionManager.get(sessionId);
+   * await session.set('soundbank', como.soundbankManager.getList());
+   * await como.sessionManager.persistSession(sessionId);
+   * ```
    *
    * @param {String} sessionName - Name of the session
    * @returns {String} Unique id of the new session

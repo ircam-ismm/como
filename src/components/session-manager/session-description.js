@@ -49,6 +49,15 @@ const Session = {
       persist: true,
     },
   },
+  // persisted placeholder for application specific data
+  applicationData: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    metas: {
+      persist: true,
+    },
+  }
 };
 
 export default Session;
