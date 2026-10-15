@@ -57,7 +57,7 @@ const Session = {
     metas: {
       persist: true,
     },
-  }
+  },
 };
 
 export default Session;

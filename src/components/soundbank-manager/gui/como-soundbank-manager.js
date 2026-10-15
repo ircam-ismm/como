@@ -129,7 +129,7 @@ class ComoSoundbankManager extends LitElement {
                     html`
                       <sc-icon
                         type="close"
-                        @input=${e => {
+                        @input=${() => {
                           // if (confirm('are you sure?')) {
                             this.como.soundbankManager.delete(name);
                           // }
@@ -154,7 +154,7 @@ class ComoSoundbankManager extends LitElement {
                   }
                 </div>
               `;
-            })
+            }),
           ]
         : nothing
       }
