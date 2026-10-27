@@ -116,7 +116,7 @@ class PlayerManager extends ComoComponent {
   /**
    * Get the full {@link Player} API access of a given player.
    *
-   * If called on another {@link ComoNode}, ``getPlayerthis`` basically creates
+   * If called on another {@link ComoNode}, `getPlayer` basically creates
    * a clone of the original player. Useful for example to duplicate the audio
    * of a node on another node.
    *

@@ -178,6 +178,11 @@ class ModelManagerServer extends ModelManager {
   }
 
   #createModelHandler = async ({ modelId, preset = 'postures' }) => {
+    if (presets[preset] === undefined) {
+      console.warn(`como.ModelManager: Invalid preset "${preset}" when creating model "${modelId}": falling back to "postures" preset (valid presets are ${Object.keys(presets).join(', ')})`);
+      preset = 'postures';
+    }
+
     const state = await this.como.stateManager.create(`${this.name}:model`, {
       uuid: randomUUID(),
       id: modelId,

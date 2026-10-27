@@ -30,12 +30,10 @@ class ModelManager extends ComoComponent {
     ]);
   }
 
-  async getModel(modelId, options = {}) {
+  async getModel(modelId, {
+    preset = 'postures',
+  } = {}) {
     // if model already exists, attach to it, else create it
-    const {
-      preset = 'postures',
-    } = options;
-
     let state = this.#models.find(model => model.get('id') === modelId);
     const model = new Model(this);
 
