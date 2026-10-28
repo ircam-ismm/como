@@ -11,6 +11,7 @@ import ComoServer from '../../src/core/ComoServer.js';
 
 import config from '../config.js';
 import { parseTxtAsStream } from '../../src/components/source-manager/utils/parse-txt-as-stream.js';
+import { aScriptSharedState } from '../../src/components/player-manager/Player.js';
 
 const testDirectory = path.join('tests');
 const projectsDirname = path.join(testDirectory, 'projects');
@@ -71,6 +72,27 @@ describe('# PlayerManager', () => {
       const cloneValues = playerClone.state.getValues();
 
       assert.deepEqual(values, cloneValues);
+    });
+
+    it.only(`duplicated player should share the same shared state instance defined in script`, async () => {
+      const sourceId = await client.sourceManager.createSource(sourceConfig);
+      const playerId = await client.playerManager.createPlayer(sourceId);
+      assert.isDefined(playerId);
+      const player = await client.playerManager.getPlayer(playerId);
+      const playerClone = await server.playerManager.getPlayer(playerId);
+
+      await player.setScript('test');
+
+      assert.isNotNull(player[aScriptSharedState]);
+      assert.isNotNull(playerClone[aScriptSharedState]);
+
+      assert.equal(player[aScriptSharedState].isOwner, true);
+      assert.equal(playerClone[aScriptSharedState].isOwner, false);
+      // update
+      player[aScriptSharedState].set({ myBoolean: true });
+
+      await delay(20);
+      assert.equal(playerClone[aScriptSharedState].get('myBoolean'), true);
     });
   });
 

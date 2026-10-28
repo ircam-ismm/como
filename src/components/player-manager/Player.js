@@ -6,6 +6,9 @@ import {
   isString,
 } from '@ircam/sc-utils';
 
+// for testing purposes
+export const aScriptSharedState = Symbol('como:player-script-shared-state');
+
 /**
  * Basically wrap 3 different states
  * - source
@@ -27,6 +30,8 @@ class Player {
   #sourceId;
   #state;
   #source;
+  // defines wether the player is the original or a duplicated instance
+  #isOriginal = true;
 
   #requestedId = null;
 
@@ -34,7 +39,7 @@ class Player {
   #scriptModule = null; // the JS module as imported from the script
   #scriptSharedState = null; // the shared state defined by the script
   #scriptContext = null; // Context object passed to all script public interface
-  #scriptErrored = false; // Wether the script thrown an error during its lifetime
+  #scriptErrored = false; // Whether the script thrown an error during its lifetime
   #unsubscribeSource = null; // The subscription to the motion source
   #scriptLastState = null;
 
@@ -99,6 +104,11 @@ class Player {
     return this.#state;
   }
 
+  /** @private */
+  get [aScriptSharedState]() {
+    return this.#scriptSharedState;
+  }
+
   /**
    * Reconnect output node to destination.
    * Allows to have a script running outside a session.
@@ -120,8 +130,10 @@ class Player {
 
     this.#source = await this.#como.sourceManager.getSource(this.#sourceId);
 
-    // this is the difference between "real" and "duplicated" clients
+    // this is one of the difference between "real" and "duplicated" clients
+    // the other one is linked to the script shared state which are either owned or attached
     if (withState) {
+      this.#isOriginal = false;
       this.#state = withState;
       this.#state.onDetach(async () => await this.delete());
     } else {
@@ -151,7 +163,10 @@ class Player {
             break;
           }
           case 'sessionId': {
-            await this.state.set({ sessionLoading: true });
+            if (this.#isOriginal) {
+              await this.state.set({ sessionLoading: true });
+            }
+
             const sessionId = value;
 
             // disconnect from current output, be it a session bus or the destination
@@ -167,7 +182,10 @@ class Player {
 
             if (sessionId === null) {
               this.#reconnectDestination();
-              await this.state.set({ scriptName: null, sessionLoading: false });
+
+              if (this.#isOriginal) {
+                await this.state.set({ scriptName: null, sessionLoading: false });
+              }
               break; // nothing left to do
             }
 
@@ -176,7 +194,10 @@ class Player {
             if (!session) {
               console.log(`Cannot attach player ${this.state.get('id')} to session ${sessionId}: session does not exists`);
               this.#reconnectDestination();
-              this.state.set({ scriptName: null, sessionId: null, sessionLoading: false });
+
+              if (this.#isOriginal) {
+                this.state.set({ scriptName: null, sessionId: null, sessionLoading: false });
+              }
               break;
             }
 
@@ -191,7 +212,9 @@ class Player {
             this.#outputNode.gain.setValueAtTime(0, fadeInTime);
             this.#outputNode.gain.linearRampToValueAtTime(1, fadeInTime + 0.01);
 
-            await this.state.set({ sessionLoading: false });
+            if (this.#isOriginal) {
+              await this.state.set({ sessionLoading: false });
+            }
 
             // handle session changes that must propagate to the player script
             this.#unsubscribeSession = session.onUpdate(async updates => {
@@ -340,18 +363,20 @@ class Player {
       const scriptSharedStateClassName = this.state.get('scriptSharedStateClassName');
 
       // clean state
-      await this.state.set({
-        scriptSharedStateClassName: null,
-        scriptSharedStateId: null,
-        scriptLoaded: false,
-      });
+      if (this.#isOriginal) {
+        await this.state.set({
+          scriptSharedStateClassName: null,
+          scriptSharedStateId: null,
+          scriptLoaded: false,
+        });
 
-      // clean class
-      this.#como.requestRfc(
-        this.#como.constants.SERVER_ID,
-        `${this.#como.playerManager.name}:deleteSharedStateClass`,
-        { scriptSharedStateClassName },
-      );
+        // clean class
+        this.#como.requestRfc(
+          this.#como.constants.SERVER_ID,
+          `${this.#como.playerManager.name}:deleteSharedStateClass`,
+          { scriptSharedStateClassName },
+        );
+      }
     }
 
     this.#scriptModule = null;
@@ -411,82 +436,75 @@ class Player {
     }
 
     // Handle script shared state
-    // create shared state for this script if any
     if (this.#scriptModule.defineSharedState) {
-      // 1. validate class description
-      let {
-        classDescription,
-        initValues,
-      } = await this.#scriptModule.defineSharedState();
+      // The original instance defines the shared state class and creates the
+      // instance for this script.
+      if (this.#isOriginal) {
+        // 1. validate class description
+        let {
+          classDescription,
+          initValues,
+        } = await this.#scriptModule.defineSharedState();
 
-      try {
-        this.#como.stateManager.validateClassDescription(classDescription);
-      } catch (err) {
-        this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid shared state definition: ${err.message}`));
-        this.#scriptErrored = true;
-        return;
-      }
+        try {
+          this.#como.stateManager.validateClassDescription(classDescription);
+        } catch (err) {
+          this.#script.reportRuntimeError(new Error(`Cannot execute script ${this.#script.name}: Invalid shared state definition: ${err.message}`));
+          this.#scriptErrored = true;
+          return;
+        }
 
-      // 2. define shared state class
-      let className;
-      try {
-        className = await this.#como.requestRfc(
-          this.#como.constants.SERVER_ID,
-          `${this.#como.playerManager.name}:defineSharedStateClass`,
-          {
-            scriptName: this.#script.name,
-            classDescription,
-          },
-        );
-      } catch (err) {
-        this.#script.reportRuntimeError(err);
-        this.#scriptErrored = true;
-        return;
-      }
+        // 2. define shared state class
+        let className;
 
-      // 3. merge init values from last script instance
-      if (!initValues) {
-        initValues = {};
+        try {
+          className = await this.#como.requestRfc(
+            this.#como.constants.SERVER_ID,
+            `${this.#como.playerManager.name}:defineSharedStateClass`,
+            {
+              scriptName: this.#script.name,
+              classDescription,
+            },
+          );
+        } catch (err) {
+          this.#script.reportRuntimeError(err);
+          this.#scriptErrored = true;
+          return;
+        }
 
-        // if no init values have been explicitly defined in the script
-        // try to propagate the values from last state instance to the new one
-        if (this.#scriptLastState !== null) {
-          for (let key in classDescription) {
-            if (key in this.#scriptLastState.values) {
-              // use value from last state only if default is the same
-              if (classDescription[key].default === this.#scriptLastState.description[key].default) {
-                initValues[key] = this.#scriptLastState.values[key];
+        // 3. merge init values from last script instance
+        if (!initValues) {
+          initValues = {};
+
+          // if no init values have been explicitly defined in the script
+          // try to propagate the values from last state instance to the new one
+          if (this.#scriptLastState !== null) {
+            for (let key in classDescription) {
+              if (key in this.#scriptLastState.values) {
+                // use value from last state only if default is the same
+                if (classDescription[key].default === this.#scriptLastState.description[key].default) {
+                  initValues[key] = this.#scriptLastState.values[key];
+                }
               }
             }
           }
         }
+
+        // 4. create script shared state
+        // @todo - define how to properly report runtime errors in shared state callbacks
+        this.#scriptSharedState = await this.#como.stateManager.create(className, initValues);
+
+        // 5. propagate shared state infos
+        await this.#state.set({
+          scriptSharedStateClassName: this.#scriptSharedState.className,
+          scriptSharedStateId: this.#scriptSharedState.id,
+          // @todo - this wont be true
+          scriptLoaded: true,
+        });
+      } else {
+        await this.#state.waitFor(values => values.scriptSharedStateClassName !== null);
+        this.#scriptSharedState = await this.#como.playerManager.getScriptSharedState(this.id);
       }
-
-      // 4. create script shared state
-      // @todo - Proxy this.#scriptSharedState to report runtime errors
-      this.#scriptSharedState = await this.#como.stateManager.create(className, initValues);
-      // override onUpdate to wrap given callbacks in a try catch block
-      // const originalOnUpdate = this.#scriptSharedState.onUpdate;
-      // this.#scriptSharedState.onUpdate = (callback, executeListener) => {
-      //   const wrappedCallback = (...args) => {
-      //     try {
-      //       callback(...args);
-      //     } catch (err) {
-      //       this.#script.reportRuntimeError(err);
-      //       this.#scriptErrored = true;
-      //     }
-      //   }
-
-      //   return originalOnUpdate.call(this.#scriptSharedState, wrappedCallback, executeListener);
-      // }
-
-
-      // 5. propagate shared state infos
-      await this.#state.set({
-        scriptSharedStateClassName: this.#scriptSharedState.className,
-        scriptSharedStateId: this.#scriptSharedState.id,
-        scriptLoaded: true,
-      });
     }
 
     // Build audio graph for this script instance
