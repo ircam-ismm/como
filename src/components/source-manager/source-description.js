@@ -27,15 +27,7 @@ export default {
     type: 'any',
     required: true,
   },
-  // current frame of the source stream
-  // note that frame are multichannel: i.e. they can host several streams
-  frame: {
-    type: 'any',
-    acknowledge: false,
-    default: null,
-    nullable: true,
-  },
-  // define if the underlying hardware is actually sending values
+  // define wether the underlying hardware is actually sending values
   active: {
     type: 'boolean',
     default: false,
@@ -45,9 +37,18 @@ export default {
     type: 'boolean',
     default: false,
   },
+  // current multichannel frame of the source stream
+  frame: {
+    type: 'any',
+    acknowledge: false,
+    default: null,
+    nullable: true,
+  },
+  // ---------------------------------------------------
   // Pause the propagation of the underlying source, currently only implemented
   // in stream player sources.
-  // @todo -  Generalize to other sources
+  // @todo - Not used for now / kept for testing purposes
+  // See how we could implement the following with w/ SharedState derived class
   control: {
     type: 'enum',
     list: ['play', 'pause'],
@@ -55,7 +56,7 @@ export default {
   },
   // ---------------------------------------------------
   // for `stream-player` sources only
-  // @todo - black list for other sources types
+  // @todo - refactor this is weird
   loop: {
     type: 'boolean',
     default: false,
@@ -71,6 +72,7 @@ export default {
     type: 'float',
     event: true,
   },
+
   // // index of the frame where the playback should start, included
   // // if loop == true, start point of the loop
   // frameStart: {
@@ -85,7 +87,5 @@ export default {
   //   default: 0,
   //   min: 0,
   // },
-
-
   // ---------------------------------------------------
 };

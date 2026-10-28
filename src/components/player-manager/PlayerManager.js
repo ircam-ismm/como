@@ -125,7 +125,7 @@ class PlayerManager extends ComoComponent {
    */
   async getPlayer(playerId) {
     if (!isString(playerId)) {
-      throw new Error(`Cannot execute "getPlayer" on PlayerManager: argument 1 ("${playerId}") is not a string`);
+      throw new Error(`Cannot execute "getPlayer" on PlayerManager: argument 1 (${playerId}) is not a string`);
     }
 
     const owned = Array.from(this.#ownedPlayers).find(player => player.id === playerId);

@@ -103,12 +103,9 @@ class SourceManager extends ComoComponent {
 
     this.#recordingFilesystem = await this.como.pluginManager.get(`${this.name}:filesystem`);
 
-    this.#sources = await this.como.stateManager.getCollection(
-      `${this.name}:source`,
-      // parameter whitelist - we really don't want the streams here
-      // @todo - move to blacklist once implemented in soundworks
-      ['id', 'type', 'infos', 'active', 'record', 'control'],
-    );
+    this.#sources = await this.como.stateManager.getCollection(`${this.name}:source`, {
+      blackList: ['frame'],
+    });
 
     this.como.setRfcHandler(`${this.name}:createSource`, this.#createSourceHandler);
     this.como.setRfcHandler(`${this.name}:deleteSource`, this.#deleteSourceHandler);

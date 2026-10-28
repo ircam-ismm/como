@@ -3,6 +3,7 @@
 
 
 - [ ] make sure projects directory can live alongside (not within) the application
+  - [ ] review project system, do not
 - [ ] documentation
 - [ ] template generator
 

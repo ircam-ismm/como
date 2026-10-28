@@ -25,9 +25,9 @@ class ModelManager extends ComoComponent {
     await super.start();
 
     // lightweight collection of models
-    this.#models = await this.como.stateManager.getCollection(`${this.name}:model`, [
-      'id', 'config', 'infos',
-    ]);
+    this.#models = await this.como.stateManager.getCollection(`${this.name}:model`, {
+      whiteList: ['id', 'config', 'infos'],
+    });
   }
 
   async getModel(modelId, {
