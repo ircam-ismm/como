@@ -348,4 +348,18 @@ describe('#ModelManager', () => {
       assert.isDefined(model.state.get('infos'));
     });
   });
+
+  describe.skip('## MISC - check node maxListenerWarning', () => {
+    afterEach(async () => {
+      fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
+    });
+
+    it('should create a new Model if not exists', async () => {
+      // setMaxListener is set to 100, we should see one warning
+      for (let i = 0; i <= 100; i++) {
+        const modelId = Math.random() + '';
+        client.modelManager.getModel(modelId);
+      }
+    });
+  });
 });

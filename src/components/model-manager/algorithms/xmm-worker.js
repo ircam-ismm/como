@@ -4,12 +4,15 @@ import { parentPort, Worker, isMainThread } from 'node:worker_threads';
 
 import xmm from '#xmm.js';
 
+const NUM_MODELS_BEFORE_NODE_WARNING = 100;
+
 export class XmmWorker {
   #worker = null;
 
   async init() {
     const { promise: onlinePromise, resolve } = Promise.withResolvers();
     this.#worker = new Worker(new URL(import.meta.url));
+    this.#worker.setMaxListeners(NUM_MODELS_BEFORE_NODE_WARNING);
     this.#worker.on('online', resolve);
     await onlinePromise;
 
