@@ -151,7 +151,7 @@ class ModelManagerServer extends ModelManager {
 
 
   #getPathname(model) {
-    const modelId = model.state.get('id')
+    const modelId = model.state.get('id');
     const projectDirname = this.como.project.get('dirname');
     const modelDirname = path.join(projectDirname, this.como.constants.PROJECT_MODELS_DIRNAME);
     const modelFilename = `${filenamify(modelId).toLowerCase()}.json`;
@@ -211,7 +211,7 @@ class ModelManagerServer extends ModelManager {
     const pathname = this.#getPathname(model);
 
     await fsPromises.rm(pathname, { force: true });
-  }
+  };
 
   #addExampleHandler = async ({ modelId, label, example }) => {
     const model = this.#privateModels.get(modelId);
