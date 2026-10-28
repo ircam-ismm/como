@@ -56,6 +56,14 @@ class ModelManager extends ComoComponent {
     return model;
   }
 
+  async deleteModel(modelId) {
+    await this.como.requestRfc(
+      this.como.constants.SERVER_ID,
+      `${this.name}:deleteModel`,
+      { modelId },
+    );
+  }
+
   /** @private */
   #getModelResolverHook = async (err, modelId) => {
     if (err) {

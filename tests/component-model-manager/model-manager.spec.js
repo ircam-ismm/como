@@ -65,6 +65,28 @@ describe('#ModelManager', () => {
     });
   });
 
+  describe('## async deleteModel(modelId)', () => {
+    const modelsDirname = path.join(projectsDirname, 'test', 'models');
+
+    after(async () => {
+      fs.rmSync(modelsDirname, { recursive: true, force: true });
+    });
+
+    it('should delete a model', async () => {
+      const modelId = 'test';
+      const model = await client.modelManager.getModel(modelId);
+
+      const modelPathname = path.join(modelsDirname, `${modelId}.json`);
+      assert.isTrue(fs.existsSync(modelPathname));
+      // assert
+      await client.modelManager.deleteModel(modelId);
+
+      assert.equal(client.modelManager.models.size, 0);
+      assert.equal(server.modelManager.models.size, 0);
+      assert.isFalse(fs.existsSync(modelPathname));
+    });
+  });
+
   describe(`## async addExample(label, input)`, () => {
     afterEach(async () => {
       fs.rmSync(path.join(projectsDirname, 'test', 'models'), { recursive: true, force: true });
@@ -277,7 +299,7 @@ describe('#ModelManager', () => {
 
       // update file after `addExample`
       {
-        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('id')}.json`);
         assert.isTrue(fs.existsSync(modelPathname));
 
         const data = JSON.parse(fs.readFileSync(modelPathname).toString());
@@ -294,7 +316,7 @@ describe('#ModelManager', () => {
 
       // update file after `clearExamples`
       {
-        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+        const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('id')}.json`);
         assert.isTrue(fs.existsSync(modelPathname));
 
         const data = JSON.parse(fs.readFileSync(modelPathname).toString());
@@ -313,7 +335,7 @@ describe('#ModelManager', () => {
       const modelId = 'test';
       const model = await client.modelManager.getModel(modelId);
 
-      const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('uuid')}.json`);
+      const modelPathname = path.join(projectsDirname, 'test', 'models', `${model.state.get('id')}.json`);
       assert.isTrue(fs.existsSync(modelPathname));
 
       const data = JSON.parse(fs.readFileSync(modelPathname).toString());

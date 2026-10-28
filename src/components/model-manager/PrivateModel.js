@@ -31,7 +31,6 @@ class PrivateModel {
     return this.#examples;
   }
 
-  /** @private */
   async delete() {
     this.#manager.algorithms['xmm'].removeListener('message', this.#onWorkerMessage);
     await this.#state.delete();

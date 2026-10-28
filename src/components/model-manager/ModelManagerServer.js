@@ -44,6 +44,7 @@ class ModelManagerServer extends ModelManager {
     super(como, name);
 
     this.como.setRfcHandler(`${this.name}:createModel`, this.#createModelHandler);
+    this.como.setRfcHandler(`${this.name}:deleteModel`, this.#deleteModelHandler);
     this.como.setRfcHandler(`${this.name}:addExample`, this.#addExampleHandler);
     this.como.setRfcHandler(`${this.name}:deleteExample`, this.#deleteExampleHandler);
     this.como.setRfcHandler(`${this.name}:clearExamples`, this.#clearExamplesHandler);
@@ -86,13 +87,6 @@ class ModelManagerServer extends ModelManager {
     }
 
     await super.stop();
-  }
-
-  #getPathname(modelUuid) {
-    const projectDirname = this.como.project.get('dirname');
-    const modelDirname = path.join(projectDirname, this.como.constants.PROJECT_MODELS_DIRNAME);
-    const modelFilename = `${filenamify(modelUuid).toLowerCase()}.json`;
-    return path.join(modelDirname, modelFilename);
   }
 
   /**
@@ -155,6 +149,15 @@ class ModelManagerServer extends ModelManager {
     }
   }
 
+
+  #getPathname(model) {
+    const modelId = model.state.get('id')
+    const projectDirname = this.como.project.get('dirname');
+    const modelDirname = path.join(projectDirname, this.como.constants.PROJECT_MODELS_DIRNAME);
+    const modelFilename = `${filenamify(modelId).toLowerCase()}.json`;
+    return path.join(modelDirname, modelFilename);
+  }
+
   /** @private */
   async persist(model) {
     const {
@@ -164,7 +167,7 @@ class ModelManagerServer extends ModelManager {
       parameters,
     } = model.state.getValuesUnsafe();
 
-    const pathname = this.#getPathname(uuid);
+    const pathname = this.#getPathname(model);
 
     const json = JSON.stringify({
       uuid,
@@ -179,7 +182,7 @@ class ModelManagerServer extends ModelManager {
 
   #createModelHandler = async ({ modelId, preset = 'postures' }) => {
     if (presets[preset] === undefined) {
-      console.warn(`como.ModelManager: Invalid preset "${preset}" when creating model "${modelId}": falling back to "postures" preset (valid presets are ${Object.keys(presets).join(', ')})`);
+      console.warn(`Cannot execute "createModel" on ModelManager:: Invalid preset "${preset}" while creating model "${modelId}" (valid presets are ${Object.keys(presets).join(', ')} - falling back to "postures" preset)`);
       preset = 'postures';
     }
 
@@ -197,24 +200,32 @@ class ModelManagerServer extends ModelManager {
     return modelId;
   };
 
-  // #deleteModelHandler = async (modelId) => {
-  //   // delete privateModel
-  //   // delete associated file
-  // }
+  #deleteModelHandler = async ({ modelId }) => {
+    const model = this.#privateModels.get(modelId);
+
+    if (!model) {
+      throw new Error(`Cannot execute "deleteModel" on ModelManager: model with id "${modelId}" does not exists`);
+    }
+
+    await model.delete();
+    const pathname = this.#getPathname(model);
+
+    await fsPromises.rm(pathname, { force: true });
+  }
 
   #addExampleHandler = async ({ modelId, label, example }) => {
     const model = this.#privateModels.get(modelId);
 
     if (!model) {
-      throw new Error(`Cannot add example ("${label}") to model: model with id "${modelId}" does not exists`);
+      throw new Error(`Cannot execute "addExample" on ModelManager: model with id "${modelId}" does not exists`);
     }
 
     if (!isString(label)) {
-      throw new Error(`Cannot add example ("${label}") to model "${modelId}": label is not a string`);
+      throw new Error(`Cannot execute "addExample" on ModelManager (model: "${modelId}"): label "${label}" is not a string `);
     }
 
     if (!Array.isArray(example)) {
-      throw new Error(`Cannot add example ("${label}") to model "${modelId}": example is not an array`);
+      throw new Error(`Cannot execute "addExample" on ModelManager (model: "${modelId}", label: ${label}): example is not an array`);
     }
 
     return await model.addExample(label, example);
@@ -224,11 +235,11 @@ class ModelManagerServer extends ModelManager {
     const model = this.#privateModels.get(modelId);
 
     if (!model) {
-      throw new Error(`Cannot delete example ("${exampleUuid}") from model: model with id "${modelId}" does not exists`);
+      throw new Error(`Cannot execute "deleteExample" on ModelManager: model with id "${modelId}" does not exists`);
     }
 
     if (!isString(exampleUuid)) {
-      throw new Error(`Cannot delete example ("${exampleUuid}") from model "${modelId}": example uuid is not a string`);
+      throw new Error(`Cannot execute "addExample" on ModelManager (model: "${modelId}"): Example id ("${exampleUuid}") is not a string`);
     }
 
     return await model.deleteExample(exampleUuid);
@@ -238,11 +249,11 @@ class ModelManagerServer extends ModelManager {
     const model = this.#privateModels.get(modelId);
 
     if (!model) {
-      throw new Error(`Cannot add example ("${label}") to model: model with id "${modelId}" does not exists`);
+      throw new Error(`Cannot execute "clearExamples" on ModelManager: model with id "${modelId}" does not exists`);
     }
 
     if (label !== null && !isString(label)) {
-      throw new Error(`Cannot add example ("${label}") to model "${modelId}": label is not a string`);
+      throw new Error(`Cannot execute "addExample" on ModelManager (model: "${modelId}"): label ("${label}") is not a string`);
     }
 
     return await model.clearExamples(label);
